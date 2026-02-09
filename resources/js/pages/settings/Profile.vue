@@ -65,18 +65,20 @@ const user = page.props.auth.user;
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="username">username</Label>
+                        <Label for="email">Email</Label>
                         <Input
-                            id="username"
-                            class="mt-1 block w-full"
-                            name="username"
-                            :default-value="user.username"
+                            id="email"
+                            name="email"
                             required
-                            autocomplete="username"
-                            placeholder="username"
+                            autofocus
+                            type="email"
+                            :tabindex="1"
+                            autocomplete="email"
+                            placeholder="email@sample"
                         />
-                        <InputError class="mt-2" :message="errors.username" />
+                        <InputError :message="errors.email" />
                     </div>
+
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">
                         <p class="-mt-4 text-sm text-muted-foreground">

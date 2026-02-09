@@ -31,11 +31,11 @@ class DatabaseSeeder extends Seeder
         }
 
         $admin = User::firstOrCreate(
-            ['username' => 'administrator'],
+            ['username' => 'administrator',
+             'email' => 'admin@local'],
             [
                 'name' => 'Administrator',
                 'role_id' => 1,
-                'email' => 'admin@local',
                 'password' => Hash::make('password'),
             ]
         );

@@ -7,10 +7,12 @@ import type { User } from '@/types';
 type Props = {
     user: User;
     showUsername?: boolean;
+    showEmail?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     showUsername: false,
+    showEmail: false,
 });
 
 const { getInitials } = useInitials();
