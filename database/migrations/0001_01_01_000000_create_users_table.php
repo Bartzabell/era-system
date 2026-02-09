@@ -15,16 +15,16 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
+            $table->string('first_name')->nullable();
             $table->string('middle_name')->nullable();
-            $table->string('last_name');
+            $table->string('last_name')->nullable();
             $table->string('full_name');
             $table->string('email')->nullable();
             $table->string('mobile_no')->nullable();
             $table->datetime('birth_date')->nullable();
             $table->foreignIdFor(Barangay::class, 'barangay_id')->nullable();
             $table->string('username')->unique();
-            $table->foreignIdFor(Role::class, 'role_id')->nullable();
+            $table->string('role')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

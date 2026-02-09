@@ -34,8 +34,8 @@ class DatabaseSeeder extends Seeder
             ['username' => 'administrator',
              'email' => 'admin@local'],
             [
-                'name' => 'Administrator',
-                'role_id' => 1,
+                'full_name' => 'Administrator',
+                'role' => 'administrator',
                 'password' => Hash::make('password'),
             ]
         );
