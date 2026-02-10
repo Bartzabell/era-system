@@ -38,5 +38,18 @@ Route::middleware('throttle:60,1')->group(function () {
             if ($authCheck) return $authCheck;
             return app(AccountApiController::class)->getAccount($request);
         });
+
+        // Add these new routes
+        Route::put('/users/profile', function (Request $request) {
+            $authCheck = validateApiToken($request);
+            if ($authCheck) return $authCheck;
+            return app(AccountApiController::class)->updateProfile($request);
+        });
+
+        Route::put('/users/password', function (Request $request) {
+            $authCheck = validateApiToken($request);
+            if ($authCheck) return $authCheck;
+            return app(AccountApiController::class)->changePassword($request);
+        });
     });
 });
