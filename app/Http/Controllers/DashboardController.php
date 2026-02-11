@@ -55,9 +55,9 @@ class DashboardController extends Controller
                     'lng' => $coords['lng'],
                     'severity' => $report->severity_level,
                     'status' => $report->status,
-                    'incident_type' => $report->incident->name ?? 'Unknown',
-                    'emergency_type' => $report->emergency->name ?? 'Unknown',
-                    'barangay' => $report->barangay->name ?? 'Unknown',
+                    'incident_type' => $report->incident->incident_name ?? 'Unknown',
+                    'emergency_type' => $report->emergency->emergency_name ?? 'Unknown',
+                    'barangay' => $report->barangay->barangay_name ?? 'Unknown',
                     'casualty_count' => $report->casualty_count,
                     'created_at' => $report->created_at->diffForHumans(),
                 ];
