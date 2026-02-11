@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'username', 'password', 'full_name', 'first_name', 
+        'username', 'password', 'full_name', 'first_name',
         'middle_name', 'last_name', 'email', 'mobile_no',
         'birth_date', 'barangay_id', 'role'
     ];
@@ -51,11 +51,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'role_id', 'id');
-    }
-
     public function permissions()
     {
         return $this->belongsToMany(Permission::class);
@@ -69,4 +64,15 @@ class User extends Authenticatable
 
         return $this->permissions()->where('slug', $permissionSlug)->exists();
     }
+
+    public function barangay()
+    {
+        return $this->belongsTo(Barangay::class);
+    }
+
+    public function incidentReports()
+    {
+        return $this->hasMany(IncidentReport::class);
+    }
+
 }

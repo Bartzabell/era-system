@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('map_coordinates')->nullable();
             $table->foreignIdFor(Emergency::class, 'emergency_id')->nullable();
             $table->foreignIdFor(Incident::class, 'incident_id')->nullable();
+            $table->string('severity_level')->nullable();
             $table->integer('casualty_count')->nullable();
             $table->integer('distance')->nullable();
             $table->text('attachment')->nullable();
@@ -31,6 +32,7 @@ return new class extends Migration
             $table->datetime('datetime_arrived')->nullable();
             $table->string('plate_no')->nullable();
             $table->string('status')->nullable();
+            $table->text('remarks')->nullable();
             $table->foreignIdFor(User::class, 'created_by')->nullable();
             $table->foreignIdFor(User::class, 'updated_by')->nullable();
             $table->foreignIdFor(User::class, 'deleted_by')->nullable();

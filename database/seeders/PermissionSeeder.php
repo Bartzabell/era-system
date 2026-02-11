@@ -22,8 +22,20 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'View Dashboard',
                 'slug' => 'view_dashboard',
-                'permission_for' => 'General',
+                'permission_for' => 'Module',
                 'description' => 'Can view module module',
+            ],
+            [
+                'name' => 'Responder Access',
+                'slug' => 'responder_access',
+                'permission_for' => 'General',
+                'description' => 'Responder Access',
+            ],
+            [
+                'name' => 'Citizen Access',
+                'slug' => 'citizen_access',
+                'permission_for' => 'General',
+                'description' => 'Citizen Access',
             ],
         ];
 

@@ -13,7 +13,7 @@ class Role extends Model
 
     protected $table = 'roles';
 
-    protected $fillable = ['name', 'created_by', 'updated_by', 'deleted_by'];
+    protected $fillable = ['role_name', 'created_by', 'updated_by', 'deleted_by'];
 
     public function creator(){
         return $this->belongsTo(User::class, 'created_by', 'id');

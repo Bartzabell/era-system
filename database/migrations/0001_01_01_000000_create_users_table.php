@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('mobile_no')->nullable();
             $table->datetime('birth_date')->nullable();
+            $table->text('address')->nullable();
             $table->foreignIdFor(Barangay::class, 'barangay_id')->nullable();
             $table->string('username')->unique();
             $table->string('role')->nullable();
