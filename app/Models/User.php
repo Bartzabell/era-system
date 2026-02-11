@@ -75,4 +75,9 @@ class User extends Authenticatable
         return $this->hasMany(IncidentReport::class);
     }
 
+    public function responder()
+    {
+        return $this->hasOne(Responder::class);
+    }
+
 }

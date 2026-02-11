@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Hotline;
 use App\Models\Incident;
 use App\Models\Permission;
+use App\Models\Responder;
 use App\Models\Role;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -228,6 +229,15 @@ class DatabaseSeeder extends Seeder
             if ($userData['role'] === 'responder') {
                 $permissionId = Permission::where('slug', 'responder_access')->pluck('id')->first();
                 $user->permissions()->sync([$permissionId]);
+
+                // Create responder record
+                Responder::firstOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'is_active' => 1,
+                        'created_by' => $user->id,
+                    ]
+                );
             } elseif ($userData['role'] === 'citizen') {
                 $permissionId = Permission::where('slug', 'citizen_access')->pluck('id')->first();
                 $user->permissions()->sync([$permissionId]);
