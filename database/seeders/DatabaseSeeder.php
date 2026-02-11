@@ -22,12 +22,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $roles = [
-            ['name' => 'administrator'],
-            ['name' => 'user'],
+            ['role_name' => 'administrator'],
+            ['role_name' => 'citizen'],
+            ['role_name' => 'responder'],
         ];
 
         foreach ($roles as $role) {
-            Role::firstOrCreate(['name' => $role['name']], $role);
+            Role::firstOrCreate(['role_name' => $role['role_name']], $role);
         }
 
         $admin = User::firstOrCreate(
