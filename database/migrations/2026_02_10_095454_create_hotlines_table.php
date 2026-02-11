@@ -12,10 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('barangays', function (Blueprint $table) {
+        Schema::create('hotlines', function (Blueprint $table) {
             $table->id();
-            $table->string('barangay_name');
-            $table->string('landmark')->nullable();
+            $table->string('hotline_name')->nullable();
+            $table->string('hotline_no')->nullable();
+            $table->text('description')->nullable();
             $table->foreignIdFor(User::class, 'created_by')->nullable();
             $table->foreignIdFor(User::class, 'updated_by')->nullable();
             $table->foreignIdFor(User::class, 'deleted_by')->nullable();
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('barangays');
+        Schema::dropIfExists('hotlines');
     }
 };
