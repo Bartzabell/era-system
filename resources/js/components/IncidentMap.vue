@@ -110,6 +110,7 @@ const updateMarkers = () => {
                     </h3>
                     <div style="font-size: 13px; line-height: 1.6;">
                         <p><strong>Emergency:</strong> ${incident.emergency_type}</p>
+                         <p><strong>Incident:</strong> ${incident.incident_type}</p>
                         <p><strong>Barangay:</strong> ${incident.barangay}</p>
                         <p><strong>Severity:</strong> <span style="color: ${getSeverityColor(incident.severity)}; font-weight: 600;">${incident.severity}</span></p>
                         <p><strong>Status:</strong> ${incident.status}</p>
