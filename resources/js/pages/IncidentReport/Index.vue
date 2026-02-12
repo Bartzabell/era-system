@@ -2,7 +2,9 @@
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import DataTable from '@/components/DataTable.vue';
-import { PhDotsThreeOutline } from '@phosphor-icons/vue';
+import CreateIncidentReportForm from './Partials/Create.vue';
+import EditIncidentReportForm from './Partials/Edit.vue';
+import { PhDotsThreeOutline, PhPlus } from '@phosphor-icons/vue';
 import { ref } from 'vue';
 
 interface IncidentReport {
@@ -23,9 +25,20 @@ interface IncidentReport {
     updated_at: string;
 }
 
-const props = defineProps<{
+interface Props {
     incidentReports: IncidentReport[];
-}>();
+    barangays: Array<{ id: number; barangay_name: string }>;
+    incidents: Array<{ id: number; incident_name: string; severity_level: string }>;
+    emergencies: Array<{ id: number; emergency_name: string; severity_level: string }>;
+    users: Array<{ id: number; full_name: string }>;
+}
+
+const props = defineProps<Props>();
+
+// Modal states
+const showCreateModal = ref(false);
+const showEditModal = ref(false);
+const editingReportId = ref<number | null>(null);
 
 const columns = [
     {
@@ -86,6 +99,24 @@ const handleRowClick = (row: IncidentReport) => {
     // router.visit(route('incident-reports.show', row.id));
 };
 
+const openCreateModal = () => {
+    showCreateModal.value = true;
+};
+
+const closeCreateModal = () => {
+    showCreateModal.value = false;
+};
+
+const openEditModal = (reportId: number) => {
+    editingReportId.value = reportId;
+    showEditModal.value = true;
+};
+
+const closeEditModal = () => {
+    showEditModal.value = false;
+    editingReportId.value = null;
+};
+
 const getSeverityColor = (severity: string) => {
     const colors: Record<string, string> = {
         'low': 'bg-green-100 text-green-800',
@@ -99,9 +130,9 @@ const getSeverityColor = (severity: string) => {
 const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
         'pending': 'bg-yellow-100 text-yellow-800',
-        'in_progress': 'bg-blue-100 text-blue-800',
-        'responded': 'bg-purple-100 text-purple-800',
-        'resolved': 'bg-green-100 text-green-800',
+        'assigned': 'bg-blue-100 text-blue-800',
+        'arrival': 'bg-purple-100 text-purple-800',
+        'completed': 'bg-green-100 text-green-800',
         'cancelled': 'bg-gray-100 text-gray-800',
     };
     return colors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
@@ -119,11 +150,20 @@ const formatStatus = (status: string) => {
         <div class="py-6">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Header -->
-                <div class="mb-6">
-                    <h1 class="text-2xl font-bold text-gray-900">Incident Reports</h1>
-                    <p class="mt-1 text-sm text-gray-600">
-                        View and manage all incident reports
-                    </p>
+                <div class="mb-6 flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Incident Reports</h1>
+                        <p class="mt-1 text-sm text-gray-600">
+                            View and manage all incident reports
+                        </p>
+                    </div>
+                    <button
+                        @click="openCreateModal"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        <PhPlus :size="20" weight="bold" />
+                        Create Report
+                    </button>
                 </div>
 
                 <!-- DataTable -->
@@ -164,7 +204,7 @@ const formatStatus = (status: string) => {
                                     View
                                 </button>
                                 <button
-                                    @click.stop="console.log('Edit', row.id)"
+                                    @click.stop="openEditModal(row.id)"
                                     class="text-gray-600 hover:text-gray-800 font-medium text-sm"
                                 >
                                     Edit
@@ -181,5 +221,26 @@ const formatStatus = (status: string) => {
                 </div>
             </div>
         </div>
+
+        <!-- Create Modal -->
+        <CreateIncidentReportForm
+            :show="showCreateModal"
+            :barangays="barangays"
+            :incidents="incidents"
+            :emergencies="emergencies"
+            :users="users"
+            @close="closeCreateModal"
+        />
+
+        <!-- Edit Modal -->
+        <EditIncidentReportForm
+            :show="showEditModal"
+            :report-id="editingReportId"
+            :barangays="barangays"
+            :incidents="incidents"
+            :emergencies="emergencies"
+            :users="users"
+            @close="closeEditModal"
+        />
     </AppLayout>
 </template>
