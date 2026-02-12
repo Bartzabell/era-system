@@ -38,7 +38,7 @@ class IncidentReportController extends Controller
             ];
         });
 
-        return Inertia::render('AccidentReport/Index', [
+        return Inertia::render('IncidentReport/Index', [
             'incidentReports' => $incidentReports,
         ]);
     }
