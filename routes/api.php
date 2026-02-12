@@ -51,5 +51,25 @@ Route::middleware('throttle:60,1')->group(function () {
             if ($authCheck) return $authCheck;
             return app(AccountApiController::class)->changePassword($request);
         });
+
+        Route::get('/dropdowns', function (Request $request) {
+            $authCheck = validateApiToken($request);
+            if ($authCheck) return $authCheck;
+            return app(\App\Http\Controllers\Api\IncidentReportApiController::class)->getDropdowns();
+        });
+
+        // Create incident report
+        Route::post('/incident-reports', function (Request $request) {
+            $authCheck = validateApiToken($request);
+            if ($authCheck) return $authCheck;
+            return app(\App\Http\Controllers\Api\IncidentReportApiController::class)->store($request);
+        });
+
+        // Get user's incident reports
+        Route::get('/incident-reports', function (Request $request) {
+            $authCheck = validateApiToken($request);
+            if ($authCheck) return $authCheck;
+            return app(\App\Http\Controllers\Api\IncidentReportApiController::class)->index($request);
+        });
     });
 });
