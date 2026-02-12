@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePage, router } from '@inertiajs/vue3';
-import { LogOut } from 'lucide-vue-next';
+import { LogOut, FileText } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 
 const page = usePage();
@@ -8,6 +8,10 @@ const user = page.props.auth?.user;
 
 const handleLogout = () => {
     router.post('/logout');
+};
+
+const goToIncidentReport = () => {
+    router.get('incident-report');
 };
 </script>
 
@@ -19,9 +23,18 @@ const handleLogout = () => {
                 <h1 class="text-xl font-semibold text-gray-900">Operation Center</h1>
             </div>
 
-            <!-- Right: Username with Logout -->
             <div class="flex items-center gap-3">
+                <Button
+                    variant="outline"
+                    @click="goToIncidentReport"
+                    class="flex items-center gap-2"
+                >
+                    <FileText class="h-4 w-4" />
+                    Incident Report
+                </Button>
+
                 <span class="text-sm font-medium text-gray-700">{{ user?.username }}</span>
+
                 <Button
                     variant="ghost"
                     size="icon"
