@@ -13,6 +13,10 @@ const handleLogout = () => {
 const goToIncidentReport = () => {
     router.get('incident-report');
 };
+
+const goToDashboard = () => {
+    router.get('dashboard');
+};
 </script>
 
 <template>
@@ -21,15 +25,22 @@ const goToIncidentReport = () => {
             <!-- Left: Operation Center -->
             <div class="flex items-center">
                 <h1 class="text-xl font-semibold text-gray-900">Operation Center</h1>
+
             </div>
 
             <div class="flex items-center gap-3">
                 <Button
                     variant="outline"
-                    @click="goToIncidentReport"
-                    class="flex items-center gap-2"
+                    @click="goToDashboard"
+                    class="flex items-center gap-2 shadow-none border-none px-2"
                 >
-                    <FileText class="h-4 w-4" />
+                    Dashboard
+                </Button>
+                <Button
+                    variant="outline"
+                    @click="goToIncidentReport"
+                    class="flex items-center gap-2 shadow-none border-none px-2"
+                >
                     Incident Report
                 </Button>
 
