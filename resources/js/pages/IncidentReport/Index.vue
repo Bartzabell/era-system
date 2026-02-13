@@ -5,7 +5,7 @@ import DataTable from '@/components/DataTable.vue';
 import CreateIncidentReportForm from './Partials/Create.vue';
 import EditIncidentReportForm from './Partials/Edit.vue';
 import { PhDotsThreeOutline, PhPlus } from '@phosphor-icons/vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 interface IncidentReport {
     id: number;
@@ -31,6 +31,7 @@ interface Props {
     incidents: Array<{ id: number; incident_name: string; severity_level: string }>;
     emergencies: Array<{ id: number; emergency_name: string; severity_level: string }>;
     users: Array<{ id: number; full_name: string }>;
+    hasFullAccess: boolean;
 }
 
 const props = defineProps<Props>();
@@ -40,63 +41,65 @@ const showCreateModal = ref(false);
 const showEditModal = ref(false);
 const editingReportId = ref<number | null>(null);
 
-const columns = [
-    {
-        key: 'id',
-        label: 'ID',
-        sortable: true
-    },
-    {
-        key: 'user_name',
-        label: 'Reporter',
-        sortable: true
-    },
-    {
-        key: 'barangay',
-        label: 'Barangay',
-        sortable: true
-    },
-    {
-        key: 'incident',
-        label: 'Incident Type',
-        sortable: true
-    },
-    {
-        key: 'emergency',
-        label: 'Emergency Type',
-        sortable: true
-    },
-    {
-        key: 'severity_level',
-        label: 'Severity',
-        sortable: true
-    },
-    {
-        key: 'status',
-        label: 'Status',
-        sortable: true
-    },
-    {
-        key: 'responder_name',
-        label: 'Responder',
-        sortable: true
-    },
-    {
-        key: 'created_at',
-        label: 'Reported At',
-        sortable: true
-    },
-    {
-        key: 'actions',
-        label: 'Actions',
-        sortable: false
-    }
-];
+const columns = computed(() => {
+    const baseColumns = [
+        {
+            key: 'id',
+            label: 'ID',
+            sortable: true
+        },
+        {
+            key: 'user_name',
+            label: 'Reporter',
+            sortable: true
+        },
+        {
+            key: 'barangay',
+            label: 'Barangay',
+            sortable: true
+        },
+        {
+            key: 'incident',
+            label: 'Incident Type',
+            sortable: true
+        },
+        {
+            key: 'emergency',
+            label: 'Emergency Type',
+            sortable: true
+        },
+        {
+            key: 'severity_level',
+            label: 'Severity',
+            sortable: true
+        },
+        {
+            key: 'status',
+            label: 'Status',
+            sortable: true
+        },
+        {
+            key: 'responder_name',
+            label: 'Responder',
+            sortable: true
+        },
+        {
+            key: 'created_at',
+            label: 'Reported At',
+            sortable: true
+        },
+        {
+            key: 'actions',
+            label: 'Actions',
+            sortable: false
+        }
+    ];
+
+    return baseColumns;
+});
 
 const handleRowClick = (row: IncidentReport) => {
     console.log('Row clicked:', row);
-    // You can navigate to detail page or open modal here
-    // router.visit(route('incident-reports.show', row.id));
 };
 
 const openCreateModal = () => {
@@ -130,7 +133,7 @@ const getSeverityColor = (severity: string) => {
 const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
         'pending': 'bg-yellow-100 text-yellow-800',
-        'assigned': 'bg-blue-100 text-blue-800',
+        'assigned': 'bg-orange-100 text-orange-800',
         'arrival': 'bg-purple-100 text-purple-800',
         'completed': 'bg-green-100 text-green-800',
         'cancelled': 'bg-gray-100 text-gray-800',
@@ -154,12 +157,12 @@ const formatStatus = (status: string) => {
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">Incident Reports</h1>
                         <p class="mt-1 text-sm text-gray-600">
-                            View and manage all incident reports
+                            {{ hasFullAccess ? 'View and manage all incident reports' : 'View your incident reports' }}
                         </p>
                     </div>
                     <button
                         @click="openCreateModal"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                     >
                         <PhPlus :size="20" weight="bold" />
                         Create Report
@@ -194,22 +197,24 @@ const formatStatus = (status: string) => {
                             <div class="flex items-center gap-2">
                                 <button
                                     @click.stop="console.log('View', row.id)"
-                                    class="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                    class="text-orange-600 hover:text-orange-800 font-medium text-sm"
                                 >
                                     View
                                 </button>
-                                <button
-                                    @click.stop="openEditModal(row.id)"
-                                    class="text-gray-600 hover:text-gray-800 font-medium text-sm"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    @click.stop="console.log('More actions', row.id)"
-                                    class="text-gray-400 hover:text-gray-600"
-                                >
-                                    <PhDotsThreeOutline :size="20" />
-                                </button>
+                                <template v-if="hasFullAccess">
+                                    <button
+                                        @click.stop="openEditModal(row.id)"
+                                        class="text-gray-600 hover:text-gray-800 font-medium text-sm"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        @click.stop="console.log('More actions', row.id)"
+                                        class="text-gray-400 hover:text-gray-600"
+                                    >
+                                        <PhDotsThreeOutline :size="20" />
+                                    </button>
+                                </template>
                             </div>
                         </template>
                     </DataTable>
@@ -223,12 +228,12 @@ const formatStatus = (status: string) => {
             :barangays="barangays"
             :incidents="incidents"
             :emergencies="emergencies"
-            :users="users"
             @close="closeCreateModal"
         />
 
-        <!-- Edit Modal -->
+        <!-- Edit Modal (only shown if user has full access) -->
         <EditIncidentReportForm
+            v-if="hasFullAccess"
             :show="showEditModal"
             :report-id="editingReportId"
             :barangays="barangays"

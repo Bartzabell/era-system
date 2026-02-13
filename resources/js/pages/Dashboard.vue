@@ -72,7 +72,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
                                 <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active Responders</p>
-                                <div class="p-1 bg-blue-200 rounded-md flex items-center justify-center">
+                                <div class="p-1 bg-orange-200 rounded-md flex items-center justify-center">
                                     <PhFireTruck :size="40" color="#0e6acd" weight="fill" />
                                 </div>
                             </div>

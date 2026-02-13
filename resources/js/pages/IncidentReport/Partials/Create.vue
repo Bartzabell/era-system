@@ -6,6 +6,7 @@ import TextInput from '@/components/TextInput.vue';
 import Boombox from '@/components/Boombox.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { PhXCircle, PhMapPin, PhCheckCircle} from '@phosphor-icons/vue';
 
 // Fix marker icon paths
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -207,15 +208,13 @@ const closeModal = () => {
                     @click="closeModal"
                     class="text-gray-400 hover:text-gray-500"
                 >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <PhXCircle :size="32" color="#f08000" weight="fill" />
                 </button>
             </div>
 
             <form @submit.prevent="submit" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Barangay Selection -->
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Barangay <span class="text-red-500">*</span>
@@ -232,7 +231,6 @@ const closeModal = () => {
                         </p>
                     </div>
 
-                    <!-- Incident Type -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Incident Type <span class="text-red-500">*</span>
@@ -250,7 +248,6 @@ const closeModal = () => {
                         </p>
                     </div>
 
-                    <!-- Emergency Type -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Emergency Type <span class="text-red-500">*</span>
@@ -268,7 +265,6 @@ const closeModal = () => {
                         </p>
                     </div>
 
-                    <!-- Severity Level -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Severity Level <span class="text-red-500">*</span>
@@ -284,8 +280,6 @@ const closeModal = () => {
                             {{ form.errors.severity_level }}
                         </p>
                     </div>
-
-                    <!-- Casualty Count -->
                     <div>
                         <TextInput
                             v-model="form.casualty_count"
@@ -297,18 +291,16 @@ const closeModal = () => {
                         />
                     </div>
 
-                    <!-- Distance -->
-                    <div>
+                    <!-- <div>
                         <TextInput
                             v-model="form.distance"
                             type="text"
                             label="Distance"
-                            placeholder="Enter distance (e.g., 5.2 km)"
+                            placeholder=""
                             :error="form.errors.distance"
+                            readonly
                         />
-                    </div>
-
-                    <!-- Map Coordinates with Map Picker -->
+                    </div> -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Map Coordinates <span class="text-red-500">*</span>
@@ -325,27 +317,21 @@ const closeModal = () => {
                             <button
                                 type="button"
                                 @click="openMapPicker"
-                                class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 whitespace-nowrap flex items-center gap-2"
+                                class="px-4 py-2 text-sm font-medium text-white bg-gray-700 border border-transparent rounded-md hover:bg-gray-900 whitespace-nowrap flex items-center gap-2"
                             >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+                                <PhMapPin :size="25" color="#f08000" weight="fill" />
                                 Pick on Map
                             </button>
                         </div>
                         <p v-if="form.errors.map_coordinates" class="mt-1 text-sm text-red-600">
                             {{ form.errors.map_coordinates }}
                         </p>
-                        <p v-else-if="form.map_coordinates" class="mt-1 text-sm text-green-600 flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
+                        <p v-else-if="form.map_coordinates" class="mt-1 text-sm text-orange-600 flex items-center gap-1">
+                            <PhCheckCircle :size="15" color="#f08000" weight="fill" />
                             Location selected
                         </p>
                     </div>
 
-                    <!-- Attachment -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Attachment
@@ -353,7 +339,7 @@ const closeModal = () => {
                         <input
                             type="file"
                             @change="handleFileChange"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             accept="image/*,application/pdf"
                         />
                         <p v-if="form.errors.attachment" class="mt-1 text-sm text-red-600">
@@ -361,7 +347,6 @@ const closeModal = () => {
                         </p>
                     </div>
 
-                    <!-- Remarks -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Remarks
@@ -369,7 +354,7 @@ const closeModal = () => {
                         <textarea
                             v-model="form.remarks"
                             rows="3"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             placeholder="Enter any additional remarks"
                         />
                         <p v-if="form.errors.remarks" class="mt-1 text-sm text-red-600">
@@ -378,7 +363,6 @@ const closeModal = () => {
                     </div>
                 </div>
 
-                <!-- Form Actions -->
                 <div class="flex items-center justify-end gap-3 pt-4 border-t">
                     <button
                         type="button"
@@ -390,7 +374,7 @@ const closeModal = () => {
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 disabled:opacity-50"
                         :disabled="form.processing"
                     >
                         {{ form.processing ? 'Creating...' : 'Create Report' }}
@@ -400,7 +384,6 @@ const closeModal = () => {
         </div>
     </Modal>
 
-    <!-- Map Picker Modal -->
     <Modal :show="showMap" max-width="4xl" @close="closeMapModal">
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
@@ -409,13 +392,11 @@ const closeModal = () => {
                     @click="closeMapModal"
                     class="text-gray-400 hover:text-gray-500"
                 >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <PhXCircle :size="32" color="#f08000" weight="fill" />
                 </button>
             </div>
 
-            <div class="mb-3 flex items-center justify-between">
+            <div class="mb-3 flex items-center justify-between gap-x-2">
                 <p class="text-sm text-gray-600">
                     Click anywhere on the map or drag the marker to select the incident location
                 </p>
@@ -423,24 +404,19 @@ const closeModal = () => {
                     type="button"
                     @click="getCurrentLocation"
                     :disabled="isLocating"
-                    class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                    class="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 flex items-center gap-2"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                    <PhMapPin :size="15" color="#f08000" weight="fill" />
                     {{ isLocating ? 'Locating...' : 'Use My Location' }}
                 </button>
             </div>
 
-            <!-- Map Container -->
             <div
                 ref="mapContainer"
                 class="border border-gray-300 rounded-lg"
                 style="height: 500px; width: 100%;"
             ></div>
 
-            <!-- Selected Coordinates Display -->
             <div class="mt-4 p-3 bg-gray-50 rounded-md">
                 <p class="text-sm text-gray-700">
                     <strong>Selected Coordinates:</strong>
@@ -448,7 +424,6 @@ const closeModal = () => {
                 </p>
             </div>
 
-            <!-- Modal Actions -->
             <div class="mt-4 flex justify-end gap-3">
                 <button
                     type="button"
@@ -460,7 +435,7 @@ const closeModal = () => {
                 <button
                     type="button"
                     @click="confirmLocation"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                    class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700"
                 >
                     Confirm Location
                 </button>

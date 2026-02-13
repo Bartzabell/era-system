@@ -14,10 +14,8 @@ class CheckPermission
             abort(403, 'Unauthorized action.');
         }
 
-        // Split permissions by pipe (|) for OR logic
         $permissionArray = explode('|', $permissions);
-        
-        // Check if user has ANY of the permissions (OR logic)
+
         $hasPermission = false;
         foreach ($permissionArray as $permission) {
             if ($request->user()->hasPermission(trim($permission))) {

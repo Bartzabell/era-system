@@ -139,7 +139,7 @@ const getCellValue = (row: T, column: Column) => {
                                         ? (sortDirection === 'asc' ? ChevronUp : ChevronDown)
                                         : ChevronsUpDown"
                                     class="w-4 h-4"
-                                    :class="sortField === column.key ? 'text-blue-600' : 'text-gray-400'"
+                                    :class="sortField === column.key ? 'text-orange-600' : 'text-gray-400'"
                                 />
                             </div>
                         </th>
@@ -149,7 +149,7 @@ const getCellValue = (row: T, column: Column) => {
                     <tr v-if="loading" class="border-b">
                         <td :colspan="columns.length" class="px-6 py-8 text-center text-gray-500">
                             <div class="flex items-center justify-center gap-2">
-                                <div class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                <div class="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
                                 <span>Loading...</span>
                             </div>
                         </td>
@@ -209,7 +209,7 @@ const getCellValue = (row: T, column: Column) => {
                     class="px-3 py-2 text-sm font-medium rounded-lg"
                     :class="[
                         page === currentPage
-                            ? 'text-white bg-blue-600'
+                            ? 'text-white bg-orange-600'
                             : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50',
                         page === '...' ? 'cursor-default hover:bg-white' : ''
                     ]"

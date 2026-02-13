@@ -5,14 +5,11 @@ import axios from 'axios';
 import Modal from '@/components/Modal.vue';
 import TextInput from '@/components/TextInput.vue';
 import Boombox from '@/components/Boombox.vue';
+import { PhXCircle, PhMapPin, PhCheckCircle, PhInfo} from '@phosphor-icons/vue';
 
 interface Props {
     show: boolean;
     reportId: number | null;
-    barangays: Array<{ id: number; barangay_name: string }>;
-    incidents: Array<{ id: number; incident_name: string; severity_level: string }>;
-    emergencies: Array<{ id: number; emergency_name: string; severity_level: string }>;
-    users: Array<{ id: number; full_name: string }>;
 }
 
 const props = defineProps<Props>();
@@ -21,29 +18,27 @@ const emit = defineEmits<{
 }>();
 
 const form = useForm({
-    user_id: null as number | null,
-    barangay_id: null as number | null,
-    map_coordinates: '',
-    emergency_id: null as number | null,
-    incident_id: null as number | null,
-    severity_level: 'low',
-    casualty_count: 0,
     distance: '',
-    attachment: null as File | null,
     responder_name: '',
     responder_contact_no: '',
     estimated_arrival: '',
     datetime_arrived: '',
     plate_no: '',
     status: 'pending',
+    attachment: null as File | null,
     remarks: '',
 });
 
-const severityLevels = [
-    { id: 'low', name: 'Low' },
-    { id: 'medium', name: 'Medium' },
-    { id: 'high', name: 'High' },
-];
+const incidentInfo = ref({
+    user_name: '',
+    barangay_name: '',
+    incident_name: '',
+    emergency_name: '',
+    severity_level: '',
+    casualty_count: 0,
+    map_coordinates: '',
+    distance: '',
+});
 
 const statuses = [
     { id: 'pending', name: 'Pending' },
@@ -53,7 +48,6 @@ const statuses = [
     { id: 'cancelled', name: 'Cancelled' },
 ];
 
-// Watch for reportId changes to load data
 watch(() => props.reportId, (newId) => {
     if (newId && props.show) {
         loadReportData(newId);
@@ -61,17 +55,20 @@ watch(() => props.reportId, (newId) => {
 }, { immediate: true });
 
 const loadReportData = (id: number) => {
-    // Make an axios request to get the report data
     axios.get(`/incident-report/${id}/edit`)
         .then(response => {
             const report = response.data.incidentReport;
-            form.user_id = report.user_id;
-            form.barangay_id = report.barangay_id;
-            form.map_coordinates = report.map_coordinates || '';
-            form.emergency_id = report.emergency_id;
-            form.incident_id = report.incident_id;
-            form.severity_level = report.severity_level;
-            form.casualty_count = report.casualty_count || 0;
+            incidentInfo.value = {
+                user_name: report.user_name,
+                barangay_name: report.barangay_name,
+                incident_name: report.incident_name,
+                emergency_name: report.emergency_name,
+                severity_level: report.severity_level,
+                casualty_count: report.casualty_count || 0,
+                map_coordinates: report.map_coordinates || '',
+                distance: report.distance || '',
+            };
+
             form.distance = report.distance || '';
             form.responder_name = report.responder_name || '';
             form.responder_contact_no = report.responder_contact_no || '';
@@ -91,26 +88,6 @@ const handleFileChange = (event: Event) => {
     if (target.files && target.files[0]) {
         form.attachment = target.files[0];
     }
-};
-
-const handleUserChange = (user: any) => {
-    form.user_id = user?.id || null;
-};
-
-const handleBarangayChange = (barangay: any) => {
-    form.barangay_id = barangay?.id || null;
-};
-
-const handleIncidentChange = (incident: any) => {
-    form.incident_id = incident?.id || null;
-};
-
-const handleEmergencyChange = (emergency: any) => {
-    form.emergency_id = emergency?.id || null;
-};
-
-const handleSeverityChange = (severity: any) => {
-    form.severity_level = severity?.id || 'low';
 };
 
 const handleStatusChange = (status: any) => {
@@ -135,7 +112,7 @@ const closeModal = () => {
 </script>
 
 <template>
-    <Modal :show="show" max-width="2xl" @close="closeModal">
+    <Modal :show="show" max-width="3xl" @close="closeModal">
         <div class="p-6">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-900">Edit Incident Report #{{ reportId }}</h2>
@@ -143,103 +120,61 @@ const closeModal = () => {
                     @click="closeModal"
                     class="text-gray-400 hover:text-gray-500"
                 >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <PhXCircle :size="32" color="#f08000" weight="fill" />
                 </button>
+            </div>
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <PhInfo :size="18" color="#f08000" weight="fill" />
+                    Incident Report Information
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                    <div>
+                        <span class="font-medium text-gray-600">Reporter:</span>
+                        <span class="ml-2 text-gray-900">{{ incidentInfo.user_name }}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-600">Barangay:</span>
+                        <span class="ml-2 text-gray-900">{{ incidentInfo.barangay_name }}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-600">Incident Type:</span>
+                        <span class="ml-2 text-gray-900">{{ incidentInfo.incident_name }}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-600">Emergency Type:</span>
+                        <span class="ml-2 text-gray-900">{{ incidentInfo.emergency_name }}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-600">Severity:</span>
+                        <span class="ml-2 capitalize">
+                            <span :class="{
+                                'text-yellow-700 bg-yellow-100 px-2 py-1 rounded text-xs': incidentInfo.severity_level === 'low',
+                                'text-orange-700 bg-orange-100 px-2 py-1 rounded text-xs': incidentInfo.severity_level === 'medium',
+                                'text-red-700 bg-red-100 px-2 py-1 rounded text-xs': incidentInfo.severity_level === 'high'
+                            }">
+                                {{ incidentInfo.severity_level }}
+                            </span>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-600">Casualties:</span>
+                        <span class="ml-2 text-gray-900">{{ incidentInfo.casualty_count }}</span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="font-medium text-gray-600">Location:</span>
+                        <span class="ml-2 text-gray-900 text-xs">{{ incidentInfo.map_coordinates || 'N/A' }}</span>
+                    </div>
+                    <div v-if="incidentInfo.distance">
+                        <span class="font-medium text-gray-600">Distance:</span>
+                        <span class="ml-2 text-gray-900">{{ incidentInfo.distance }}</span>
+                    </div>
+                </div>
             </div>
 
             <form @submit.prevent="submit" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- User Selection -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Reporter <span class="text-red-500">*</span>
-                        </label>
-                        <Boombox
-                            :items="users"
-                            :existing-value="form.user_id"
-                            label-field="full_name"
-                            placeholder="Select reporter"
-                            @change="handleUserChange"
-                        />
-                        <p v-if="form.errors.user_id" class="mt-1 text-sm text-red-600">
-                            {{ form.errors.user_id }}
-                        </p>
-                    </div>
-
-                    <!-- Barangay Selection -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Barangay <span class="text-red-500">*</span>
-                        </label>
-                        <Boombox
-                            :items="barangays"
-                            :existing-value="form.barangay_id"
-                            label-field="barangay_name"
-                            placeholder="Select barangay"
-                            @change="handleBarangayChange"
-                        />
-                        <p v-if="form.errors.barangay_id" class="mt-1 text-sm text-red-600">
-                            {{ form.errors.barangay_id }}
-                        </p>
-                    </div>
-
-                    <!-- Incident Type -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Incident Type <span class="text-red-500">*</span>
-                        </label>
-                        <Boombox
-                            :items="incidents"
-                            :existing-value="form.incident_id"
-                            label-field="incident_name"
-                            description-field="severity_level"
-                            placeholder="Select incident type"
-                            @change="handleIncidentChange"
-                        />
-                        <p v-if="form.errors.incident_id" class="mt-1 text-sm text-red-600">
-                            {{ form.errors.incident_id }}
-                        </p>
-                    </div>
-
-                    <!-- Emergency Type -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Emergency Type <span class="text-red-500">*</span>
-                        </label>
-                        <Boombox
-                            :items="emergencies"
-                            :existing-value="form.emergency_id"
-                            label-field="emergency_name"
-                            description-field="severity_level"
-                            placeholder="Select emergency type"
-                            @change="handleEmergencyChange"
-                        />
-                        <p v-if="form.errors.emergency_id" class="mt-1 text-sm text-red-600">
-                            {{ form.errors.emergency_id }}
-                        </p>
-                    </div>
-
-                    <!-- Severity Level -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Severity Level <span class="text-red-500">*</span>
-                        </label>
-                        <Boombox
-                            :items="severityLevels"
-                            :existing-value="form.severity_level"
-                            label-field="name"
-                            placeholder="Select severity"
-                            @change="handleSeverityChange"
-                        />
-                        <p v-if="form.errors.severity_level" class="mt-1 text-sm text-red-600">
-                            {{ form.errors.severity_level }}
-                        </p>
-                    </div>
-
-                    <!-- Status -->
-                    <div>
+                    <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Status <span class="text-red-500">*</span>
                         </label>
@@ -255,19 +190,6 @@ const closeModal = () => {
                         </p>
                     </div>
 
-                    <!-- Casualty Count -->
-                    <div>
-                        <TextInput
-                            v-model="form.casualty_count"
-                            type="number"
-                            label="Casualty Count"
-                            placeholder="Enter casualty count"
-                            :min="0"
-                            :error="form.errors.casualty_count"
-                        />
-                    </div>
-
-                    <!-- Distance -->
                     <div>
                         <TextInput
                             v-model="form.distance"
@@ -278,18 +200,6 @@ const closeModal = () => {
                         />
                     </div>
 
-                    <!-- Map Coordinates -->
-                    <div class="md:col-span-2">
-                        <TextInput
-                            v-model="form.map_coordinates"
-                            type="text"
-                            label="Map Coordinates"
-                            placeholder="Enter coordinates (e.g., 14.5995, 120.9842)"
-                            :error="form.errors.map_coordinates"
-                        />
-                    </div>
-
-                    <!-- Responder Name -->
                     <div>
                         <TextInput
                             v-model="form.responder_name"
@@ -300,7 +210,6 @@ const closeModal = () => {
                         />
                     </div>
 
-                    <!-- Responder Contact -->
                     <div>
                         <TextInput
                             v-model="form.responder_contact_no"
@@ -311,7 +220,6 @@ const closeModal = () => {
                         />
                     </div>
 
-                    <!-- Plate Number -->
                     <div>
                         <TextInput
                             v-model="form.plate_no"
@@ -322,7 +230,6 @@ const closeModal = () => {
                         />
                     </div>
 
-                    <!-- Estimated Arrival -->
                     <div>
                         <TextInput
                             v-model="form.estimated_arrival"
@@ -332,7 +239,6 @@ const closeModal = () => {
                         />
                     </div>
 
-                    <!-- Datetime Arrived -->
                     <div>
                         <TextInput
                             v-model="form.datetime_arrived"
@@ -342,7 +248,6 @@ const closeModal = () => {
                         />
                     </div>
 
-                    <!-- Attachment -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Attachment
@@ -350,7 +255,7 @@ const closeModal = () => {
                         <input
                             type="file"
                             @change="handleFileChange"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             accept="image/*,application/pdf"
                         />
                         <p v-if="form.errors.attachment" class="mt-1 text-sm text-red-600">
@@ -358,7 +263,6 @@ const closeModal = () => {
                         </p>
                     </div>
 
-                    <!-- Remarks -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Remarks
@@ -366,7 +270,7 @@ const closeModal = () => {
                         <textarea
                             v-model="form.remarks"
                             rows="3"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             placeholder="Enter any additional remarks"
                         />
                         <p v-if="form.errors.remarks" class="mt-1 text-sm text-red-600">
@@ -375,7 +279,6 @@ const closeModal = () => {
                     </div>
                 </div>
 
-                <!-- Form Actions -->
                 <div class="flex items-center justify-end gap-3 pt-4 border-t">
                     <button
                         type="button"
@@ -387,7 +290,7 @@ const closeModal = () => {
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 disabled:opacity-50"
                         :disabled="form.processing"
                     >
                         {{ form.processing ? 'Updating...' : 'Update Report' }}
