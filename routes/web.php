@@ -24,7 +24,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('citizen-page', [CitizenController::class, 'index'])->name('citizen-page.index');
 
     Route::middleware('permission:admin_access|responder_access')->group(function () {
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/export/monthly-report', [DashboardController::class, 'exportMonthlyReport'])->name('dashboard.export.monthly');
+        Route::get('/dashboard/export/citizen-report', [DashboardController::class, 'exportCitizenReport'])->name('dashboard.export.citizen');
     });
 });
 

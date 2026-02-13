@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\IncidentReport;
 use App\Models\Responder;
+use App\Exports\MonthlyReportExport;
+use App\Exports\CitizenReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -39,14 +42,12 @@ class DashboardController extends Controller
             ->whereNull('deleted_at')
             ->count();
 
-        // Get active incidents with coordinates for the map
         $incidentMarkers = IncidentReport::with(['barangay', 'incident', 'emergency'])
             ->whereNotIn('status', ['resolved', 'completed'])
             ->whereNull('deleted_at')
             ->whereNotNull('map_coordinates')
             ->get()
             ->map(function ($report) {
-                // Parse coordinates (assuming format: "lat,lng" or JSON)
                 $coords = $this->parseCoordinates($report->map_coordinates);
 
                 return [
@@ -63,6 +64,29 @@ class DashboardController extends Controller
                 ];
             });
 
+        // Get recent incident reports for the feed
+        $incidentFeed = IncidentReport::with(['incident', 'barangay'])
+            ->whereNotIn('status', ['resolved', 'completed'])
+            ->whereNull('deleted_at')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function ($report) {
+                $coords = $this->parseCoordinates($report->map_coordinates);
+
+                return [
+                    'id' => $report->id,
+                    'incident_name' => $report->incident->incident_name ?? 'Unknown Incident',
+                    'landmark' => $report->barangay->barangay_name ?? 'Unknown Location',
+                    'coordinates' => $coords,
+                    'time_ago' => $this->formatTimeAgo($report->created_at),
+                    'priority_score' => $this->calculatePriorityScore($report),
+                    'severity_level' => $report->severity_level,
+                    'status' => $report->status,
+                    'created_at' => $report->created_at,
+                ];
+            });
+
         return Inertia::render('Dashboard', [
             'stats' => [
                 'activeIncidents' => $activeIncidents,
@@ -71,20 +95,38 @@ class DashboardController extends Controller
                 'resolvedToday' => $resolvedToday,
             ],
             'incidentMarkers' => $incidentMarkers,
+            'incidentFeed' => $incidentFeed,
         ]);
+    }
+
+    public function exportMonthlyReport(Request $request)
+    {
+        $month = $request->input('month', Carbon::now()->month);
+        $year = $request->input('year', Carbon::now()->year);
+
+        $fileName = 'monthly_incident_report_' . Carbon::createFromDate($year, $month, 1)->format('F_Y') . '.xlsx';
+
+        return Excel::download(new MonthlyReportExport($month, $year), $fileName);
+    }
+
+    public function exportCitizenReport(Request $request)
+    {
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth());
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth());
+
+        $fileName = 'citizen_incident_reports_' . Carbon::now()->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new CitizenReportExport($startDate, $endDate), $fileName);
     }
 
     private function parseCoordinates($coordinates)
     {
-        // Handle different coordinate formats
         if (is_string($coordinates)) {
-            // Try JSON first
             $decoded = json_decode($coordinates, true);
             if ($decoded && isset($decoded['lat']) && isset($decoded['lng'])) {
                 return $decoded;
             }
 
-            // Try comma-separated format
             $parts = explode(',', $coordinates);
             if (count($parts) === 2) {
                 return [
@@ -94,7 +136,61 @@ class DashboardController extends Controller
             }
         }
 
-        // Default fallback (Philippines center)
         return ['lat' => 14.5995, 'lng' => 120.9842];
+    }
+
+    private function formatTimeAgo($createdAt)
+    {
+        $now = Carbon::now();
+        $created = Carbon::parse($createdAt);
+        $diffInMinutes = $created->diffInMinutes($now);
+
+        if ($diffInMinutes < 1) {
+            return 'Just now';
+        } elseif ($diffInMinutes < 60) {
+            return $diffInMinutes . ' min ago';
+        } elseif ($diffInMinutes < 1440) {
+            $hours = floor($diffInMinutes / 60);
+            return $hours . ' hr ago';
+        } else {
+            $days = floor($diffInMinutes / 1440);
+            return $days . ' day' . ($days > 1 ? 's' : '') . ' ago';
+        }
+    }
+
+    private function calculatePriorityScore($report)
+    {
+        $score = 0;
+
+        // Severity level scoring
+        switch (strtolower($report->severity_level)) {
+            case 'critical':
+                $score += 40;
+                break;
+            case 'high':
+                $score += 30;
+                break;
+            case 'medium':
+                $score += 20;
+                break;
+            case 'low':
+                $score += 10;
+                break;
+        }
+
+        // Casualty count scoring
+        $score += min($report->casualty_count * 10, 30);
+
+        // Time-based scoring (newer = higher priority)
+        $minutesAgo = Carbon::parse($report->created_at)->diffInMinutes(Carbon::now());
+        if ($minutesAgo < 15) {
+            $score += 30;
+        } elseif ($minutesAgo < 30) {
+            $score += 20;
+        } elseif ($minutesAgo < 60) {
+            $score += 10;
+        }
+
+        return min($score, 100);
     }
 }
