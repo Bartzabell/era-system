@@ -148,7 +148,7 @@ const formatStatus = (status: string) => {
 
     <AppLayout>
         <div class="py-6">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Header -->
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -167,17 +167,12 @@ const formatStatus = (status: string) => {
                 </div>
 
                 <!-- DataTable -->
-                <div class="bg-white rounded-lg shadow">
-                    <DataTable
-                        :columns="columns"
-                        :data="incidentReports"
-                        :per-page="10"
-                        @row-click="handleRowClick"
-                    >
+                <div class="bg-white rounded-lg shadow ">
+                    <DataTable :columns="columns" :data="incidentReports" :per-page="10" @row-click="handleRowClick">
                         <!-- Custom severity cell -->
                         <template #cell-severity_level="{ value }">
                             <span
-                                class="px-2 py-1 text-xs font-semibold rounded-full"
+                                class="px-2 py-1 text-xs font-semibold rounded-full w-full"
                                 :class="getSeverityColor(value)"
                             >
                                 {{ value ? value.toUpperCase() : 'N/A' }}
