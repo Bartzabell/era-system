@@ -1,16 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import Modal from '@/components/Modal.vue';
 import TextInput from '@/components/TextInput.vue';
 import Boombox from '@/components/Boombox.vue';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix marker icon paths
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: markerIcon2x,
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
+});
 
 interface Props {
     show: boolean;
     barangays: Array<{ id: number; barangay_name: string }>;
     incidents: Array<{ id: number; incident_name: string; severity_level: string }>;
     emergencies: Array<{ id: number; emergency_name: string; severity_level: string }>;
-    users: Array<{ id: number; full_name: string }>;
 }
 
 const props = defineProps<Props>();
@@ -19,7 +32,6 @@ const emit = defineEmits<{
 }>();
 
 const form = useForm({
-    user_id: null as number | null,
     barangay_id: null as number | null,
     map_coordinates: '',
     emergency_id: null as number | null,
@@ -28,12 +40,6 @@ const form = useForm({
     casualty_count: 0,
     distance: '',
     attachment: null as File | null,
-    responder_name: '',
-    responder_contact_no: '',
-    estimated_arrival: '',
-    datetime_arrived: '',
-    plate_no: '',
-    status: 'pending',
     remarks: '',
 });
 
@@ -43,23 +49,19 @@ const severityLevels = [
     { id: 'high', name: 'High' },
 ];
 
-const statuses = [
-    { id: 'pending', name: 'Pending' },
-    { id: 'assigned', name: 'Assigned' },
-    { id: 'arrival', name: 'Arrival' },
-    { id: 'completed', name: 'Completed' },
-    { id: 'cancelled', name: 'Cancelled' },
-];
+// Map state
+const showMap = ref(false);
+const mapContainer = ref<HTMLElement | null>(null);
+let map: L.Map | null = null;
+let marker: L.Marker | null = null;
+const markerPosition = ref<[number, number]>([14.5995, 120.9842]); // Default Manila
+const isLocating = ref(false);
 
 const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
         form.attachment = target.files[0];
     }
-};
-
-const handleUserChange = (user: any) => {
-    form.user_id = user?.id || null;
 };
 
 const handleBarangayChange = (barangay: any) => {
@@ -78,8 +80,105 @@ const handleSeverityChange = (severity: any) => {
     form.severity_level = severity?.id || 'low';
 };
 
-const handleStatusChange = (status: any) => {
-    form.status = status?.id || 'pending';
+// Initialize map
+const initMap = () => {
+    nextTick(() => {
+        if (!mapContainer.value) return;
+
+        // Parse existing coordinates if available
+        let initialCenter: [number, number] = [14.5995, 120.9842];
+        if (form.map_coordinates) {
+            const coords = form.map_coordinates.split(',').map(s => parseFloat(s.trim()));
+            if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                initialCenter = [coords[0], coords[1]];
+                markerPosition.value = initialCenter;
+            }
+        }
+
+        // Create map
+        map = L.map(mapContainer.value).setView(initialCenter, 13);
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add marker
+        marker = L.marker(markerPosition.value, {
+            draggable: true
+        }).addTo(map);
+
+        // Handle map click
+        map.on('click', (e: L.LeafletMouseEvent) => {
+            markerPosition.value = [e.latlng.lat, e.latlng.lng];
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            }
+        });
+
+        // Handle marker drag
+        marker.on('dragend', () => {
+            if (marker) {
+                const position = marker.getLatLng();
+                markerPosition.value = [position.lat, position.lng];
+            }
+        });
+    });
+};
+
+// Open map picker
+const openMapPicker = () => {
+    showMap.value = true;
+    nextTick(() => {
+        initMap();
+    });
+};
+
+// Get current location
+const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser');
+        return;
+    }
+
+    isLocating.value = true;
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            markerPosition.value = [lat, lng];
+
+            if (map && marker) {
+                map.setView([lat, lng], 15);
+                marker.setLatLng([lat, lng]);
+            }
+
+            isLocating.value = false;
+        },
+        (error) => {
+            console.error('Error getting location:', error);
+            isLocating.value = false;
+            alert('Unable to get your location. Please click on the map to select a location.');
+        }
+    );
+};
+
+// Confirm location selection
+const confirmLocation = () => {
+    const [lat, lng] = markerPosition.value;
+    form.map_coordinates = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    closeMapModal();
+};
+
+// Close map modal
+const closeMapModal = () => {
+    showMap.value = false;
+    if (map) {
+        map.remove();
+        map = null;
+        marker = null;
+    }
 };
 
 const submit = () => {
@@ -116,23 +215,6 @@ const closeModal = () => {
 
             <form @submit.prevent="submit" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- User Selection -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Reporter <span class="text-red-500">*</span>
-                        </label>
-                        <Boombox
-                            :items="users"
-                            :existing-value="form.user_id"
-                            label-field="full_name"
-                            placeholder="Select reporter"
-                            @change="handleUserChange"
-                        />
-                        <p v-if="form.errors.user_id" class="mt-1 text-sm text-red-600">
-                            {{ form.errors.user_id }}
-                        </p>
-                    </div>
-
                     <!-- Barangay Selection -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -203,23 +285,6 @@ const closeModal = () => {
                         </p>
                     </div>
 
-                    <!-- Status -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Status <span class="text-red-500">*</span>
-                        </label>
-                        <Boombox
-                            :items="statuses"
-                            :existing-value="form.status"
-                            label-field="name"
-                            placeholder="Select status"
-                            @change="handleStatusChange"
-                        />
-                        <p v-if="form.errors.status" class="mt-1 text-sm text-red-600">
-                            {{ form.errors.status }}
-                        </p>
-                    </div>
-
                     <!-- Casualty Count -->
                     <div>
                         <TextInput
@@ -243,68 +308,41 @@ const closeModal = () => {
                         />
                     </div>
 
-                    <!-- Map Coordinates -->
+                    <!-- Map Coordinates with Map Picker -->
                     <div class="md:col-span-2">
-                        <TextInput
-                            v-model="form.map_coordinates"
-                            type="text"
-                            label="Map Coordinates"
-                            placeholder="Enter coordinates (e.g., 14.5995, 120.9842)"
-                            :error="form.errors.map_coordinates"
-                        />
-                    </div>
-
-                    <!-- Responder Name -->
-                    <div>
-                        <TextInput
-                            v-model="form.responder_name"
-                            type="text"
-                            label="Responder Name"
-                            placeholder="Enter responder name"
-                            :error="form.errors.responder_name"
-                        />
-                    </div>
-
-                    <!-- Responder Contact -->
-                    <div>
-                        <TextInput
-                            v-model="form.responder_contact_no"
-                            type="tel"
-                            label="Responder Contact Number"
-                            placeholder="Enter contact number"
-                            :error="form.errors.responder_contact_no"
-                        />
-                    </div>
-
-                    <!-- Plate Number -->
-                    <div>
-                        <TextInput
-                            v-model="form.plate_no"
-                            type="text"
-                            label="Plate Number"
-                            placeholder="Enter plate number"
-                            :error="form.errors.plate_no"
-                        />
-                    </div>
-
-                    <!-- Estimated Arrival -->
-                    <div>
-                        <TextInput
-                            v-model="form.estimated_arrival"
-                            type="datetime-local"
-                            label="Estimated Arrival"
-                            :error="form.errors.estimated_arrival"
-                        />
-                    </div>
-
-                    <!-- Datetime Arrived -->
-                    <div>
-                        <TextInput
-                            v-model="form.datetime_arrived"
-                            type="datetime-local"
-                            label="Datetime Arrived"
-                            :error="form.errors.datetime_arrived"
-                        />
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Map Coordinates <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <TextInput
+                                v-model="form.map_coordinates"
+                                type="text"
+                                placeholder="Click 'Pick on Map' to select location"
+                                :error="form.errors.map_coordinates"
+                                class="flex-1"
+                                readonly
+                            />
+                            <button
+                                type="button"
+                                @click="openMapPicker"
+                                class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 whitespace-nowrap flex items-center gap-2"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                Pick on Map
+                            </button>
+                        </div>
+                        <p v-if="form.errors.map_coordinates" class="mt-1 text-sm text-red-600">
+                            {{ form.errors.map_coordinates }}
+                        </p>
+                        <p v-else-if="form.map_coordinates" class="mt-1 text-sm text-green-600 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Location selected
+                        </p>
                     </div>
 
                     <!-- Attachment -->
@@ -359,6 +397,74 @@ const closeModal = () => {
                     </button>
                 </div>
             </form>
+        </div>
+    </Modal>
+
+    <!-- Map Picker Modal -->
+    <Modal :show="showMap" max-width="4xl" @close="closeMapModal">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Select Location on Map</h3>
+                <button
+                    @click="closeMapModal"
+                    class="text-gray-400 hover:text-gray-500"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="mb-3 flex items-center justify-between">
+                <p class="text-sm text-gray-600">
+                    Click anywhere on the map or drag the marker to select the incident location
+                </p>
+                <button
+                    type="button"
+                    @click="getCurrentLocation"
+                    :disabled="isLocating"
+                    class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {{ isLocating ? 'Locating...' : 'Use My Location' }}
+                </button>
+            </div>
+
+            <!-- Map Container -->
+            <div
+                ref="mapContainer"
+                class="border border-gray-300 rounded-lg"
+                style="height: 500px; width: 100%;"
+            ></div>
+
+            <!-- Selected Coordinates Display -->
+            <div class="mt-4 p-3 bg-gray-50 rounded-md">
+                <p class="text-sm text-gray-700">
+                    <strong>Selected Coordinates:</strong>
+                    {{ markerPosition[0].toFixed(6) }}, {{ markerPosition[1].toFixed(6) }}
+                </p>
+            </div>
+
+            <!-- Modal Actions -->
+            <div class="mt-4 flex justify-end gap-3">
+                <button
+                    type="button"
+                    @click="closeMapModal"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="button"
+                    @click="confirmLocation"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                >
+                    Confirm Location
+                </button>
+            </div>
         </div>
     </Modal>
 </template>
