@@ -122,9 +122,8 @@ const exportCitizenReport = () => {
                         class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active
-                                    Responders</p>
-                                <div class="p-1 bg-blue-200 rounded-md flex items-center justify-center">
+                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active Responders</p>
+                                <div class="p-1 bg-orange-200 rounded-md flex items-center justify-center">
                                     <PhFireTruck :size="40" color="#0e6acd" weight="fill" />
                                 </div>
                             </div>
@@ -194,10 +193,8 @@ const exportCitizenReport = () => {
                 </div>
             </div>
 
-            <!-- Right Sidebar - Spans full height -->
-            <div class="col-span-1 lg:col-span-1 h-3/4">
-                <div
-                    class="relative bg-white px-4 py-3 h-full overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+            <div class="col-span-1 lg:col-span-1 h-3/4 flex flex-col">
+                <div class="relative h-[calc(75%-5rem)] bg-white px-4 py-3 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border flex flex-col">
                     <div class="flex justify-between items-center">
                         <h1 class="text-2xl font-black my-3">Incident Feed</h1>
                         <div class="flex">
