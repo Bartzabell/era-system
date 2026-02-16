@@ -96,6 +96,7 @@ const exportCitizenReport = () => {
 </script>
 
 <template>
+
     <Head title="Dashboard" />
 
     <AppLayout>
@@ -103,11 +104,11 @@ const exportCitizenReport = () => {
             <div class="col-span-1 lg:col-span-2 flex flex-col gap-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div
-                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar"
-                    >
+                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active Incidents</p>
+                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active
+                                    Incidents</p>
                                 <div class="p-1 bg-red-200 rounded-md flex items-center justify-center">
                                     <Flame :size="40" color="#e60000" weight="fill" />
                                 </div>
@@ -118,12 +119,12 @@ const exportCitizenReport = () => {
                         </div>
                     </div>
                     <div
-                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar"
-                    >
+                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active Responders</p>
-                                <div class="p-1 bg-orange-200 rounded-md flex items-center justify-center">
+                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active
+                                    Responders</p>
+                                <div class="p-1 bg-blue-200 rounded-md flex items-center justify-center">
                                     <PhFireTruck :size="40" color="#0e6acd" weight="fill" />
                                 </div>
                             </div>
@@ -133,11 +134,11 @@ const exportCitizenReport = () => {
                         </div>
                     </div>
                     <div
-                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar"
-                    >
+                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Avg response Time</p>
+                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Avg response
+                                    Time</p>
                                 <div class="p-1 bg-green-200 rounded-md flex items-center justify-center">
                                     <PhClockCountdown :size="40" color="#00a814" weight="fill" />
                                 </div>
@@ -147,10 +148,12 @@ const exportCitizenReport = () => {
                             </div>
                         </div>
                     </div>
-                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+                    <div
+                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Resolved Today</p>
+                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Resolved Today
+                                </p>
                                 <div class="p-1 bg-slate-200 rounded-md flex items-center justify-center">
                                     <PhCheckCircle :size="40" color="#404040" />
                                 </div>
@@ -191,13 +194,15 @@ const exportCitizenReport = () => {
                 </div>
             </div>
 
-            <div class="col-span-1 lg:col-span-1 h-3/4 flex flex-col">
-                <div class="relative h-[calc(75%-5rem)] bg-white px-4 py-3 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border flex flex-col">
+            <!-- Right Sidebar - Spans full height -->
+            <div class="col-span-1 lg:col-span-1 h-3/4">
+                <div
+                    class="relative bg-white px-4 py-3 h-full overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     <div class="flex justify-between items-center">
                         <h1 class="text-2xl font-black my-3">Incident Feed</h1>
                         <div class="flex">
-                            <PhFunnel :size="24" color="#969696" weight="fill"/>
-                            <PhDotsThreeOutline :size="24" color="#969696" weight="fill"/>
+                            <PhFunnel :size="24" color="#969696" weight="fill" />
+                            <PhDotsThreeOutline :size="24" color="#969696" weight="fill" />
                         </div>
                     </div>
 
