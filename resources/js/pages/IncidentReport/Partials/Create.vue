@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, nextTick } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import Modal from '@/components/Modal.vue';
 import TextInput from '@/components/TextInput.vue';
