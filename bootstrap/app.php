@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'permission' => \App\Http\Middleware\CheckPermission::class,
+            'mobile.token' => \App\Http\Middleware\ValidateMobileToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
