@@ -85,6 +85,65 @@ class IncidentReportController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'barangay_id' => 'required|exists:barangays,id',
+            'map_coordinates' => 'required|string', // Now required
+            'emergency_id' => 'required|exists:emergencies,id',
+            'incident_id' => 'required|exists:incidents,id',
+            'severity_level' => 'required|in:low,medium,high',
+            'casualty_count' => 'nullable|integer|min:0',
+            'distance' => 'nullable|string',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'remarks' => 'nullable|string',
+        ]);
+
+        // Auto-fill user_id from authenticated user
+        $validated['user_id'] = auth()->id();
+
+        // Auto-set status to pending
+        $validated['status'] = 'pending';
+
+        // Handle file upload
+        if ($request->hasFile('attachment')) {
+            $path = $request->file('attachment')->store('incident-reports', 'public');
+            $validated['attachment'] = $path;
+        }
+
+        IncidentReport::create($validated);
+
+        return redirect()->route('incident-report.index')
+            ->with('success', 'Incident report created successfully.');
+    }
+
+    // In the create() method, remove users from the data being passed:
+
+    public function create()
+    {
+        // Get all necessary data for the form
+        $barangays = Barangay::select('id', 'barangay_name')
+            ->orderBy('barangay_name')
+            ->get();
+
+        $incidents = Incident::select('id', 'incident_name', 'severity_level')
+            ->orderBy('incident_name')
+            ->get();
+
+        $emergencies = Emergency::select('id', 'emergency_name', 'severity_level')
+            ->orderBy('emergency_name')
+            ->get();
+
+        // Removed users query - not needed for create form
+
+        return Inertia::render('IncidentReport/Create', [
+            'barangays' => $barangays,
+            'incidents' => $incidents,
+            'emergencies' => $emergencies,
+            // 'users' => $users, // Removed
+        ]);
+    }
+
     public function show(IncidentReport $incidentReport)
     {
         $user = auth()->user();

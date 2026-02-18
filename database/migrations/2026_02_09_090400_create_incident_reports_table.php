@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('casualty_count')->nullable();
             $table->integer('distance')->nullable();
             $table->text('attachment')->nullable();
+            $table->text('responder_attachment')->nullable();
             $table->string('responder_name')->nullable();
             $table->string('responder_contact_no')->nullable();
             $table->datetime('estimated_arrival')->nullable();
@@ -33,6 +34,10 @@ return new class extends Migration
             $table->string('plate_no')->nullable();
             $table->string('status')->nullable();
             $table->text('remarks')->nullable();
+            $table->text('responder_remarks')->nullable();
+            $table->text('treatment_provided')->nullable();
+            $table->text('cancel_remarks')->nullable();
+            $table->string('cancelled_by')->nullable();
             $table->foreignIdFor(User::class, 'created_by')->nullable();
             $table->foreignIdFor(User::class, 'updated_by')->nullable();
             $table->foreignIdFor(User::class, 'deleted_by')->nullable();
