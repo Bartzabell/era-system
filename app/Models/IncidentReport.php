@@ -27,7 +27,12 @@ class IncidentReport extends Model
         'datetime_arrived',
         'plate_no',
         'status',
-        'remarks'
+        'remarks',
+        'responder_remarks',
+        'treatment_provided',
+        'responder_attachment',
+        'cancel_remarks',
+        'cancelled_by'
     ];
 
     public function creator(){

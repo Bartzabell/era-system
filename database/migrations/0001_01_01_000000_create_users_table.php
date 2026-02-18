@@ -24,7 +24,7 @@ return new class extends Migration
             $table->datetime('birth_date')->nullable();
             $table->text('address')->nullable();
             $table->foreignIdFor(Barangay::class, 'barangay_id')->nullable();
-            $table->string('username')->unique();
+            $table->string('username', 191)->unique();
             $table->string('role')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
