@@ -23,6 +23,7 @@ class AccountApiController extends Controller
             'email' => 'nullable|email|unique:users',
             'mobile_no' => 'nullable|max:20',
             'birth_date' => 'nullable|date',
+            'address' => 'nullable|string',
             'barangay_id' => 'nullable|exists:barangays,id',
             'role' => 'nullable|string',
         ]);
@@ -44,6 +45,7 @@ class AccountApiController extends Controller
             'email' => $request->email,
             'mobile_no' => $request->mobile_no,
             'birth_date' => $request->birth_date,
+            'address' => $request->address,
             'barangay_id' => $request->barangay_id,
             'role' => $request->role,
         ]);
@@ -109,6 +111,8 @@ class AccountApiController extends Controller
             'email' => 'nullable|email|unique:users,email,' . $request->user()->id,
             'mobile_no' => 'nullable|max:20',
             'birth_date' => 'nullable|date',
+            'address' => 'nullable|string',
+            'barangay_id' => 'nullable|exists:barangays,id',
             'role' => 'nullable|string',
         ]);
 
@@ -128,6 +132,8 @@ class AccountApiController extends Controller
             'email' => $request->email,
             'mobile_no' => $request->mobile_no,
             'birth_date' => $request->birth_date,
+            'address' => $request->address,
+            'barangay_id' => $request->barangay_id,
             'role' => $request->role,
         ]);
 

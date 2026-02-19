@@ -9,6 +9,7 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
     // Public routes
     Route::post('/auth/register', [AccountApiController::class, 'register']);
     Route::post('/auth/login', [AccountApiController::class, 'login']);
+    Route::get('/dropdowns', [IncidentReportApiController::class, 'getDropdowns']);
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
@@ -18,7 +19,7 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         Route::put('/users/password', [AccountApiController::class, 'changePassword']);
 
         // Dropdowns & Hotlines
-        Route::get('/dropdowns', [IncidentReportApiController::class, 'getDropdowns']);
+        // Route::get('/dropdowns', [IncidentReportApiController::class, 'getDropdowns']);
         Route::get('/hotlines', [HotlineApiController::class, 'index']);
 
         // Incident Reports

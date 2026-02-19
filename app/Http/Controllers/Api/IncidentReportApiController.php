@@ -161,7 +161,7 @@ class IncidentReportApiController extends Controller
         );
     }
 
-    // Update report
+    // Update report - handles ALL field updates
     public function updateReport(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -170,6 +170,9 @@ class IncidentReportApiController extends Controller
             'severity_level' => 'nullable|in:low,mid,high',
             'datetime_arrived' => 'nullable|date',
             'remarks' => 'nullable|string',
+            'responder_remarks' => 'nullable|string', // ✅ NEW
+            'treatment_provided' => 'nullable|string', // ✅ NEW
+            'responder_attachment' => 'nullable|string|url', // ✅ NEW
         ]);
 
         if ($validator->fails()) {
@@ -179,8 +182,17 @@ class IncidentReportApiController extends Controller
         $report = IncidentReport::findOrFail($id);
 
         // Authorization check
-        $authCheck = $this->checkReportAuthorization($request->user(), $report);
-        if ($authCheck) return $authCheck;
+        $user = $request->user();
+        
+        // Citizen can only update their own reports
+        if ($user->role === 'Citizen' && $report->user_id !== $user->id) {
+            return $this->errorResponse('Unauthorized', 403);
+        }
+
+        // Responder can only update reports they accepted
+        if ($user->role === 'Responder' && $report->responder_name !== $user->full_name) {
+            return $this->errorResponse('Unauthorized', 403);
+        }
 
         // Status validation
         if ($request->has('status')) {
@@ -190,7 +202,7 @@ class IncidentReportApiController extends Controller
 
         // Build update data
         $updateData = $this->buildUpdateData($request, $report);
-        $updateData['updated_by'] = $request->user()->id;
+        $updateData['updated_by'] = $user->id;
 
         $report->update($updateData);
 
@@ -209,7 +221,7 @@ class IncidentReportApiController extends Controller
     public function cancelReport(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'reason' => 'nullable|string',
+            'cancel_remarks' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -219,19 +231,36 @@ class IncidentReportApiController extends Controller
         $report = IncidentReport::findOrFail($id);
         $user = $request->user();
 
-        // Check cancel permissions
-        $cancelCheck = $this->checkCancelPermissions($user, $report);
-        if ($cancelCheck) return $cancelCheck;
+        // Citizen can only cancel their own waiting reports
+        if ($user->role === 'Citizen') {
+            if ($report->user_id !== $user->id) {
+                return $this->errorResponse('Unauthorized', 403);
+            }
 
-        // Add cancellation reason to remarks
-        $cancelRemark = "Cancelled by {$user->role}" . ($request->reason ? ": {$request->reason}" : "");
-        
+            if ($report->status !== 'waiting') {
+                return $this->errorResponse('Can only cancel waiting reports', 400);
+            }
+        }
+
+        // Responder can cancel anytime (except resolved)
+        if ($user->role === 'Responder') {
+            if ($report->responder_name !== $user->full_name && $report->status !== 'waiting') {
+                return $this->errorResponse('Unauthorized', 403);
+            }
+
+            if ($report->status === 'resolved') {
+                return $this->errorResponse('Cannot cancel resolved reports', 400);
+            }
+        }
+
         $report->update([
             'status' => 'cancelled',
-            'remarks' => $report->remarks ? $report->remarks . "\n\n" . $cancelRemark : $cancelRemark,
+            'cancel_remarks' => $request->cancel_remarks,
+            'cancelled_by' => $user->role, // Store role: "Citizen" or "Responder"
             'updated_by' => $user->id,
         ]);
 
+        // Clear cache
         Cache::forget("responder_location_{$id}");
 
         return $this->successResponse(
@@ -333,6 +362,9 @@ class IncidentReportApiController extends Controller
         if ($request->has('severity_level')) $updateData['severity_level'] = $request->severity_level;
         if ($request->has('datetime_arrived')) $updateData['datetime_arrived'] = $request->datetime_arrived;
         if ($request->has('remarks')) $updateData['remarks'] = $request->remarks;
+        if ($request->has('responder_remarks')) $updateData['responder_remarks'] = $request->responder_remarks;
+        if ($request->has('treatment_provided')) $updateData['treatment_provided'] = $request->treatment_provided;
+        if ($request->has('responder_attachment')) $updateData['responder_attachment'] = $request->responder_attachment;
         
         return $updateData;
     }
