@@ -106,11 +106,27 @@ const statusClass = (status: string) => {
 }
 
 const columns = [
-    { accessorKey: 'id',             header: 'ID' },
-    { accessorKey: 'user_name',      header: 'Reporter' },
-    { accessorKey: 'barangay',       header: 'Barangay' },
-    { accessorKey: 'incident',       header: 'Incident Type' },
-    { accessorKey: 'emergency',      header: 'Emergency Type' },
+   { accessorKey: 'id', header: 'ID' },
+    {
+        accessorKey: 'user.full_name',
+        header: 'Reporter',
+        cell: ({ row }: any) => row.original.user?.full_name ?? '—',
+    },
+    {
+        accessorKey: 'barangay.barangay_name',
+        header: 'Barangay',
+        cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '—',
+    },
+    {
+        accessorKey: 'incident.incident_name',
+        header: 'Incident Type',
+        cell: ({ row }: any) => row.original.incident?.incident_name ?? '—',
+    },
+    {
+        accessorKey: 'emergency.emergency_name',
+        header: 'Emergency Type',
+        cell: ({ row }: any) => row.original.emergency?.emergency_name ?? '—',
+    },
     {
         accessorKey: 'severity_level',
         header: 'Severity',

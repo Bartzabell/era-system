@@ -30,7 +30,13 @@ const currentDateTime = ref('');
  */
 const normalizeDate = (val) => {
     if (!val) return '';
-    return val.split('T')[0].split(' ')[0];
+    if (props.type === 'datetime-local') {
+        // Keep full datetime, just normalize the separator
+        // Handles: "2026-02-19 14:30:00", "2026-02-19T14:30:00"
+        const normalized = val.replace(' ', 'T');      // space → T
+        return normalized.substring(0, 16);            // YYYY-MM-DDTHH:mm
+    }
+    return val.split('T')[0].split(' ')[0];            // date only
 };
 
 // ── Type resolution ───────────────────────────────────────────────────────────
