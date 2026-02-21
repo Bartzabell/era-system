@@ -234,7 +234,7 @@ class DatabaseSeeder extends Seeder
                 Responder::firstOrCreate(
                     ['user_id' => $user->id],
                     [
-                        'is_active' => 1,
+                        'is_active' => true,
                         'created_by' => $user->id,
                     ]
                 );
