@@ -50,12 +50,16 @@ class IncidentReportController extends Controller
             'users'           => $users,
             'hasFullAccess'   => $hasFullAccess,
             'filters'         => $request->only('per_page'),
+            'currentUserId' => Auth::id(),
         ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $user = Auth::user();
+        $hasFullAccess = $user->hasPermission('admin_access') || $user->hasPermission('responder_access');
+
+        $rules = [
             'barangay_id'     => 'required|exists:barangays,id',
             'map_coordinates' => 'required|string',
             'emergency_id'    => 'required|exists:emergencies,id',
@@ -65,15 +69,21 @@ class IncidentReportController extends Controller
             'distance'        => 'nullable|string',
             'attachment'      => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'remarks'         => 'nullable|string',
-        ]);
+        ];
 
-        DB::transaction(function () use ($request) {
+        if ($hasFullAccess) {
+            $rules['user_id'] = 'required|exists:users,id';
+        }
+
+        $request->validate($rules);
+
+        DB::transaction(function () use ($request, $hasFullAccess, $user) {
             $data = $request->only([
                 'barangay_id', 'map_coordinates', 'emergency_id', 'incident_id',
                 'severity_level', 'casualty_count', 'distance', 'remarks',
             ]);
 
-            $data['user_id']    = Auth::id();
+            $data['user_id']    = $hasFullAccess ? $request->user_id : Auth::id();
             $data['status']     = 'pending';
             $data['created_by'] = Auth::id();
             $data['updated_by'] = Auth::id();

@@ -37,6 +37,7 @@ const props = defineProps<{
     users: Array<{ id: number; full_name: string }>
     hasFullAccess: boolean
     filters: object
+    currentUserId: number
 }>()
 
 const breadcrumbs = [
@@ -182,6 +183,8 @@ const columns = [
                 :incidents="incidents"
                 :emergencies="emergencies"
                 :users="users"
+                :has-full-access="hasFullAccess"
+                :current-user-id="currentUserId"
                 @close="closeFormModal"
                 @success="closeFormModal"
             />
