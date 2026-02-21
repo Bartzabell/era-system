@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
-import DataTable from '@/components/DataTable.vue'
+import DataTable from '@/components/Datatable.vue'
 import Modal from '@/components/Modal.vue'
 import ButtonCode from '@/components/ButtonCode.vue'
 import CustomInput from '@/components/CustomInput.vue'
