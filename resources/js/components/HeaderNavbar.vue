@@ -1,28 +1,26 @@
 <script setup lang="ts">
 import { usePage, router } from '@inertiajs/vue3';
-import { LogOut, FileText } from 'lucide-vue-next';
+import { LogOut } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { computed } from 'vue';
 
 const page = usePage();
 const user = page.props.auth?.user;
 
-// Check if user has admin or responder access
-const hasFullAccess = computed(() => {
-    const permissions = user?.permissions || [];
-    return permissions.includes('admin_access') || permissions.includes('responder_access');
-});
+const permissions = computed(() =>
+    (user?.permissions || []).map((p: any) => p.slug)
+);
 
-const handleLogout = () => {
-    router.post('/logout');
-};
+const isAdmin = computed(() => permissions.value.includes('admin_access'));
+const isResponder = computed(() => permissions.value.includes('responder_access'));
+const isCitizen = computed(() => permissions.value.includes('citizen_access'));
 
-const goToIncidentReport = () => {
-    router.get('incident-report');
-};
+const handleLogout = () => router.post('/logout');
+
+const goToIncidentReport = () => router.get('incident-report');
 
 const goToMainPage = () => {
-    if (hasFullAccess.value) {
+    if (isAdmin.value || isResponder.value) {
         router.get('dashboard');
     } else {
         router.get('citizen-page');
@@ -33,7 +31,6 @@ const goToMainPage = () => {
 <template>
     <header class="bg-white border-b border-gray-200 shadow-sm m-2 rounded-lg">
         <div class="flex items-center justify-between px-6 py-4">
-            <!-- Left: Operation Center -->
             <div class="flex items-center">
                 <h1 class="text-xl font-semibold text-gray-900">Operation Center</h1>
             </div>
@@ -43,7 +40,7 @@ const goToMainPage = () => {
                     @click="goToMainPage"
                     class="flex items-center gap-2 shadow-none border-none px-2"
                 >
-                    {{ hasFullAccess ? 'Dashboard' : 'Citizen Page' }}
+                    {{ (isAdmin || isResponder) ? 'Dashboard' : 'Citizen Page' }}
                 </Button>
                 <Button
                     variant="outline"

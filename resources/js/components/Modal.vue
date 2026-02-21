@@ -75,7 +75,7 @@ const maxWidthClass = computed(() => {
 
 <template>
   <dialog class="w-auto min-h-full m-0 overflow-y-auto bg-transparent backdrop:bg-transparent" ref="dialog">
-    <div class="fixed inset-0 flex bg-gray-500/50 items-center justify-center px-4 py-6 overflow-y-auto sm:px-0"
+    <div class="fixed inset-0 flex bg-black/50 items-center justify-center px-4 py-6 overflow-y-auto sm:px-0"
       style="z-index: 40;" scroll-region>
 
       <!-- Modal Content -->
@@ -85,7 +85,7 @@ const maxWidthClass = computed(() => {
         leave-from-class="translate-y-0 opacity-100 sm:scale-100"
         leave-to-class="translate-y-4 opacity-0 sm:translate-y-0 sm:scale-95">
         <div v-show="show"
-          class="w-full md:w-auto mb-6 border-2 border-black overflow-hidden transition-all transform bg-white  shadow-xl dark:bg-gray-800 sm:mx-auto max-h-[85vh] flex flex-col"
+          class="w-full md:w-auto mb-6 p-2 overflow-hidden transition-all transform bg-white rounded-xl  shadow-xl dark:bg-gray-800 sm:mx-auto max-h-[85vh] flex flex-col"
           :class="maxWidthClass">
 
           <!-- Scrollable Content Area -->

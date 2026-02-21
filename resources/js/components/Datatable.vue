@@ -1,230 +1,188 @@
-<script setup lang="ts" generic="T extends Record<string, any>">
-import { computed, ref } from 'vue';
-import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { Link } from '@inertiajs/vue3'
+import {
+  FlexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useVueTable,
+} from '@tanstack/vue-table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { PhTrash, PhListMagnifyingGlass, PhMagnifyingGlass } from "@phosphor-icons/vue";
+import CustomSelect from './CustomSelect.vue'
 
-interface Column {
-    key: string;
-    label: string;
-    sortable?: boolean;
-    render?: (value: any, row: T) => string;
-}
+const props = defineProps({
+  columns: {
+    type: Array,
+    required: true
+  },
+  data: {
+    type: Object, // Changed from Array to Object to match Laravel pagination
+    required: true
+  },
+  filters: {
+    type: Object,
+    default: () => ({})
+  },
+  showSearch: {
+    type: Boolean,
+    default: true
+  },
+  showPerPage: {
+    type: Boolean,
+    default: false
+  },
+  perPageOptions: {
+    type: Array,
+    default: () => [
+      { value: 5, label: '5' },
+      { value: 10, label: '10' },
+      { value: 25, label: '25' },
+      { value: 50, label: '50' },
+      { value: 100, label: '100' }
+    ]
+  }
+})
 
-interface Props {
-    columns: Column[];
-    data: T[];
-    perPage?: number;
-    loading?: boolean;
-}
+const navigateToPage = (url) => {
+  if (!url) return;
 
-const props = withDefaults(defineProps<Props>(), {
-    perPage: 10,
-    loading: false
-});
-
-const emit = defineEmits<{
-    rowClick: [row: T];
-}>();
-
-const currentPage = ref(1);
-const sortField = ref<string | null>(null);
-const sortDirection = ref<'asc' | 'desc'>('asc');
-
-// Sorting logic
-const sortedData = computed(() => {
-    if (!sortField.value) return props.data;
-
-    return [...props.data].sort((a, b) => {
-        const aVal = a[sortField.value!];
-        const bVal = b[sortField.value!];
-
-        if (aVal === null || aVal === undefined) return 1;
-        if (bVal === null || bVal === undefined) return -1;
-
-        let comparison = 0;
-        if (typeof aVal === 'string' && typeof bVal === 'string') {
-            comparison = aVal.localeCompare(bVal);
-        } else if (typeof aVal === 'number' && typeof bVal === 'number') {
-            comparison = aVal - bVal;
-        } else {
-            comparison = String(aVal).localeCompare(String(bVal));
-        }
-
-        return sortDirection.value === 'asc' ? comparison : -comparison;
-    });
-});
-
-// Pagination logic
-const totalPages = computed(() => Math.ceil(sortedData.value.length / props.perPage));
-
-const paginatedData = computed(() => {
-    const start = (currentPage.value - 1) * props.perPage;
-    const end = start + props.perPage;
-    return sortedData.value.slice(start, end);
-});
-
-const pageNumbers = computed(() => {
-    const pages: (number | string)[] = [];
-    const maxVisible = 5;
-
-    if (totalPages.value <= maxVisible) {
-        for (let i = 1; i <= totalPages.value; i++) {
-            pages.push(i);
-        }
-    } else {
-        if (currentPage.value <= 3) {
-            for (let i = 1; i <= 4; i++) pages.push(i);
-            pages.push('...');
-            pages.push(totalPages.value);
-        } else if (currentPage.value >= totalPages.value - 2) {
-            pages.push(1);
-            pages.push('...');
-            for (let i = totalPages.value - 3; i <= totalPages.value; i++) pages.push(i);
-        } else {
-            pages.push(1);
-            pages.push('...');
-            pages.push(currentPage.value - 1);
-            pages.push(currentPage.value);
-            pages.push(currentPage.value + 1);
-            pages.push('...');
-            pages.push(totalPages.value);
-        }
-    }
-
-    return pages;
-});
-
-const handleSort = (column: Column) => {
-    if (!column.sortable) return;
-
-    if (sortField.value === column.key) {
-        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortField.value = column.key;
-        sortDirection.value = 'asc';
-    }
+  // If using Inertia.js
+  if (window.Inertia) {
+    window.Inertia.visit(url);
+  } else {
+    // Otherwise use standard navigation
+    window.location.href = url;
+  }
 };
 
-const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages.value) {
-        currentPage.value = page;
-    }
-};
+const emit = defineEmits(['update:filters'])
 
-const getCellValue = (row: T, column: Column) => {
-    const value = row[column.key];
-    return column.render ? column.render(value, row) : value;
-};
+const sorting = ref([])
+const globalFilter = ref(props.filters.search || '')
+const perPage = ref(props.filters.per_page || props.data.per_page || 10)
+
+// Watch for changes in global filter and emit back to parent
+watch(globalFilter, (newValue) => {
+  emit('update:filters', {
+    ...props.filters,
+    search: newValue
+  })
+})
+
+// Watch for changes in per page and emit back to parent
+watch(perPage, (newValue) => {
+  emit('update:filters', {
+    ...props.filters,
+    per_page: newValue,
+    page: 1 // Reset to first page when changing per page
+  })
+})
+
+const table = useVueTable({
+  get data() { return props.data.data }, // Use .data to access the actual array
+  get columns() { return props.columns },
+  state: {
+    get sorting() { return sorting.value },
+    get globalFilter() { return globalFilter.value }
+  },
+  onSortingChange: updaterOrValue => {
+    sorting.value = typeof updaterOrValue === 'function'
+      ? updaterOrValue(sorting.value)
+      : updaterOrValue
+  },
+  getCoreRowModel: getCoreRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  // getPaginationRowModel: getPaginationRowModel(),
+})
 </script>
 
 <template>
-    <div class="w-full">
-        <!-- Table -->
-        <div class="relative overflow-x-auto border border-gray-200 rounded-lg">
-            <table class="w-full text-sm text-left">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
-                    <tr>
-                        <th
-                            v-for="column in columns"
-                            :key="column.key"
-                            scope="col"
-                            class="px-6 py-3"
-                            :class="{ 'cursor-pointer select-none hover:bg-gray-100': column.sortable }"
-                            @click="handleSort(column)"
-                        >
-                            <div class="flex items-center gap-2">
-                                <span>{{ column.label }}</span>
-                                <component
-                                    v-if="column.sortable"
-                                    :is="sortField === column.key
-                                        ? (sortDirection === 'asc' ? ChevronUp : ChevronDown)
-                                        : ChevronsUpDown"
-                                    class="w-4 h-4"
-                                    :class="sortField === column.key ? 'text-orange-600' : 'text-gray-400'"
-                                />
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="loading" class="border-b">
-                        <td :colspan="columns.length" class="px-6 py-8 text-center text-gray-500">
-                            <div class="flex items-center justify-center gap-2">
-                                <div class="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-                                <span>Loading...</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr v-else-if="paginatedData.length === 0" class="border-b">
-                        <td :colspan="columns.length" class="px-6 py-8 text-center text-gray-500">
-                            No data available
-                        </td>
-                    </tr>
-                    <tr
-                        v-else
-                        v-for="(row, index) in paginatedData"
-                        :key="index"
-                        class="bg-white border-b hover:bg-gray-50 cursor-pointer"
-                        @click="emit('rowClick', row)"
-                    >
-                        <td
-                            v-for="column in columns"
-                            :key="column.key"
-                            class="px-6 py-4"
-                        >
-                            <slot :name="`cell-${column.key}`" :row="row" :value="row[column.key]">
-                                {{ getCellValue(row, column) }}
-                            </slot>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        <div v-if="!loading && paginatedData.length > 0" class="flex items-center justify-between mt-4">
-            <div class="text-sm text-gray-700">
-                Showing
-                <span class="font-medium">{{ (currentPage - 1) * perPage + 1 }}</span>
-                to
-                <span class="font-medium">{{ Math.min(currentPage * perPage, data.length) }}</span>
-                of
-                <span class="font-medium">{{ data.length }}</span>
-                results
-            </div>
-
-            <div class="flex items-center gap-2">
-                <button
-                    @click="goToPage(currentPage - 1)"
-                    :disabled="currentPage === 1"
-                    class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <ChevronLeft class="w-4 h-4" />
-                </button>
-
-                <button
-                    v-for="(page, index) in pageNumbers"
-                    :key="index"
-                    @click="typeof page === 'number' ? goToPage(page) : null"
-                    :disabled="page === '...'"
-                    class="px-3 py-2 text-sm font-medium rounded-lg"
-                    :class="[
-                        page === currentPage
-                            ? 'text-white bg-orange-600'
-                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50',
-                        page === '...' ? 'cursor-default hover:bg-white' : ''
-                    ]"
-                >
-                    {{ page }}
-                </button>
-
-                <button
-                    @click="goToPage(currentPage + 1)"
-                    :disabled="currentPage === totalPages"
-                    class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <ChevronRight class="w-4 h-4" />
-                </button>
-            </div>
-        </div>
+  <div class="space-y-4">
+    <!-- Global Search -->
+    <div class="flex flex-col gap-1 pt-1 sm:flex-row sm:items-end sm:justify-end">
+      <div v-if="showPerPage" class="flex items-center gap-2">
+        <div class="text-gray-400 text-xs">Per page:</div>
+        <CustomSelect label="" name="per_page" v-model="perPage" :options="perPageOptions" class="w-max" />
+      </div>
+      <div v-if="showSearch" class="flex items-center pt-4">
+        <PhMagnifyingGlass class="relative text-gray-400 transform -translate-y-1/2 left-8 top-3" :size="24" />
+        <Input class="w-full text-right bg-white border border-black" placeholder=". . ." :model-value="globalFilter"
+          @update:model-value="globalFilter = $event" />
+      </div>
     </div>
+
+    <!-- Table -->
+    <div class="overflow-hidden shadow-lg rounded-lg  bg-white">
+      <Table>
+        <TableHeader>
+          <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+            <TableHead v-for="header in headerGroup.headers" :key="header.id"
+              :class="header.column.getCanSort() ? 'cursor-pointer text-left select-none' : ''"
+              @click="header.column.getCanSort() ? header.column.toggleSorting() : null">
+              <FlexRender :render="header.column.columnDef.header" :props="header.getContext()" />
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          <template v-if="table.getRowModel().rows.length">
+            <TableRow v-for="row in table.getRowModel().rows" :key="row.id">
+              <TableCell class="py-1" v-for="cell in row.getVisibleCells()" :key="cell.id">
+                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+              </TableCell>
+            </TableRow>
+          </template>
+
+          <TableRow v-else>
+            <TableCell :colspan="columns.length" class="h-24 text-center">
+              No results.
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex flex-col items-center justify-between px-2 lg:flex-row">
+      <div class="flex items-center space-x-2">
+        <nav class="flex w-full gap-2 -space-x-px bg-gray-300lg:inline-flex" aria-label="Pagination">
+          <template v-for="page in data.links" :key="page.label">
+
+            <Button v-if="page.active" size="sm"
+              :class="'z-10 text-xs h-auto border hover:!bg-orange-600/50 border-black bg-orange-600'">
+              <span v-html="page.label"></span>
+            </Button>
+            <!-- Clickable page with URL -->
+            <Link v-else-if="page.url" :href="page.url" method="get" preserve-state class="inline-block">
+            <Button size="sm" :class="'text-black bg-gray-200 border border-black text-xs hover:!bg-orange-600/50'">
+              <span v-html="page.label"></span>
+            </Button>
+            </Link>
+            <!-- Disabled page (no URL, like "...") -->
+            <Button v-else size="sm"
+              :class="'opacity-50 bg-white border border-black hover:!bg-orange-600/80 text-black text-xs'">
+              <span v-html="page.label"></span>
+            </Button>
+          </template>
+        </nav>
+      </div>
+      <div class="flex text-sm text-muted-foreground">
+        Showing {{ data.from }} to {{ data.to }} of {{ data.total }} entries
+      </div>
+    </div>
+  </div>
 </template>
