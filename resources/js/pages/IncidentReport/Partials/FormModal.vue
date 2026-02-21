@@ -65,7 +65,6 @@ const handleFileChange = (event: Event) => {
     if (target.files?.[0]) form.attachment = target.files[0]
 }
 
-// ── Map ─────────────────────────────────────────────────────────────────────
 const showMap        = ref(false)
 const mapContainer   = ref<HTMLElement | null>(null)
 const isLocating     = ref(false)
@@ -79,7 +78,6 @@ const isSearching    = ref(false)
 let map: L.Map | null = null
 let mapMarker: L.Marker | null = null
 
-// ── Reverse geocode using Nominatim ─────────────────────────────────────────
 const reverseGeocode = async (lat: number, lng: number) => {
     isGeocoding.value = true
     resolvedAddress.value = ''
@@ -96,8 +94,6 @@ const reverseGeocode = async (lat: number, lng: number) => {
         isGeocoding.value = false
     }
 }
-
-// ── Forward geocode / search ─────────────────────────────────────────────────
 const searchAddress = async () => {
     if (!searchQuery.value.trim()) return
     isSearching.value = true
@@ -126,7 +122,6 @@ const selectSearchResult = (result: any) => {
     searchQuery.value = ''
 }
 
-// ── Map init ─────────────────────────────────────────────────────────────────
 const updateMarker = (lat: number, lng: number) => {
     markerPos.value = [lat, lng]
     reverseGeocode(lat, lng)
@@ -184,24 +179,53 @@ const closeMapModal = () => {
     mapMarker = null
 }
 
-const getCurrentLocation = () => {
-    if (!navigator.geolocation) { alert('Geolocation not supported'); return }
+const getCurrentLocation = async () => {
     isLocating.value = true
-    navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-            const lat = coords.latitude
-            const lng = coords.longitude
+
+    // Try browser geolocation first
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+                const lat = coords.latitude
+                const lng = coords.longitude
+                markerPos.value = [lat, lng]
+                map?.setView([lat, lng], 16)
+                mapMarker?.setLatLng([lat, lng])
+                reverseGeocode(lat, lng)
+                isLocating.value = false
+            },
+            async () => {
+                // Browser geolocation failed — fall back to IP geolocation
+                await locateByIp()
+            },
+            { timeout: 8000 }
+        )
+    } else {
+        // Geolocation API not available
+        await locateByIp()
+    }
+}
+
+const locateByIp = async () => {
+    try {
+        const res = await fetch('https://ipapi.co/json/')
+        const data = await res.json()
+
+        if (data.latitude && data.longitude) {
+            const lat = parseFloat(data.latitude)
+            const lng = parseFloat(data.longitude)
             markerPos.value = [lat, lng]
-            map?.setView([lat, lng], 16)
+            map?.setView([lat, lng], 13)
             mapMarker?.setLatLng([lat, lng])
             reverseGeocode(lat, lng)
-            isLocating.value = false
-        },
-        () => {
-            isLocating.value = false
-            alert('Unable to get location. Click the map or search an address instead.')
+        } else {
+            alert('Unable to determine location. Please click the map or search an address.')
         }
-    )
+    } catch {
+        alert('Unable to determine location. Please click the map or search an address.')
+    } finally {
+        isLocating.value = false
+    }
 }
 
 const confirmLocation = () => {
@@ -239,9 +263,8 @@ const closeModal = () => {
             </button>
         </div>
 
-        <form @submit.prevent="submitForm" class="p-4 bg-form-body dark:bg-gray-800 max-h-[85vh] overflow-y-auto">
+        <form @submit.prevent="submitForm" class="p-4 bg-form-body dark:bg-gray-800 max-h-[85vh]">
 
-            <!-- ── CREATE: Incident Details ─────────────────────────────── -->
             <template v-if="mode === 'create'">
                 <h2 class="mb-2 font-semibold text-gray-700 dark:text-gray-200">Incident Details</h2>
                 <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
@@ -294,25 +317,30 @@ const closeModal = () => {
             <!-- ── EDIT: Read-only Report Details ─────────────────────────── -->
             <template v-if="mode === 'edit'">
                 <h2 class="mb-2 font-semibold text-gray-700 dark:text-gray-200">Report Details</h2>
-                <div class="grid grid-cols-1 gap-4 p-4 mb-4 rounded-lg border border-blue-200 bg-blue-50 dark:bg-gray-700/50 dark:border-blue-700 lg:grid-cols-3">
+                <div class="grid grid-cols-1 gap-4 p-4 mb-4 rounded-lg border border-orange-200 bg-orange-50 dark:bg-gray-700/50 dark:border-orange-700 lg:grid-cols-3">
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Barangay</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Reporter</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.user?.full_name ?? '—' }}</p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Barangay</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.barangay?.barangay_name ?? '—' }}</p>
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Incident Type</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Incident Type</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.incident?.incident_name ?? '—' }}</p>
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Emergency Type</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Emergency Type</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.emergency?.emergency_name ?? '—' }}</p>
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Severity Level</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Severity Level</p>
                         <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold capitalize"
                             :class="{
                                 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300': record?.severity_level === 'low',
@@ -324,33 +352,33 @@ const closeModal = () => {
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Casualty Count</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Casualty Count</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.casualty_count ?? '0' }}</p>
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Reported By</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Reported By</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.user?.full_name ?? '—' }}</p>
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Date Reported</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Date Reported</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">
                             {{ record?.created_at ? new Date(record.created_at).toLocaleString() : '—' }}
                         </p>
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Map Coordinates</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Map Coordinates</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100 break-all">{{ record?.map_coordinates ?? '—' }}</p>
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Current Status</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Current Status</p>
                         <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold capitalize"
                             :class="{
                                 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-200': record?.status === 'pending',
-                                'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300': record?.status === 'assigned',
+                                'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300': record?.status === 'assigned',
                                 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300': record?.status === 'arrival',
                                 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300': record?.status === 'completed',
                                 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300': record?.status === 'cancelled',
@@ -360,14 +388,14 @@ const closeModal = () => {
                     </div>
 
                     <div v-if="record?.remarks" class="lg:col-span-2">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Remarks</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Remarks</p>
                         <p class="text-sm text-gray-800 dark:text-gray-100">{{ record.remarks }}</p>
                     </div>
 
                     <div v-if="record?.attachment">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-0.5">Attachment</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Attachment</p>
                         <a :href="`/storage/${record.attachment}`" target="_blank"
-                            class="text-sm text-blue-600 hover:underline dark:text-blue-400 flex items-center gap-1">
+                            class="text-sm text-orange-600 hover:underline dark:text-orange-400 flex items-center gap-1">
                             View Attachment
                         </a>
                     </div>
