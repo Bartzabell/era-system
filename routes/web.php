@@ -15,13 +15,12 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Incident Reports — no create/edit routes needed (modal-based)
     Route::get('incident-report', [IncidentReportController::class, 'index'])->name('incident-report.index');
-    Route::get('incident-report/create', [IncidentReportController::class, 'create'])->name('incident-report.create');
     Route::post('incident-report', [IncidentReportController::class, 'store'])->name('incident-report.store');
-    Route::get('incident-report/{incidentReport}', [IncidentReportController::class, 'show'])->name('incident-report.show');
-    Route::get('incident-report/{incidentReport}/edit', [IncidentReportController::class, 'edit'])->name('incident-report.edit');
     Route::put('incident-report/{incidentReport}', [IncidentReportController::class, 'update'])->name('incident-report.update');
     Route::delete('incident-report/{incidentReport}', [IncidentReportController::class, 'destroy'])->name('incident-report.destroy');
+    Route::get('incident-report/{incidentReport}', [IncidentReportController::class, 'show'])->name('incident-report.show');
     Route::get('citizen-page', [CitizenController::class, 'index'])->name('citizen-page.index');
 
     Route::middleware('permission:admin_access|responder_access')->group(function () {

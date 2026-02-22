@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
-import DataTable from '@/Components/DataTable.vue';
+import DataTable from '@/components/Datatable.vue';
 import CreateForm from './Partials/Create.vue';
 import EditForm from './Partials/Edit.vue';
 import { PhPlus } from '@phosphor-icons/vue';

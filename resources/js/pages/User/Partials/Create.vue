@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useForm, router } from '@inertiajs/vue3';
-import Modal from '@/Components/Modal.vue';
-import TextInput from '@/Components/TextInput.vue';
-import Boombox from '@/Components/Boombox.vue';
-import Toggle from '@/Components/Toggle.vue';
+import Modal from '@/components/Modal.vue';
+import TextInput from '@/components/Textinput.vue';
+import Boombox from '@/components/BoomBox.vue';
+import Toggle from '@/components/Toggle.vue';
 import { PhXCircle } from '@phosphor-icons/vue';
 
 interface Props {
