@@ -14,11 +14,21 @@ class Incident extends Model
     protected $fillable = [
         'incident_name',
         'definition',
-        'severity_level'
+        'severity_level',
+        'base_severity',
+        'base_time',
+        'base_resources',
+        'base_secondary',
+        'emergency_id',
     ];
 
     public function creator(){
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function emergency()
+    {
+        return $this->belongsTo(Emergency::class, 'emergency_id', 'id');
     }
 
     public function updater(){
