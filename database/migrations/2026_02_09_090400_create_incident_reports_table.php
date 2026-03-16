@@ -22,9 +22,17 @@ return new class extends Migration
             $table->text('map_coordinates')->nullable();
             $table->foreignIdFor(Emergency::class, 'emergency_id')->nullable();
             $table->foreignIdFor(Incident::class, 'incident_id')->nullable();
+
+
             $table->string('severity_level')->nullable();
             $table->integer('casualty_count')->nullable();
             $table->integer('distance')->nullable();
+
+            $table->decimal('distance_km', 5, 2)->nullable();
+            $table->decimal('priority_score', 4, 2)->nullable();
+            $table->string('priority_level')->nullable();
+            $table->string('priority_label')->nullable();
+
             $table->text('attachment')->nullable();
             $table->text('responder_attachment')->nullable();
             $table->string('responder_name')->nullable();

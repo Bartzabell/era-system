@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Emergency;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,17 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('incidents', function (Blueprint $table) {
+        Schema::create('site_locations', function (Blueprint $table) {
             $table->id();
-            $table->string('incident_name');
-            $table->foreignIdFor(Emergency::class, 'emergency_id')->nullable();
-            $table->text('definition')->nullable();
-
-            $table->unsignedTinyInteger('base_severity')->default(1);   // 1-10
-            $table->unsignedTinyInteger('base_time')->default(1);       // 1-10
-            $table->unsignedTinyInteger('base_resources')->default(1);  // 1-10
-            $table->unsignedTinyInteger('base_secondary')->default(1);  // 1-10
-
+            $table->string('site_name');
+            $table->string('site_type');
+            $table->string('site_category');
+            $table->string('coordinates');
             $table->foreignIdFor(User::class, 'created_by')->nullable();
             $table->foreignIdFor(User::class, 'updated_by')->nullable();
             $table->foreignIdFor(User::class, 'deleted_by')->nullable();
@@ -37,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('incidents');
+        Schema::dropIfExists('site_locations');
     }
 };
