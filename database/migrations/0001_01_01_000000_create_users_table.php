@@ -2,6 +2,7 @@
 
 use App\Models\Barangay;
 use App\Models\Role;
+use App\Models\SiteLocation;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('mobile_no')->nullable();
             $table->datetime('birth_date')->nullable();
+            $table->foreignIdFor(SiteLocation::class, 'site_location_id')->nullable();
             $table->text('address')->nullable();
             $table->foreignIdFor(Barangay::class, 'barangay_id')->nullable();
             $table->string('username', 191)->unique();
