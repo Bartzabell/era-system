@@ -21,6 +21,7 @@ class IncidentReport extends Model
         'casualty_count',
         'distance',
         'distance_km',
+        'site_location_id',
         'priority_score',
         'priority_level',
         'priority_label',
@@ -65,5 +66,9 @@ class IncidentReport extends Model
     public function emergency()
     {
         return $this->belongsTo(Emergency::class);
+    }
+
+    public function siteLocation(){
+        return $this->belongsTo(SiteLocation::class, 'site_location_id', 'id');
     }
 }

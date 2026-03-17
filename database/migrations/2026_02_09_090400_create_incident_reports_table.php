@@ -3,6 +3,7 @@
 use App\Models\Barangay;
 use App\Models\Emergency;
 use App\Models\Incident;
+use App\Models\SiteLocation;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -29,6 +30,7 @@ return new class extends Migration
             $table->integer('distance')->nullable();
 
             $table->decimal('distance_km', 5, 2)->nullable();
+            $table->foreignIdFor(SiteLocation::class, 'site_location_id')->nullable();
             $table->decimal('priority_score', 4, 2)->nullable();
             $table->string('priority_level')->nullable();
             $table->string('priority_label')->nullable();
