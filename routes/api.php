@@ -18,9 +18,8 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         Route::put('/users/profile', [AccountApiController::class, 'updateProfile']);
         Route::put('/users/password', [AccountApiController::class, 'changePassword']);
 
-        // Dropdowns & Hotlines
-        // Route::get('/dropdowns', [IncidentReportApiController::class, 'getDropdowns']);
         Route::get('/hotlines', [HotlineApiController::class, 'index']);
+        Route::post('/responder/update-facility', [IncidentReportApiController::class, 'updateResponderFacility']);
 
         // Incident Reports
         Route::post('/incident-reports', [IncidentReportApiController::class, 'store']);
@@ -30,6 +29,7 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         Route::post('/incident-reports/{id}/accept', [IncidentReportApiController::class, 'acceptReport']);
         Route::put('/incident-reports/{id}', [IncidentReportApiController::class, 'updateReport']);
         Route::post('/incident-reports/{id}/cancel', [IncidentReportApiController::class, 'cancelReport']);
+        Route::get('/site-locations', [IncidentReportApiController::class, 'getSiteLocations']);
         
         // Location tracking
         Route::post('/incident-reports/{id}/location', [IncidentReportApiController::class, 'updateResponderLocation']);

@@ -7,10 +7,13 @@ use App\Models\IncidentReport;
 use App\Models\Emergency;
 use App\Models\Incident;
 use App\Models\Barangay;
+use App\Models\SiteLocation;
+use App\Services\ClosestFacilityFinder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use App\Services\PriorityScoreCalculator;
 
 class IncidentReportApiController extends Controller
 {
@@ -22,9 +25,9 @@ class IncidentReportApiController extends Controller
     {
         return response()->json([
             'success' => true,
-            'emergencies' => Emergency::select('id', 'emergency_name', 'severity_level')->get(),
-            'incidents' => Incident::select('id', 'incident_name', 'severity_level')->get(),
-            'barangays' => Barangay::select('id', 'barangay_name', 'landmark')->get()
+            'emergencies' => Emergency::all(),
+            'incidents' => Incident::all(),
+            'barangays' => Barangay::all()
         ]);
     }
 
@@ -45,6 +48,29 @@ class IncidentReportApiController extends Controller
             return $this->errorResponse($validator->errors(), 422);
         }
 
+        // Parse coordinates
+        $coords = explode(', ', $request->map_coordinates);
+        $incidentLat = (float)$coords[0];
+        $incidentLng = (float)$coords[1];
+
+        // Get incident
+        $incident = Incident::findOrFail($request->incident_id);
+
+        // Find closest facility
+        $facilityFinder = new ClosestFacilityFinder();
+        $facilityResult = $facilityFinder->findClosest(
+            $incident->incident_name,
+            $incidentLat,
+            $incidentLng
+        );
+
+        // Use closest facility distance, or null if not found
+        $distance = $facilityResult['success'] ? $facilityResult['distance_km'] : null;
+
+        // Calculate priority score (with closest facility distance)
+        $calculator = new PriorityScoreCalculator();
+        $priorityData = $calculator->calculate($incident, $distance);
+
         $report = IncidentReport::create([
             'user_id' => $request->user()->id,
             'emergency_id' => $request->emergency_id,
@@ -55,8 +81,11 @@ class IncidentReportApiController extends Controller
             'attachment' => $request->attachment,
             'severity_level' => 'low',
             'status' => 'waiting',
-            'distance' => null,
+            'distance' => $distance,
             'remarks' => $request->remarks,
+            'priority_score' => $priorityData['priority_score'],
+            'priority_level' => $priorityData['priority_level'],
+            'priority_label' => $priorityData['priority_label'],
         ]);
 
         return $this->successResponse('Incident report submitted successfully', ['report' => $report], 201);
@@ -71,6 +100,39 @@ class IncidentReportApiController extends Controller
             ->get();
 
         return $this->successResponse(null, ['reports' => $reports]);
+    }
+
+    // Update responder's current facility location
+    public function updateResponderFacility(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'site_location_id' => 'required|exists:site_locations,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->errors(), 422);
+        }
+
+        try {
+            $user = $request->user();
+
+            // Only responders can update their facility
+            if ($user->role !== 'responder') {
+                return $this->errorResponse('Only responders can update facility location', 403);
+            }
+
+            $user->update([
+                'site_location_id' => $request->site_location_id
+            ]);
+
+            return $this->successResponse(
+                'Facility location updated successfully',
+                ['user' => $user]
+            );
+        } catch (\Exception $e) {
+            Log::error('Update Responder Facility Error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to update facility location', 500);
+        }
     }
 
     // Get all pending reports (waiting status)
@@ -109,7 +171,7 @@ class IncidentReportApiController extends Controller
             return $this->errorResponse($validator->errors(), 422);
         }
 
-        // Check if responder already has an ongoing case
+        // Check if responder already has ongoing case
         $ongoingCase = IncidentReport::where('responder_name', $request->user()->full_name)
             ->whereIn('status', ['assigned', 'arriving'])
             ->first();
@@ -129,10 +191,23 @@ class IncidentReportApiController extends Controller
         $incidentLat = (float)$coords[0];
         $incidentLng = (float)$coords[1];
 
-        // Get distance and duration
+        // Get responder's current site location
+        $responder = $request->user();
+        $currentSite = $responder->siteLocation;
+
+        if (!$currentSite) {
+            return $this->errorResponse('Please set your current facility location first.', 400);
+        }
+
+        // Parse site coordinates
+        $siteCoords = explode(', ', $currentSite->coordinates);
+        $siteLat = (float)$siteCoords[0];
+        $siteLng = (float)$siteCoords[1];
+
+        // Get distance from site to incident
         $distanceData = $this->getDistanceFromGoogle(
-            $request->responder_latitude,
-            $request->responder_longitude,
+            $siteLat,
+            $siteLng,
             $incidentLat,
             $incidentLng
         );
@@ -144,6 +219,11 @@ class IncidentReportApiController extends Controller
         // Calculate ETA
         $travelTimeMinutes = $distanceData['duration_minutes'] ?? ($distanceData['distance_km'] / 30 * 60);
         $estimatedArrival = now()->addMinutes($travelTimeMinutes);
+
+        // Recalculate priority score with actual distance
+        $incident = $report->incident;
+        $calculator = new PriorityScoreCalculator();
+        $priorityData = $calculator->calculate($incident, $distanceData['distance_km']);
 
         // Update report
         $report->update([
@@ -167,12 +247,15 @@ class IncidentReportApiController extends Controller
         $validator = Validator::make($request->all(), [
             'status' => 'nullable|in:arriving,resolved',
             'barangay_id' => 'nullable|exists:barangays,id',
+            'casualty_count' => 'nullable|integer|min:0',
             'severity_level' => 'nullable|in:low,mid,high',
             'datetime_arrived' => 'nullable|date',
             'remarks' => 'nullable|string',
             'responder_remarks' => 'nullable|string', // ✅ NEW
             'treatment_provided' => 'nullable|string', // ✅ NEW
             'responder_attachment' => 'nullable|string|url', // ✅ NEW
+            'site_location_id' => 'nullable|exists:site_locations,id',
+            'distance_km' => 'nullable|numeric|min:0', 
         ]);
 
         if ($validator->fails()) {
@@ -290,6 +373,20 @@ class IncidentReportApiController extends Controller
         return $this->successResponse('Location updated');
     }
 
+    // Get all site locations
+    public function getSiteLocations()
+    {
+        try {
+            $siteLocations = SiteLocation::select('id', 'site_name', 'site_type', 'site_category', 'coordinates')
+                ->get();
+
+            return $this->successResponse(null, ['site_locations' => $siteLocations]);
+        } catch (\Exception $e) {
+            Log::error('Get Site Locations Error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to fetch site locations', 500);
+        }
+    }
+
     // Get responder location (cache)
     public function getResponderLocation(Request $request, $id)
     {
@@ -359,12 +456,15 @@ class IncidentReportApiController extends Controller
         }
         
         if ($request->has('barangay_id')) $updateData['barangay_id'] = $request->barangay_id;
+        if ($request->has('casualty_count')) $updateData['casualty_count'] = $request->casualty_count;
         if ($request->has('severity_level')) $updateData['severity_level'] = $request->severity_level;
         if ($request->has('datetime_arrived')) $updateData['datetime_arrived'] = $request->datetime_arrived;
         if ($request->has('remarks')) $updateData['remarks'] = $request->remarks;
         if ($request->has('responder_remarks')) $updateData['responder_remarks'] = $request->responder_remarks;
         if ($request->has('treatment_provided')) $updateData['treatment_provided'] = $request->treatment_provided;
         if ($request->has('responder_attachment')) $updateData['responder_attachment'] = $request->responder_attachment;
+        if ($request->has('site_location_id')) $updateData['site_location_id'] = $request->site_location_id;
+        if ($request->has('distance_km')) $updateData['distance_km'] = $request->distance_km;                  
         
         return $updateData;
     }
