@@ -1,139 +1,216 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
-import DataTable from '@/components/Datatable.vue';
-import CreateForm from './Partials/Create.vue';
-import EditForm from './Partials/Edit.vue';
-import { PhPlus } from '@phosphor-icons/vue';
-import { Pencil, Trash2 } from 'lucide-vue-next';
+import { ref, h } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
+import AppLayout from '@/layouts/AppLayout.vue'
+import DataTable from '@/components/Datatable.vue'
+import Modal from '@/components/Modal.vue'
+import ButtonCode from '@/components/ButtonCode.vue'
+import { Button } from '@/components/ui/button'
+import { PhPlus, PhPencil, PhTrash } from '@phosphor-icons/vue'
+import FormModal from './Partials/FormModal.vue'
 
 interface User {
-    id: number;
-    username: string;
-    full_name: string;
-    email: string;
-    mobile_no: string;
-    role: string;
-    barangay?: { id: number; barangay_name: string };
-    created_at: string;
+    id: number
+    username: string
+    full_name: string
+    first_name: string
+    middle_name: string
+    last_name: string
+    email: string
+    mobile_no: string
+    birth_date: string
+    role: string
+    barangay?: { id: number; barangay_name: string }
+    permissions: Array<{ id: number; name: string; slug: string }>
+    responder: any | null
+    created_at: string
 }
 
-interface Props {
-    users: User[];
-    barangays: any[];
-    roles: any[];
-    permissions: any[];
+const props = defineProps<{
+    users: object
+    barangays: Array<{ id: number; barangay_name: string }>
+    roles: Array<{ id: number; role_name: string }>
+    permissions: Array<{ id: number; name: string; slug: string }>
+    filters: object
+}>()
+
+const breadcrumbs = [
+    { title: 'Homepage', href: '/landing' },
+    { title: 'User Management', href: '/users' },
+]
+
+const localFilters  = ref(props.filters)
+const updateFilters = (newFilters: object) => {
+    localFilters.value = newFilters
+    router.get(route('users.index'), newFilters, { preserveState: true, replace: true })
 }
 
-const props = defineProps<Props>();
+// Modal state
+const isFormVisible   = ref(false)
+const showDeleteModal = ref(false)
+const formMode        = ref<'create' | 'edit'>('create')
+const currentRecord   = ref<User | null>(null)
 
-const showCreateModal = ref(false);
-const showEditModal = ref(false);
-const editingUserId = ref<number | null>(null);
+const openCreateModal = () => {
+    formMode.value      = 'create'
+    currentRecord.value = null
+    isFormVisible.value = true
+}
+
+const openEditModal = (record: User) => {
+    formMode.value      = 'edit'
+    currentRecord.value = record
+    isFormVisible.value = true
+}
+
+const closeFormModal = () => {
+    isFormVisible.value = false
+    currentRecord.value = null
+}
+
+const openDeleteModal = (record: User) => {
+    currentRecord.value   = record
+    showDeleteModal.value = true
+}
+
+const deleteUser = () => {
+    router.delete(`/users/${currentRecord.value!.id}`, {
+        onSuccess: () => { showDeleteModal.value = false },
+    })
+}
+
+// Role badge
+const roleBadgeClass = (role: string) => {
+    const map: Record<string, string> = {
+        administrator: 'bg-red-100 text-red-700',
+        responder:     'bg-blue-100 text-blue-700',
+        citizen:       'bg-green-100 text-green-700',
+    }
+    return `px-2 py-1 text-xs font-semibold rounded-full capitalize ${map[role?.toLowerCase()] ?? 'bg-gray-100 text-gray-700'}`
+}
 
 const columns = [
-    { key: 'username', label: 'Username', sortable: true },
-    { key: 'full_name', label: 'Full Name', sortable: true },
-    { key: 'email', label: 'Email', sortable: true },
-    { key: 'mobile_no', label: 'Mobile No.', sortable: true },
-    { key: 'role', label: 'Role', sortable: true },
-    { key: 'barangay_name', label: 'Barangay', sortable: true },
-    { key: 'actions', label: 'Actions', sortable: false },
-];
-
-const tableData = computed(() =>
-    props.users.map(user => ({
-        ...user,
-        barangay_name: user.barangay?.barangay_name || 'N/A',
-    }))
-);
-
-const openCreateModal = () => showCreateModal.value = true;
-const closeCreateModal = () => showCreateModal.value = false;
-
-const openEditModal = (userId: number) => {
-    editingUserId.value = userId;
-    showEditModal.value = true;
-};
-
-const closeEditModal = () => {
-    showEditModal.value = false;
-    editingUserId.value = null;
-};
-
-const deleteUser = (userId: number) => {
-    if (confirm('Are you sure you want to delete this user?')) {
-        router.delete(`/users/${userId}`, { preserveScroll: true });
-    }
-};
+    { accessorKey: 'id', header: 'ID' },
+    { accessorKey: 'username', header: 'Username' },
+    {
+        accessorKey: 'full_name',
+        header: 'Full Name',
+        cell: ({ row }: any) => row.original.full_name || '—',
+    },
+    { accessorKey: 'email', header: 'Email' },
+    { accessorKey: 'mobile_no', header: 'Mobile No.' },
+    {
+        accessorKey: 'role',
+        header: 'Role',
+        cell: ({ row }: any) => h(
+            'span',
+            { class: roleBadgeClass(row.original.role) },
+            row.original.role ?? '—'
+        ),
+    },
+    {
+        accessorKey: 'barangay.barangay_name',
+        header: 'Barangay',
+        cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '—',
+    },
+    {
+        accessorKey: 'permissions',
+        header: 'Permissions',
+        cell: ({ row }: any) => {
+            const perms = row.original.permissions ?? []
+            if (!perms.length) return h('span', { class: 'text-gray-400 text-xs' }, 'None')
+            return h('div', { class: 'flex flex-wrap gap-1' },
+                perms.map((p: any) => h(
+                    'span',
+                    { class: 'px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded' },
+                    p.name
+                ))
+            )
+        },
+    },
+    {
+        accessorKey: 'responder',
+        header: 'Responder',
+        cell: ({ row }: any) => h(
+            'span',
+            {
+                class: row.original.responder
+                    ? 'px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700'
+                    : 'px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500'
+            },
+            row.original.responder ? 'Yes' : 'No'
+        ),
+    },
+    { accessorKey: 'created_at', header: 'Created At' },
+    {
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }: any) => h('div', { class: 'flex space-x-2' }, [
+            h(Button, {
+                variant: 'outline', size: 'icon',
+                onClick: () => openEditModal(row.original),
+                class: 'text-white bg-sky-500 rounded-full hover:bg-sky-400',
+            }, () => h(PhPencil, { size: 18 })),
+            h(Button, {
+                variant: 'outline', size: 'icon',
+                onClick: () => openDeleteModal(row.original),
+                class: 'text-white bg-red-500 rounded-full hover:bg-red-400',
+            }, () => h(PhTrash, { size: 16 })),
+        ]),
+    },
+]
 </script>
 
 <template>
     <Head title="User Management" />
+    <AppLayout :breadcrumbs="breadcrumbs">
 
-    <AppLayout>
-        <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-gray-800">User Management</h2>
-                <button
+        <Modal :show="isFormVisible" @close="closeFormModal" class="fixed inset-0 z-50">
+            <FormModal
+                v-if="isFormVisible"
+                :mode="formMode"
+                :record="currentRecord"
+                :barangays="barangays"
+                :roles="roles"
+                :permissions="permissions"
+                @close="closeFormModal"
+                @success="closeFormModal"
+            />
+        </Modal>
+
+        <div class="w-full flex justify-center mt-10">
+            <div class="w-[92%]">
+                <ButtonCode
                     @click="openCreateModal"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-                >
-                    <PhPlus :size="20" weight="bold" />
-                    Add User
-                </button>
-            </div>
-        </template>
-
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <DataTable
-                        :columns="columns"
-                        :data="tableData"
-                        :per-page="10"
-                    >
-                        <template #cell-actions="{ row }">
-                            <div class="flex items-center gap-2" @click.stop>
-                                <button
-                                    @click="openEditModal(row.id)"
-                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Edit"
-                                >
-                                    <Pencil class="w-4 h-4" />
-                                </button>
-                                <button
-                                    @click="deleteUser(row.id)"
-                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Delete"
-                                >
-                                    <Trash2 class="w-4 h-4" />
-                                </button>
-                            </div>
-                        </template>
-                    </DataTable>
-                </div>
+                    text="Add User"
+                    :icon="PhPlus"
+                    color="bg-orange-500 hover:bg-orange-600"
+                />
+                <DataTable
+                    :columns="columns"
+                    :data="users"
+                    :show-per-page="true"
+                    :filters="localFilters"
+                    @update:filters="updateFilters"
+                />
             </div>
         </div>
 
-        <!-- Create Modal -->
-        <CreateForm
-            :show="showCreateModal"
-            :barangays="barangays"
-            :roles="roles"
-            :permissions="permissions"
-            @close="closeCreateModal"
-        />
+        <!-- Delete Modal -->
+        <Modal :show="showDeleteModal" @close="showDeleteModal = false">
+            <div class="p-6">
+                <h2 class="mb-4 text-lg font-medium text-gray-900">Delete User</h2>
+                <p class="text-sm text-gray-600">
+                    Are you sure you want to delete
+                    <strong>{{ currentRecord?.full_name || currentRecord?.username }}</strong>?
+                    This action cannot be undone.
+                </p>
+                <div class="flex justify-end mt-6 gap-2">
+                    <Button @click="showDeleteModal = false">Cancel</Button>
+                    <Button @click="deleteUser" class="bg-red-600 hover:bg-red-700 text-white">Delete</Button>
+                </div>
+            </div>
+        </Modal>
 
-        <!-- Edit Modal -->
-        <EditForm
-            :show="showEditModal"
-            :user-id="editingUserId"
-            :barangays="barangays"
-            :roles="roles"
-            :permissions="permissions"
-            @close="closeEditModal"
-        />
     </AppLayout>
 </template>

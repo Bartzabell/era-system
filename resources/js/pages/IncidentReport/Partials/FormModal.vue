@@ -413,7 +413,7 @@ const closeModal = () => {
             </button>
         </div>
 
-        <form @submit.prevent="submitForm" class="p-4 bg-form-body dark:bg-gray-800 max-h-[85vh] overflow-y-auto">
+        <form @submit.prevent="submitForm" class="p-4 bg-form-body dark:bg-gray-800 max-h-[85vh] ">
 
             <!-- ── CREATE MODE ──────────────────────────────────────────────── -->
             <template v-if="mode === 'create'">
