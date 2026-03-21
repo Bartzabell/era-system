@@ -6,7 +6,8 @@ import DataTable from '@/components/Datatable.vue'
 import Modal from '@/components/Modal.vue'
 import ButtonCode from '@/components/ButtonCode.vue'
 import CustomInput from '@/components/CustomInput.vue'
-import { PhBroadcast, PhTrash, PhMegaphone, PhClock, PhCalendar, PhUser } from '@phosphor-icons/vue'
+import { PhBroadcast, PhTrash, PhSiren, PhCalendar, PhUser } from '@phosphor-icons/vue'
+import { Megaphone } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { h } from 'vue'
 
@@ -41,9 +42,9 @@ const updateFilters = (newFilters: object) => {
 }
 
 // Delete modal
-const showDeleteModal  = ref(false)
-const deletingRecord   = ref<Announcement | null>(null)
-const openDeleteModal  = (record: Announcement) => {
+const showDeleteModal = ref(false)
+const deletingRecord  = ref<Announcement | null>(null)
+const openDeleteModal = (record: Announcement) => {
     deletingRecord.value  = record
     showDeleteModal.value = true
 }
@@ -67,12 +68,34 @@ const submitForm = () => {
     })
 }
 
-// Audience badge
-const audienceBadgeClass = (record: Announcement) => {
+// Format date to "Jan 1, 2025 12:12 AM" respecting browser locale
+// The server sends UTC strings — we display in local time
+const formatDate = (dateStr: string | null): string => {
+    if (!dateStr) return '—'
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return dateStr
+    return date.toLocaleString('en-PH', {
+        month:  'short',
+        day:    'numeric',
+        year:   'numeric',
+        hour:   'numeric',
+        minute: '2-digit',
+        hour12: true,
+    })
+}
+
+const audienceBadgeClass = (record: any) => {
     if (record.for_citizens && record.for_responders) return 'bg-purple-100 text-purple-700'
     if (record.for_responders) return 'bg-blue-100 text-blue-700'
     if (record.for_citizens)   return 'bg-green-100 text-green-700'
     return 'bg-gray-100 text-gray-600'
+}
+
+const audienceBadgeLabel = (record: any) => {
+    if (record.for_citizens && record.for_responders) return 'General'
+    if (record.for_responders) return 'Responders'
+    if (record.for_citizens)   return 'Citizens'
+    return 'None'
 }
 
 const columns = [
@@ -81,7 +104,11 @@ const columns = [
     {
         accessorKey: 'announcement_message',
         header: 'Message',
-        cell: ({ row }: any) => h('p', { class: 'line-clamp-2 text-sm text-gray-600 max-w-xs' }, row.original.announcement_message),
+        cell: ({ row }: any) => h(
+            'p',
+            { class: 'line-clamp-2 text-sm text-gray-600 max-w-xs' },
+            row.original.announcement_message
+        ),
     },
     {
         accessorKey: 'audience',
@@ -89,11 +116,19 @@ const columns = [
         cell: ({ row }: any) => h(
             'span',
             { class: `px-2 py-1 text-xs font-semibold rounded-full ${audienceBadgeClass(row.original)}` },
-            row.original.audience
+            audienceBadgeLabel(row.original)
         ),
     },
-    { accessorKey: 'created_by_name', header: 'Created By' },
-    { accessorKey: 'created_at',      header: 'Created At' },
+    {
+        accessorKey: 'creator.full_name',
+        header: 'Created By',
+        cell: ({ row }: any) => row.original.creator?.full_name ?? row.original.created_by_name ?? '—',
+    },
+    {
+        accessorKey: 'created_at',
+        header: 'Created At',
+        cell: ({ row }: any) => formatDate(row.original.created_at),
+    },
     {
         id: 'actions',
         header: 'Actions',
@@ -119,17 +154,18 @@ const columns = [
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     <!-- Create Announcement Form -->
-                    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
-                        <div class="flex items-center gap-2 mb-4">
-                            <PhMegaphone :size="22" class="text-orange-500" weight="fill" />
-                            <h2 class="text-lg font-bold text-gray-800">New Announcement</h2>
+                    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-2">
+                        <div class="flex items-center justify-center text-center gap-2 mb-4 bg-yellow-200 rounded-lg p-2">
+                            <Megaphone :size="22" weight="fill" />
+                            <h2 class="text-xl font-black text-black">Broadcast Message</h2>
                         </div>
 
-                        <form @submit.prevent="submitForm" class="flex flex-col gap-4">
+                        <form @submit.prevent="submitForm" class="flex flex-col gap-4 m-4">
                             <div>
                                 <CustomInput
                                     name="Announcement Title"
                                     v-model="form.announcement_title"
+                                    class="font-black"
                                 />
                                 <p v-if="form.errors.announcement_title" class="text-xs text-red-500 mt-1">
                                     {{ form.errors.announcement_title }}
@@ -137,7 +173,9 @@ const columns = [
                             </div>
 
                             <div>
-                                <label class="block mb-1 text-sm text-gray-600">Message <span class="text-red-500">*</span></label>
+                                <label class="block mb-1 text-sm text-gray-600">
+                                    Message <span class="text-red-500">*</span>
+                                </label>
                                 <textarea
                                     v-model="form.announcement_message"
                                     rows="4"
@@ -151,7 +189,9 @@ const columns = [
 
                             <!-- Audience Toggles -->
                             <div>
-                                <label class="block mb-2 text-sm text-gray-600">Broadcast To <span class="text-red-500">*</span></label>
+                                <label class="block mb-2 text-sm text-gray-600">
+                                    Broadcast To <span class="text-red-500">*</span>
+                                </label>
                                 <div class="flex gap-4">
                                     <label class="flex items-center gap-2 cursor-pointer select-none">
                                         <input
@@ -176,12 +216,12 @@ const columns = [
                                 </p>
                             </div>
 
-                            <div class="flex justify-end">
+                            <div class="flex justify-center">
                                 <ButtonCode
                                     type="submit"
                                     :icon="PhBroadcast"
                                     color="bg-orange-500 hover:bg-orange-600"
-                                    text="Broadcast"
+                                    text="Send Broadcast"
                                     :disabled="form.processing"
                                 />
                             </div>
@@ -192,32 +232,30 @@ const columns = [
                     <div class="flex flex-col gap-4">
 
                         <!-- Today's Broadcasts -->
-                        <div class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-2">
-                            <div class="flex items-center gap-2 mb-1">
-                                <PhClock :size="18" class="text-orange-500" weight="fill" />
-                                <h3 class="text-sm font-bold text-gray-700">Today's Broadcasts</h3>
+                        <div class="bg-white rounded-xl border border-gray-200 flex flex-col gap-2">
+                            <div class="flex items-center gap-2 mb-1 bg-gray-300 p-2 rounded-xl">
+                                <PhSiren :size="32" class="text-red-500" weight="fill" />
+                                <h3 class="text-sm font-bold text-gray-700">Today's Broadcasted Alerts</h3>
                                 <span class="ml-auto text-xs bg-orange-100 text-orange-600 font-semibold px-2 py-0.5 rounded-full">
                                     {{ broadcastAlerts.length }}
                                 </span>
                             </div>
 
-                            <div class="flex flex-col gap-2 max-h-56 overflow-y-auto">
+                            <div class="flex flex-col gap-2 max-h-56 overflow-y-auto p-4">
                                 <div
                                     v-for="alert in broadcastAlerts"
                                     :key="alert.id"
                                     class="rounded-lg border border-orange-100 bg-orange-50 p-3"
                                 >
                                     <div class="flex items-start justify-between gap-1 mb-1">
-                                        <p class="text-xs font-bold text-gray-800 line-clamp-1">{{ alert.announcement_title }}</p>
+                                        <p class="text-xs font-bold text-gray-800 line-clamp-1">
+                                            {{ alert.announcement_title }}
+                                        </p>
                                         <span
                                             class="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                                            :class="{
-                                                'bg-purple-100 text-purple-700': alert.for_citizens && alert.for_responders,
-                                                'bg-blue-100 text-blue-700':    !alert.for_citizens && alert.for_responders,
-                                                'bg-green-100 text-green-700':  alert.for_citizens && !alert.for_responders,
-                                            }"
+                                            :class="audienceBadgeClass(alert)"
                                         >
-                                            {{ alert.audience }}
+                                            {{ audienceBadgeLabel(alert) }}
                                         </span>
                                     </div>
                                     <p class="text-xs text-gray-500 line-clamp-2">{{ alert.announcement_message }}</p>
@@ -229,39 +267,38 @@ const columns = [
                                     </div>
                                 </div>
 
-                                <p v-if="broadcastAlerts.length === 0" class="text-xs text-gray-400 text-center py-3">
+                                <p v-if="broadcastAlerts.length === 0"
+                                    class="text-xs text-gray-400 text-center py-3">
                                     No broadcasts today
                                 </p>
                             </div>
                         </div>
 
                         <!-- This Week's History -->
-                        <div class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-2">
-                            <div class="flex items-center gap-2 mb-1">
-                                <PhCalendar :size="18" class="text-gray-500" weight="fill" />
-                                <h3 class="text-sm font-bold text-gray-700">This Week</h3>
+                        <div class="bg-white rounded-xl border border-gray-200 flex flex-col gap-2">
+                            <div class="flex items-center gap-2 mb-1 bg-gray-300 p-2 rounded-xl">
+                                <PhCalendar :size="32" class="text-gray-500" weight="fill" />
+                                <h3 class="text-sm font-bold text-gray-700">Previous Broadcast (Weekly)</h3>
                                 <span class="ml-auto text-xs bg-gray-100 text-gray-600 font-semibold px-2 py-0.5 rounded-full">
                                     {{ broadcastHistory.length }}
                                 </span>
                             </div>
 
-                            <div class="flex flex-col gap-2 max-h-56 overflow-y-auto">
+                            <div class="flex flex-col gap-2 max-h-56 overflow-y-auto p-4">
                                 <div
                                     v-for="item in broadcastHistory"
                                     :key="item.id"
                                     class="rounded-lg border border-gray-100 bg-gray-50 p-3"
                                 >
                                     <div class="flex items-start justify-between gap-1 mb-1">
-                                        <p class="text-xs font-bold text-gray-800 line-clamp-1">{{ item.announcement_title }}</p>
+                                        <p class="text-xs font-bold text-gray-800 line-clamp-1">
+                                            {{ item.announcement_title }}
+                                        </p>
                                         <span
                                             class="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                                            :class="{
-                                                'bg-purple-100 text-purple-700': item.for_citizens && item.for_responders,
-                                                'bg-blue-100 text-blue-700':    !item.for_citizens && item.for_responders,
-                                                'bg-green-100 text-green-700':  item.for_citizens && !item.for_responders,
-                                            }"
+                                            :class="audienceBadgeClass(item)"
                                         >
-                                            {{ item.audience }}
+                                            {{ audienceBadgeLabel(item) }}
                                         </span>
                                     </div>
                                     <p class="text-xs text-gray-500 line-clamp-2">{{ item.announcement_message }}</p>
@@ -269,11 +306,13 @@ const columns = [
                                         <span class="text-[10px] text-gray-400 flex items-center gap-1">
                                             <PhUser :size="10" /> {{ item.created_by_name }}
                                         </span>
-                                        <span class="text-[10px] text-gray-400">{{ item.created_at }}</span>
+                                        <!-- formatted date on history items -->
+                                        <span class="text-[10px] text-gray-400">{{ formatDate(item.created_at) }}</span>
                                     </div>
                                 </div>
 
-                                <p v-if="broadcastHistory.length === 0" class="text-xs text-gray-400 text-center py-3">
+                                <p v-if="broadcastHistory.length === 0"
+                                    class="text-xs text-gray-400 text-center py-3">
                                     No broadcasts this week
                                 </p>
                             </div>
