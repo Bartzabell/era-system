@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import IncidentMap from '@/components/IncidentMap.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 import { PhFireTruck, PhClockCountdown, PhCheckCircle, PhDotsThreeOutline, PhFunnel, PhMapPin } from '@phosphor-icons/vue'
 import { Flame } from 'lucide-vue-next';
 
@@ -19,7 +18,9 @@ interface IncidentMarker {
     id: number;
     lat: number;
     lng: number;
-    severity: string;
+    priority_level: string;
+    priority_label: string;
+    priority_score: number;
     status: string;
     incident_type: string;
     emergency_type: string;
@@ -32,13 +33,11 @@ interface IncidentFeedItem {
     id: number;
     incident_name: string;
     landmark: string;
-    coordinates: {
-        lat: number;
-        lng: number;
-    };
+    coordinates: { lat: number; lng: number };
     time_ago: string;
     priority_score: number;
-    severity_level: string;
+    priority_level: string;
+    priority_label: string;
     status: string;
     created_at: string;
 }
@@ -50,65 +49,57 @@ const props = defineProps<{
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard().url,
-    },
+    { title: 'Dashboard', href: dashboard().url },
 ];
 
-const getSeverityColor = (severity: string) => {
-    switch (severity?.toLowerCase()) {
-        case 'critical':
-            return 'border-red-700 bg-red-700';
-        case 'high':
-            return 'border-orange-700 bg-orange-700';
-        case 'medium':
-            return 'border-orange-500 bg-orange-500';
-        case 'low':
-            return 'border-yellow-500 bg-yellow-500';
-        default:
-            return 'border-gray-500 bg-gray-500';
+// Color by priority_level (P1–P5)
+const getPriorityLevelColor = (level: string) => {
+    const map: Record<string, string> = {
+        P1: 'border-red-700 bg-red-700',
+        P2: 'border-orange-600 bg-orange-600',
+        P3: 'border-yellow-500 bg-yellow-500',
+        P4: 'border-blue-500 bg-blue-500',
+        P5: 'border-gray-400 bg-gray-400',
     }
-};
+    return map[level] ?? 'border-gray-400 bg-gray-400'
+}
 
-const getPriorityColor = (score: number) => {
-    if (score >= 75) return 'text-red-700';
-    if (score >= 50) return 'text-orange-700';
-    if (score >= 25) return 'text-yellow-600';
-    return 'text-gray-600';
-};
+const getPriorityScoreColor = (score: number | null) => {
+    if (!score) return 'text-gray-400'
+    if (score >= 8.5) return 'text-red-700'
+    if (score >= 6.5) return 'text-orange-600'
+    if (score >= 4.5) return 'text-yellow-600'
+    if (score >= 2.5) return 'text-blue-600'
+    return 'text-gray-500'
+}
 
 const exportMonthlyReport = () => {
-    const now = new Date();
+    const now   = new Date();
     const month = now.getMonth() + 1;
-    const year = now.getFullYear();
-
+    const year  = now.getFullYear();
     window.location.href = `/dashboard/export/monthly-report?month=${month}&year=${year}`;
 };
 
 const exportCitizenReport = () => {
-    const now = new Date();
+    const now       = new Date();
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-
+    const endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
     window.location.href = `/dashboard/export/citizen-report?start_date=${startDate}&end_date=${endDate}`;
 };
 </script>
 
 <template>
-
     <Head title="Dashboard" />
 
     <AppLayout>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 bg-gray-300">
             <div class="col-span-1 lg:col-span-2 flex flex-col gap-4">
+                <!-- Stats -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div
-                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active
-                                    Incidents</p>
+                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active Incidents</p>
                                 <div class="p-1 bg-red-200 rounded-md flex items-center justify-center">
                                     <Flame :size="40" color="#e60000" weight="fill" />
                                 </div>
@@ -118,8 +109,7 @@ const exportCitizenReport = () => {
                             </div>
                         </div>
                     </div>
-                    <div
-                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
                                 <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active Responders</p>
@@ -132,12 +122,10 @@ const exportCitizenReport = () => {
                             </div>
                         </div>
                     </div>
-                    <div
-                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Avg response
-                                    Time</p>
+                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Avg Response Time</p>
                                 <div class="p-1 bg-green-200 rounded-md flex items-center justify-center">
                                     <PhClockCountdown :size="40" color="#00a814" weight="fill" />
                                 </div>
@@ -147,12 +135,10 @@ const exportCitizenReport = () => {
                             </div>
                         </div>
                     </div>
-                    <div
-                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Resolved Today
-                                </p>
+                                <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Resolved Today</p>
                                 <div class="p-1 bg-slate-200 rounded-md flex items-center justify-center">
                                     <PhCheckCircle :size="40" color="#404040" />
                                 </div>
@@ -164,26 +150,26 @@ const exportCitizenReport = () => {
                     </div>
                 </div>
 
-                <!-- Map Content Area -->
+                <!-- Map -->
                 <div class="relative bg-white overflow-hidden rounded-xl dark:border-sidebar-border">
                     <div class="flex justify-between items-center p-4">
                         <h1 class="text-2xl font-black">Live Incident Map</h1>
+                        <!-- Legend now uses priority levels -->
                         <div class="flex gap-2 text-sm">
                             <span class="flex items-center gap-1">
-                                <span class="w-3 h-3 rounded-full bg-red-600"></span>
-                                Critical
+                                <span class="w-3 h-3 rounded-full bg-red-600"></span> P1 Critical
                             </span>
                             <span class="flex items-center gap-1">
-                                <span class="w-3 h-3 rounded-full bg-orange-600"></span>
-                                High
+                                <span class="w-3 h-3 rounded-full bg-orange-600"></span> P2 High
                             </span>
                             <span class="flex items-center gap-1">
-                                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                                Medium
+                                <span class="w-3 h-3 rounded-full bg-yellow-500"></span> P3 Moderate
                             </span>
                             <span class="flex items-center gap-1">
-                                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-                                Low
+                                <span class="w-3 h-3 rounded-full bg-blue-500"></span> P4 Low
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="w-3 h-3 rounded-full bg-gray-400"></span> P5
                             </span>
                         </div>
                     </div>
@@ -193,7 +179,8 @@ const exportCitizenReport = () => {
                 </div>
             </div>
 
-            <div class="col-span-1 lg:col-span-1 h-3/4 flex flex-col">
+            <!-- Incident Feed -->
+            <div class="col-span-1 lg:col-span-1 h-full flex flex-col">
                 <div class="relative h-[calc(75%-5rem)] bg-white px-4 py-3 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border flex flex-col">
                     <div class="flex justify-between items-center">
                         <h1 class="text-2xl font-black my-3">Incident Feed</h1>
@@ -203,20 +190,41 @@ const exportCitizenReport = () => {
                         </div>
                     </div>
 
-                    <!-- Incident Feed List -->
-                    <!-- <div class="flex-1 grid gap-2 grid-cols-1 rounded-2xl overflow-y-auto pr-2 bg-gray-200 p-2 mb-3"> -->
                     <div class="grid gap-2 grid-cols-1 h-[calc(75%-5rem)] overflow-y-auto pr-2 bg-gray-200 p-2">
                         <div
                             v-for="incident in incidentFeed"
                             :key="incident.id"
-                            :class="['border rounded-2xl', getSeverityColor(incident.severity_level)]"
+                            :class="['border rounded-2xl', getPriorityLevelColor(incident.priority_level)]"
                         >
                             <div class="rounded-2xl bg-white h-full ml-5 p-4">
                                 <div class="flex flex-col gap-2">
-                                    <div class="flex justify-between items-start">
+                                    <div class="flex justify-between items-start gap-2">
                                         <h3 class="font-bold text-sm line-clamp-1">{{ incident.incident_name }}</h3>
-                                        <span :class="['text-xs font-semibold', getPriorityColor(incident.priority_score)]">
-                                            {{ incident.priority_score }}
+                                        <!-- Priority badge replaces raw score -->
+                                        <span
+                                            v-if="incident.priority_level"
+                                            class="shrink-0 text-xs font-bold px-1.5 py-0.5 rounded"
+                                            :class="{
+                                                'bg-red-100 text-red-700':    incident.priority_level === 'P1',
+                                                'bg-orange-100 text-orange-700': incident.priority_level === 'P2',
+                                                'bg-yellow-100 text-yellow-700': incident.priority_level === 'P3',
+                                                'bg-blue-100 text-blue-700':  incident.priority_level === 'P4',
+                                                'bg-gray-100 text-gray-600':  incident.priority_level === 'P5',
+                                            }"
+                                        >
+                                            {{ incident.priority_level }}
+                                        </span>
+                                    </div>
+                                    <!-- Priority label + score -->
+                                    <div class="flex items-center gap-1">
+                                        <span
+                                            class="text-xs font-medium"
+                                            :class="getPriorityScoreColor(incident.priority_score)"
+                                        >
+                                            {{ incident.priority_label ?? '—' }}
+                                        </span>
+                                        <span v-if="incident.priority_score" class="text-xs text-gray-400">
+                                            ({{ incident.priority_score }}/10)
                                         </span>
                                     </div>
                                     <div class="flex items-center gap-1 text-xs text-gray-600">

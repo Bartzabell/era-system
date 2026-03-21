@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { PhX, PhPlus, PhFloppyDisk, PhMapPin, PhXCircle, PhCheckCircle, PhMagnifyingGlass } from '@phosphor-icons/vue'
 import CustomInput from '@/components/CustomInput.vue'
@@ -23,8 +23,8 @@ const props = defineProps<{
     mode: 'create' | 'edit'
     record: any | null
     barangays: Array<{ id: number; barangay_name: string }>
-    incidents: Array<{ id: number; incident_name: string; severity_level: string }>
-    emergencies: Array<{ id: number; emergency_name: string; severity_level: string }>
+    incidents: Array<{ id: number; incident_name: string; emergency_id: number; base_severity: number; base_time: number; base_resources: number; base_secondary: number }>
+    emergencies: Array<{ id: number; emergency_name: string }>
     users: Array<{ id: number; full_name: string }>
     hasFullAccess: boolean
     currentUserId: number
@@ -33,35 +33,128 @@ const props = defineProps<{
 const emit = defineEmits(['close', 'success'])
 
 const form = useForm({
-    user_id:         props.hasFullAccess ? (props.record?.user_id ?? props.currentUserId) : props.currentUserId,
-    barangay_id:     props.record?.barangay_id     ?? null,
-    map_coordinates: props.record?.map_coordinates ?? '',
-    emergency_id:    props.record?.emergency_id    ?? null,
-    incident_id:     props.record?.incident_id     ?? null,
-    severity_level:  props.record?.severity_level  ?? 'low',
-    casualty_count:  props.record?.casualty_count  ?? 0,
-    distance:        props.record?.distance        ?? '',
-    remarks:         props.record?.remarks         ?? '',
-    attachment:      null as File | null,
+    _method:              props.mode === 'edit' ? 'PUT' : undefined,
+    user_id:              props.hasFullAccess ? (props.record?.user_id ?? props.currentUserId) : props.currentUserId,
+    barangay_id:          props.record?.barangay_id     ?? null,
+    map_coordinates:      props.record?.map_coordinates ?? '',
+    emergency_id:         props.record?.emergency_id    ?? null,
+    incident_id:          props.record?.incident_id     ?? null,
+    casualty_count:       props.record?.casualty_count  ?? 0,
+    distance:             props.record?.distance        ?? null,
+    remarks:              props.record?.remarks         ?? '',
+    attachment:           null as File | null,
     responder_name:       props.record?.responder_name       ?? '',
     responder_contact_no: props.record?.responder_contact_no ?? '',
     estimated_arrival:    props.record?.estimated_arrival    ?? '',
     datetime_arrived:     props.record?.datetime_arrived     ?? '',
     plate_no:             props.record?.plate_no             ?? '',
-    status:               props.record?.status               ?? 'pending',
+    status:               props.record?.status               ?? 'waiting',
+    priority_score:       props.record?.priority_score       ?? null,
+    priority_level:       props.record?.priority_level       ?? null,
+    priority_label:       props.record?.priority_label       ?? null,
 })
 
-const severityLevels = [
-    { id: 'low',    name: 'Low' },
-    { id: 'medium', name: 'Medium' },
-    { id: 'high',   name: 'High' },
-]
+// ── Emergency → Incident filtering ──────────────────────────────────────────
+const filteredIncidents = computed(() =>
+    form.emergency_id
+        ? props.incidents.filter(i => i.emergency_id === form.emergency_id)
+        : props.incidents
+)
+
+watch(() => form.emergency_id, (newEmergencyId) => {
+    if (!newEmergencyId) return
+    const stillValid = props.incidents.find(
+        i => i.id === form.incident_id && i.emergency_id === newEmergencyId
+    )
+    if (!stillValid) form.incident_id = null
+    recomputePriority()
+})
+
+watch(() => form.incident_id, () => recomputePriority())
+watch(() => form.distance,    () => recomputePriority())
+
+// ── Priority Score Calculator ────────────────────────────────────────────────
+const WEIGHTS = {
+    severity:  0.35,
+    time:      0.25,
+    distance:  0.20,
+    resources: 0.10,
+    secondary: 0.10,
+}
+
+const normalizeDistance = (km: number | null): number => {
+    if (km === null || km === undefined) return 5
+    const clamped = Math.min(Math.max(km, 0), 50)
+    return parseFloat(((1 - clamped / 50) * 10).toFixed(2))
+}
+
+const mapToLevel = (score: number): { level: string; label: string } => {
+    if (score >= 8.5) return { level: 'P1', label: 'Critical' }
+    if (score >= 6.5) return { level: 'P2', label: 'High' }
+    if (score >= 4.5) return { level: 'P3', label: 'Moderate' }
+    if (score >= 2.5) return { level: 'P4', label: 'Low' }
+    return            { level: 'P5', label: 'Informational' }
+}
+
+const recomputePriority = () => {
+    const incident = props.incidents.find(i => i.id === form.incident_id)
+    if (!incident) {
+        form.priority_score = null
+        form.priority_level = null
+        form.priority_label = null
+        return
+    }
+
+    const distanceScore = normalizeDistance(form.distance)
+    const score = parseFloat((
+        (incident.base_severity  * WEIGHTS.severity)  +
+        (incident.base_time      * WEIGHTS.time)       +
+        (distanceScore           * WEIGHTS.distance)   +
+        (incident.base_resources * WEIGHTS.resources)  +
+        (incident.base_secondary * WEIGHTS.secondary)
+    ).toFixed(2))
+
+    const { level, label } = mapToLevel(score)
+    form.priority_score = score
+    form.priority_level = level
+    form.priority_label = label
+}
+
+const priorityDisplay = computed(() => {
+    if (!form.priority_score) return null
+    return {
+        score: form.priority_score,
+        level: form.priority_level,
+        label: form.priority_label,
+    }
+})
+
+const priorityBadgeClass = computed(() => {
+    const map: Record<string, string> = {
+        P1: 'bg-red-100 text-red-700 border-red-300',
+        P2: 'bg-orange-100 text-orange-700 border-orange-300',
+        P3: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+        P4: 'bg-blue-100 text-blue-700 border-blue-300',
+        P5: 'bg-gray-100 text-gray-600 border-gray-300',
+    }
+    return map[form.priority_level ?? ''] ?? 'bg-gray-100 text-gray-600 border-gray-300'
+})
+
+// ── Severity label derived from incident_reports.severity_level (read-only display) ──
+const severityBadgeClass = (level: string) => {
+    const map: Record<string, string> = {
+        low:    'bg-green-100 text-green-700',
+        medium: 'bg-yellow-100 text-yellow-700',
+        high:   'bg-red-100 text-red-700',
+    }
+    return `inline-block px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${map[level] ?? 'bg-gray-100 text-gray-600'}`
+}
 
 const statusOptions = [
-    { value: 'pending',   label: 'Pending' },
+    { value: 'waiting',   label: 'Waiting' },
     { value: 'assigned',  label: 'Assigned' },
-    { value: 'arrival',   label: 'Arrival' },
-    { value: 'completed', label: 'Completed' },
+    { value: 'arriving',  label: 'Arriving' },
+    { value: 'resolved',  label: 'Resolved' },
     { value: 'cancelled', label: 'Cancelled' },
 ]
 
@@ -71,23 +164,23 @@ const handleFileChange = (event: Event) => {
 }
 
 // ── Main Map Picker ──────────────────────────────────────────────────────────
-const showMap        = ref(false)
-const mapContainer   = ref<HTMLElement | null>(null)
-const isLocating     = ref(false)
-const isGeocoding    = ref(false)
-const markerPos      = ref<[number, number]>([14.5995, 120.9842])
+const showMap         = ref(false)
+const mapContainer    = ref<HTMLElement | null>(null)
+const isLocating      = ref(false)
+const isGeocoding     = ref(false)
+const markerPos       = ref<[number, number]>([14.5995, 120.9842])
 const resolvedAddress = ref('')
-const searchQuery    = ref('')
-const searchResults  = ref<any[]>([])
-const isSearching    = ref(false)
+const searchQuery     = ref('')
+const searchResults   = ref<any[]>([])
+const isSearching     = ref(false)
 
 let map: L.Map | null = null
 let mapMarker: L.Marker | null = null
 
 // ── Mini-map (edit mode read-only) ───────────────────────────────────────────
-const miniMapContainer   = ref<HTMLElement | null>(null)
-const miniMapAddress     = ref('')
-const isMiniGeocoding    = ref(false)
+const miniMapContainer = ref<HTMLElement | null>(null)
+const miniMapAddress   = ref('')
+const isMiniGeocoding  = ref(false)
 let miniMap: L.Map | null = null
 
 const parseCoordsFromString = (str: string): [number, number] | null => {
@@ -106,7 +199,6 @@ const reverseGeocodeAddress = async (lat: number, lng: number): Promise<string> 
             { headers: { 'Accept-Language': 'en' } }
         )
         const data = await res.json()
-        // Prefer a short nearby name: amenity / road / suburb / neighbourhood
         const p = data.address ?? {}
         const nearby = p.amenity || p.leisure || p.tourism || p.road || p.neighbourhood || p.suburb || p.village || p.town || p.city
         if (nearby) {
@@ -125,42 +217,31 @@ const initMiniMap = async () => {
     if (!coords) return
 
     isMiniGeocoding.value = true
-    miniMapAddress.value = ''
-
+    miniMapAddress.value  = ''
     await nextTick()
 
     if (miniMap) { miniMap.remove(); miniMap = null }
 
     miniMap = L.map(miniMapContainer.value, {
-        zoomControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false,
-        keyboard: false,
-        attributionControl: false,
+        zoomControl: false, dragging: false, scrollWheelZoom: false,
+        doubleClickZoom: false, touchZoom: false, keyboard: false, attributionControl: false,
     }).setView(coords, 16)
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-    }).addTo(miniMap)
-
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(miniMap)
     L.marker(coords).addTo(miniMap)
 
-    miniMapAddress.value = await reverseGeocodeAddress(coords[0], coords[1])
+    miniMapAddress.value  = await reverseGeocodeAddress(coords[0], coords[1])
     isMiniGeocoding.value = false
 }
 
-// init mini-map when in edit mode
 onMounted(() => {
-    if (props.mode === 'edit') {
-        nextTick(() => initMiniMap())
-    }
+    if (props.mode === 'edit') nextTick(() => initMiniMap())
+    if (props.mode === 'create') recomputePriority()
 })
 
 // ── Main Map Picker logic ────────────────────────────────────────────────────
 const reverseGeocode = async (lat: number, lng: number) => {
-    isGeocoding.value = true
+    isGeocoding.value     = true
     resolvedAddress.value = ''
     try {
         const res = await fetch(
@@ -178,7 +259,7 @@ const reverseGeocode = async (lat: number, lng: number) => {
 
 const searchAddress = async () => {
     if (!searchQuery.value.trim()) return
-    isSearching.value = true
+    isSearching.value   = true
     searchResults.value = []
     try {
         const res = await fetch(
@@ -196,12 +277,12 @@ const searchAddress = async () => {
 const selectSearchResult = (result: any) => {
     const lat = parseFloat(result.lat)
     const lng = parseFloat(result.lon)
-    markerPos.value = [lat, lng]
+    markerPos.value       = [lat, lng]
+    resolvedAddress.value = result.display_name
+    searchResults.value   = []
+    searchQuery.value     = ''
     map?.setView([lat, lng], 16)
     mapMarker?.setLatLng([lat, lng])
-    resolvedAddress.value = result.display_name
-    searchResults.value = []
-    searchQuery.value = ''
 }
 
 const updateMarker = (lat: number, lng: number) => {
@@ -221,8 +302,7 @@ const initMap = () => {
 
         map = L.map(mapContainer.value).setView(center, 13)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19, attribution: '© OpenStreetMap contributors',
         }).addTo(map)
 
         mapMarker = L.marker(markerPos.value, { draggable: true }).addTo(map)
@@ -248,9 +328,9 @@ const openMapPicker = () => {
 }
 
 const closeMapModal = () => {
-    showMap.value = false
-    searchQuery.value = ''
-    searchResults.value = []
+    showMap.value         = false
+    searchQuery.value     = ''
+    searchResults.value   = []
     resolvedAddress.value = ''
     map?.remove()
     map = null
@@ -280,7 +360,7 @@ const getCurrentLocation = async () => {
 
 const locateByIp = async () => {
     try {
-        const res = await fetch('https://ipapi.co/json/')
+        const res  = await fetch('https://ipapi.co/json/')
         const data = await res.json()
         if (data.latitude && data.longitude) {
             const lat = parseFloat(data.latitude)
@@ -310,7 +390,7 @@ const submitForm = () => {
     if (props.mode === 'create') {
         form.post('/incident-report', options)
     } else {
-        form.put(`/incident-report/${props.record.id}`, options)
+        form.post(`/incident-report/${props.record.id}`, options)
     }
 }
 
@@ -340,7 +420,6 @@ const closeModal = () => {
                 <h2 class="mb-2 font-semibold text-gray-700 dark:text-gray-200">Incident Details</h2>
                 <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
 
-                    <!-- Reporter selector (full-access only) -->
                     <div v-if="hasFullAccess" class="lg:col-span-2">
                         <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Reporter <span class="text-red-500">*</span></label>
                         <Boombox
@@ -360,30 +439,43 @@ const closeModal = () => {
                         <p v-if="form.errors.barangay_id" class="text-xs text-red-500 mt-1">{{ form.errors.barangay_id }}</p>
                     </div>
 
-                    <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Incident Type <span class="text-red-500">*</span></label>
-                        <Boombox :items="incidents" :existing-value="form.incident_id" label-field="incident_name"
-                            placeholder="Select incident type" @change="(v: any) => form.incident_id = v?.id ?? null" />
-                        <p v-if="form.errors.incident_id" class="text-xs text-red-500 mt-1">{{ form.errors.incident_id }}</p>
-                    </div>
-
+                    <!-- Emergency first, then filtered Incident -->
                     <div>
                         <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Emergency Type <span class="text-red-500">*</span></label>
-                        <Boombox :items="emergencies" :existing-value="form.emergency_id" label-field="emergency_name"
-                            placeholder="Select emergency type" @change="(v: any) => form.emergency_id = v?.id ?? null" />
+                        <Boombox
+                            :items="emergencies"
+                            :existing-value="form.emergency_id"
+                            label-field="emergency_name"
+                            placeholder="Select emergency type"
+                            @change="(v: any) => { form.emergency_id = v?.id ?? null }"
+                        />
                         <p v-if="form.errors.emergency_id" class="text-xs text-red-500 mt-1">{{ form.errors.emergency_id }}</p>
                     </div>
 
                     <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Severity Level <span class="text-red-500">*</span></label>
-                        <Boombox :items="severityLevels" :existing-value="form.severity_level" label-field="name"
-                            placeholder="Select severity" @change="(v: any) => form.severity_level = v?.id ?? 'low'" />
-                        <p v-if="form.errors.severity_level" class="text-xs text-red-500 mt-1">{{ form.errors.severity_level }}</p>
+                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">
+                            Incident Type <span class="text-red-500">*</span>
+                            <span v-if="!form.emergency_id" class="text-gray-400 font-normal text-xs"> — select emergency first</span>
+                        </label>
+                        <Boombox
+                            :items="filteredIncidents"
+                            :existing-value="form.incident_id"
+                            label-field="incident_name"
+                            placeholder="Select incident type"
+                            @change="(v: any) => { form.incident_id = v?.id ?? null }"
+                        />
+                        <p v-if="form.errors.incident_id" class="text-xs text-red-500 mt-1">{{ form.errors.incident_id }}</p>
                     </div>
 
                     <div>
                         <CustomInput name="Casualty Count" type="number" v-model="form.casualty_count" />
                         <p v-if="form.errors.casualty_count" class="text-xs text-red-500 mt-1">{{ form.errors.casualty_count }}</p>
+                    </div>
+
+                    <div>
+                        <CustomInput name="Distance (km)" type="number" v-model="form.distance" />
+                        <p class="text-xs text-gray-400 mt-0.5">Optional — improves priority accuracy</p>
+                        <p v-if="form.errors.distance" class="text-xs text-red-500 mt-1">{{ form.errors.distance }}</p>
                     </div>
 
                     <div class="lg:col-span-2">
@@ -400,6 +492,23 @@ const closeModal = () => {
                         <p v-else-if="form.map_coordinates" class="mt-1 text-xs text-orange-600 flex items-center gap-1">
                             <PhCheckCircle :size="14" /> Location selected
                         </p>
+                    </div>
+
+                    <!-- Priority Score live preview -->
+                    <div v-if="priorityDisplay" class="lg:col-span-2">
+                        <p class="block m-1 text-sm text-gray-600 dark:text-gray-200">Computed Priority</p>
+                        <div class="flex items-center gap-3 p-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 dark:bg-gray-700/40">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border"
+                                :class="priorityBadgeClass">
+                                {{ priorityDisplay.level }} — {{ priorityDisplay.label }}
+                            </span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                Score: <strong class="text-gray-700 dark:text-gray-200">{{ priorityDisplay.score }}</strong> / 10
+                            </span>
+                        </div>
+                    </div>
+                    <div v-else-if="form.incident_id === null && form.emergency_id !== null" class="lg:col-span-2">
+                        <p class="text-xs text-gray-400 italic">Select an incident type to compute priority score.</p>
                     </div>
                 </div>
             </template>
@@ -420,23 +529,19 @@ const closeModal = () => {
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Incident Type</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.incident?.incident_name ?? '—' }}</p>
-                    </div>
-
-                    <div>
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Emergency Type</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.emergency?.emergency_name ?? '—' }}</p>
                     </div>
 
                     <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Incident Type</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.incident?.incident_name ?? '—' }}</p>
+                    </div>
+
+                    <!-- severity_level read from incident_reports (auto-set on create by server) -->
+                    <div>
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Severity Level</p>
-                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold capitalize"
-                            :class="{
-                                'bg-green-100 text-green-700': record?.severity_level === 'low',
-                                'bg-yellow-100 text-yellow-700': record?.severity_level === 'medium',
-                                'bg-red-100 text-red-700': record?.severity_level === 'high',
-                            }">
+                        <span :class="severityBadgeClass(record?.severity_level ?? '')">
                             {{ record?.severity_level ?? '—' }}
                         </span>
                     </div>
@@ -444,6 +549,34 @@ const closeModal = () => {
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Casualty Count</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.casualty_count ?? '0' }}</p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Distance (km)</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">
+                            {{ record?.distance != null ? `${record.distance} km` : '—' }}
+                        </p>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="lg:col-span-2">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Priority</p>
+                        <div v-if="record?.priority_level" class="flex items-center gap-3">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border"
+                                :class="{
+                                    'bg-red-100 text-red-700 border-red-300':          record.priority_level === 'P1',
+                                    'bg-orange-100 text-orange-700 border-orange-300': record.priority_level === 'P2',
+                                    'bg-yellow-100 text-yellow-700 border-yellow-300': record.priority_level === 'P3',
+                                    'bg-blue-100 text-blue-700 border-blue-300':       record.priority_level === 'P4',
+                                    'bg-gray-100 text-gray-600 border-gray-300':       record.priority_level === 'P5',
+                                }">
+                                {{ record.priority_level }} — {{ record.priority_label }}
+                            </span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                Score: <strong class="text-gray-700 dark:text-gray-200">{{ record.priority_score }}</strong> / 10
+                            </span>
+                        </div>
+                        <p v-else class="text-sm text-gray-400">—</p>
                     </div>
 
                     <div>
@@ -457,16 +590,17 @@ const closeModal = () => {
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Current Status</p>
                         <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold capitalize"
                             :class="{
-                                'bg-gray-100 text-gray-600': record?.status === 'pending',
-                                'bg-orange-100 text-orange-700': record?.status === 'assigned' || record?.status === 'arrival',
-                                'bg-green-100 text-green-700': record?.status === 'completed',
-                                'bg-red-100 text-red-700': record?.status === 'cancelled',
+                                'bg-yellow-100 text-yellow-700': record?.status === 'waiting',
+                                'bg-orange-100 text-orange-700': record?.status === 'assigned',
+                                'bg-purple-100 text-purple-700': record?.status === 'arriving',
+                                'bg-green-100 text-green-700':   record?.status === 'resolved',
+                                'bg-red-100 text-red-700':       record?.status === 'cancelled',
                             }">
                             {{ record?.status ?? '—' }}
                         </span>
                     </div>
 
-                    <!-- Location field spanning full width -->
+                    <!-- Location spanning full width -->
                     <div class="lg:col-span-3">
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-1">Location</p>
                         <div class="flex items-start gap-2 mb-2">
@@ -477,7 +611,6 @@ const closeModal = () => {
                                 <span v-else class="text-gray-400">—</span>
                             </p>
                         </div>
-                        <!-- Mini-map -->
                         <div
                             v-if="record?.map_coordinates"
                             ref="miniMapContainer"
@@ -508,16 +641,22 @@ const closeModal = () => {
                     <div><CustomInput name="Plate No"             v-model="form.plate_no" /></div>
                     <div>
                         <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Status</label>
-                        <select v-model="form.status" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:text-white">
+                        <select v-model="form.status"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:text-white">
                             <option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                         </select>
                         <p v-if="form.errors.status" class="text-xs text-red-500 mt-1">{{ form.errors.status }}</p>
                     </div>
                     <div><CustomInput name="Estimated Arrival" type="datetime-local" v-model="form.estimated_arrival" /></div>
                     <div><CustomInput name="Datetime Arrived"  type="datetime-local" v-model="form.datetime_arrived" /></div>
+                    <div>
+                        <CustomInput name="Distance (km)" type="number" v-model="form.distance" />
+                        <p v-if="form.errors.distance" class="text-xs text-red-500 mt-1">{{ form.errors.distance }}</p>
+                    </div>
                 </div>
             </template>
 
+            <!-- ── Notes & Attachment (both modes) ─────────────────────────── -->
             <h2 class="mb-2 font-semibold text-gray-700 dark:text-gray-200">Notes & Attachment</h2>
             <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
                 <div><CustomInput name="Remarks" v-model="form.remarks" /></div>
@@ -559,7 +698,8 @@ const closeModal = () => {
                         {{ isSearching ? 'Searching...' : 'Search' }}
                     </button>
                 </div>
-                <ul v-if="searchResults.length" class="absolute z-[9999] w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
+                <ul v-if="searchResults.length"
+                    class="absolute z-[9999] w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
                     <li v-for="result in searchResults" :key="result.place_id"
                         @click="selectSearchResult(result)"
                         class="px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 cursor-pointer border-b last:border-0">

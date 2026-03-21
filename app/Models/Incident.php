@@ -14,7 +14,6 @@ class Incident extends Model
     protected $fillable = [
         'incident_name',
         'definition',
-        'severity_level',
         'base_severity',
         'base_time',
         'base_resources',

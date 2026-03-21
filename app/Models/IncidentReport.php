@@ -17,7 +17,6 @@ class IncidentReport extends Model
         'map_coordinates',
         'emergency_id',
         'incident_id',
-        'severity_level',
         'casualty_count',
         'distance',
         'distance_km',
