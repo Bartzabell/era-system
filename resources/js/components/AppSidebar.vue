@@ -19,44 +19,75 @@ import AppLogo from './AppLogo.vue';
 import { computed } from 'vue';
 
 const page = usePage();
-
 const userPermissions = computed<string[]>(() =>
     (page.props.auth as any)?.user?.permissions?.map((p: { slug: string }) => p.slug) ?? []
 );
-
 const can = (...perms: string[]) =>
     perms.some(p => userPermissions.value.includes(p));
 
-const allNavItems: (NavItem & { permissions?: string[] })[] = [
+type NavItemWithPermissions = NavItem & { permissions?: string[] };
+
+interface NavGroup {
+    label: string;
+    permissions?: string[];
+    items: NavItemWithPermissions[];
+}
+
+const navGroups: NavGroup[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: ChartColumnStacked,
+        label: 'Dashboard',
         permissions: ['admin_access', 'responder_access'],
+        items: [
+            {
+                title: 'Dashboard',
+                href: dashboard(),
+                icon: ChartColumnStacked,
+                permissions: ['admin_access', 'responder_access'],
+            },
+        ],
     },
     {
-        title: 'Reports',
-        href: '/incident-report',
-        icon: FileCheckCorner,
+        label: 'Incident Module',
+        items: [
+            {
+                title: 'Reports',
+                href: '/incident-report',
+                icon: FileCheckCorner,
+            },
+        ],
     },
     {
-        title: 'Alerts Config',
-        href: '/announcement-alert',
-        icon: Megaphone,
+        label: 'Admin',
         permissions: ['admin_access'],
-    },
-    {
-        title: 'Users',
-        href: '/users',
-        icon: Users,
-        permissions: ['admin_access'],
+        items: [
+            {
+                title: 'Alerts Config',
+                href: '/announcement-alert',
+                icon: Megaphone,
+                permissions: ['admin_access'],
+            },
+            {
+                title: 'Users',
+                href: '/users',
+                icon: Users,
+                permissions: ['admin_access'],
+            },
+        ],
     },
 ];
 
-const mainNavItems = computed<NavItem[]>(() =>
-    allNavItems.filter(item =>
-        !item.permissions || can(...item.permissions)
-    )
+const visibleNavGroups = computed(() =>
+    navGroups
+        .filter(group =>
+            !group.permissions || can(...group.permissions)
+        )
+        .map(group => ({
+            ...group,
+            items: group.items.filter(item =>
+                !item.permissions || can(...item.permissions)
+            ),
+        }))
+        .filter(group => group.items.length > 0)
 );
 
 const footerNavItems: NavItem[] = [];
@@ -75,11 +106,14 @@ const footerNavItems: NavItem[] = [];
                 </SidebarMenuItem>
             </SidebarMenu>
         </SidebarHeader>
-
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <NavMain
+                v-for="group in visibleNavGroups"
+                :key="group.label"
+                :label="group.label"
+                :items="group.items"
+            />
         </SidebarContent>
-
         <SidebarFooter>
             <NavFooter :items="footerNavItems" />
             <NavUser />

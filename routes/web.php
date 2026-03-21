@@ -4,6 +4,7 @@ use App\Http\Controllers\AnnouncementAlertController;
 use App\Http\Controllers\CitizenController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IncidentReportController;
+use App\Http\Controllers\MonthlyReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,6 +46,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/announcement-alert', [AnnouncementAlertController::class, 'index'])->name('announcement-alert.index');
         Route::post('/announcement-alert', [AnnouncementAlertController::class, 'store'])->name('announcement-alert.store');
         Route::delete('/announcement-alert/{announcementAlert}', [AnnouncementAlertController::class, 'destroy'])->name('announcement-alert.destroy');
+
+        Route::get('/monthly-report',            [MonthlyReportController::class, 'index'])     ->name('monthly-report.index');
+        Route::get('/monthly-report/export-csv', [MonthlyReportController::class, 'exportCsv'])->name('monthly-report.export-csv');
+        Route::get('/monthly-report/export-pdf', [MonthlyReportController::class, 'exportPdf'])->name('monthly-report.export-pdf');
     });
 });
 

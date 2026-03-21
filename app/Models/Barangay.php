@@ -13,7 +13,7 @@ class Barangay extends Model
 
     protected $fillable = [
         'barangay_name',
-        'lanbdmark',
+        'landmark',
     ];
 
     public function creator(){
