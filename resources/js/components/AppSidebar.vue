@@ -50,9 +50,14 @@ const navGroups: NavGroup[] = [
         label: 'Incident Module',
         items: [
             {
-                title: 'Reports',
+                title: 'Incident Reports',
                 href: '/incident-report',
                 icon: FileCheckCorner,
+            },
+            {
+                title: 'Monthly Report',
+                href: '/monthly-report',
+
             },
         ],
     },
