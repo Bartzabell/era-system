@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, FileCheckCorner, ChartColumnStacked } from 'lucide-vue-next';
+import { BookOpen, Megaphone, FileCheckCorner, ChartColumnStacked } from 'lucide-vue-next';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -28,9 +28,15 @@ const mainNavItems: NavItem[] = [
         href: '/incident-report',
         icon: FileCheckCorner,
     },
+    {
+        title: 'Alerts Config',
+        href: '/announcement-alert',
+        icon: Megaphone,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
+
 ];
 </script>
 

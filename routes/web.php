@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnnouncementAlertController;
 use App\Http\Controllers\CitizenController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IncidentReportController;
@@ -15,19 +16,23 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Incident Reports — no create/edit routes needed (modal-based)
+
     Route::get('incident-report', [IncidentReportController::class, 'index'])->name('incident-report.index');
     Route::post('incident-report', [IncidentReportController::class, 'store'])->name('incident-report.store');
     Route::put('incident-report/{incidentReport}', [IncidentReportController::class, 'update'])->name('incident-report.update');
     Route::delete('incident-report/{incidentReport}', [IncidentReportController::class, 'destroy'])->name('incident-report.destroy');
     Route::get('incident-report/{incidentReport}', [IncidentReportController::class, 'show'])->name('incident-report.show');
+
     Route::get('citizen-page', [CitizenController::class, 'index'])->name('citizen-page.index');
+
+    // ── Notification routes — all authenticated roles need these ──────────────
+    Route::get('/announcement-alert/notifications', [AnnouncementAlertController::class, 'notifications'])->name('announcement-alert.notifications');
+    Route::post('/announcement-alert/mark-read', [AnnouncementAlertController::class, 'markAsRead'])->name('announcement-alert.mark-read');
 
     Route::middleware('permission:admin_access|responder_access')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/export/monthly-report', [DashboardController::class, 'exportMonthlyReport'])->name('dashboard.export.monthly');
         Route::get('/dashboard/export/citizen-report', [DashboardController::class, 'exportCitizenReport'])->name('dashboard.export.citizen');
-
     });
 
     Route::middleware('permission:admin_access')->group(function () {
@@ -36,6 +41,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+
+        Route::get('/announcement-alert', [AnnouncementAlertController::class, 'index'])->name('announcement-alert.index');
+        Route::post('/announcement-alert', [AnnouncementAlertController::class, 'store'])->name('announcement-alert.store');
+        Route::delete('/announcement-alert/{announcementAlert}', [AnnouncementAlertController::class, 'destroy'])->name('announcement-alert.destroy');
     });
 });
 
