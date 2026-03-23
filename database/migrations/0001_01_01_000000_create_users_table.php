@@ -28,6 +28,7 @@ return new class extends Migration
             $table->foreignIdFor(Barangay::class, 'barangay_id')->nullable();
             $table->string('username', 191)->unique();
             $table->string('role')->nullable();
+            $table->longText('profile_picture')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

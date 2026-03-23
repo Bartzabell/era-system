@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class AccountApiController extends Controller
 {
@@ -177,5 +178,40 @@ class AccountApiController extends Controller
             'success' => true,
             'message' => 'Password changed successfully'
         ]);
+    }
+
+    /**
+     * Update user profile picture
+     */
+    public function updateProfilePicture(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'profile_picture' => 'required|string|max:5242880'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = $request->user();
+            $user->profile_picture = $request->profile_picture;
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile picture updated successfully',
+                'user' => $user  // ← Return FULL user object
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update profile picture: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

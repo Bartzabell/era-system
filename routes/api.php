@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AccountApiController;
+use App\Http\Controllers\Api\AnnouncementApiController;
 use App\Http\Controllers\Api\HotlineApiController;
 use App\Http\Controllers\Api\IncidentReportApiController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         Route::get('/users/me', [AccountApiController::class, 'getAccount']);
         Route::put('/users/profile', [AccountApiController::class, 'updateProfile']);
         Route::put('/users/password', [AccountApiController::class, 'changePassword']);
+        Route::post('/users/profile-picture', [AccountApiController::class, 'updateProfilePicture']);
 
         Route::get('/hotlines', [HotlineApiController::class, 'index']);
         Route::post('/responder/update-facility', [IncidentReportApiController::class, 'updateResponderFacility']);
@@ -34,5 +36,9 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         // Location tracking
         Route::post('/incident-reports/{id}/location', [IncidentReportApiController::class, 'updateResponderLocation']);
         Route::get('/incident-reports/{id}/location', [IncidentReportApiController::class, 'getResponderLocation']);
+
+        // Announcements
+        Route::get('/announcements', [AnnouncementApiController::class, 'index']);
+        Route::post('/announcements/{id}/mark-as-read', [AnnouncementApiController::class, 'markAsRead']);
     });
 });
