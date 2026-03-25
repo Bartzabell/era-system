@@ -32,34 +32,19 @@ class IncidentReportController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        $incidentReports = $query->latest()->paginate($perPage);
+        $barangays = Barangay::select('id', 'barangay_name')->orderBy('barangay_name')->get();
 
-        $barangays = Barangay::select('id', 'barangay_name')
-            ->orderBy('barangay_name')
-            ->get();
+        $incidents = Incident::select('id', 'incident_name', 'emergency_id', 'base_severity', 'base_time', 'base_resources', 'base_secondary')
+            ->orderBy('incident_name')->get();
 
-        $incidents = Incident::select(
-                'id',
-                'incident_name',
-                'emergency_id',
-                'base_severity',
-                'base_time',
-                'base_resources',
-                'base_secondary'
-            )
-            ->orderBy('incident_name')
-            ->get();
-
-        $emergencies = Emergency::select('id', 'emergency_name')
-            ->orderBy('emergency_name')
-            ->get();
+        $emergencies = Emergency::select('id', 'emergency_name')->orderBy('emergency_name')->get();
 
         $users = User::select('id', 'first_name', 'last_name')
             ->get()
             ->map(fn($u) => ['id' => $u->id, 'full_name' => $u->first_name . ' ' . $u->last_name]);
 
         return Inertia::render('IncidentReport/Index', [
-            'incidentReports' => $incidentReports,
+            'incidentReports' => $query->latest()->paginate($perPage),
             'barangays'       => $barangays,
             'incidents'       => $incidents,
             'emergencies'     => $emergencies,
@@ -76,17 +61,20 @@ class IncidentReportController extends Controller
         $hasFullAccess = $user->hasPermission('admin_access') || $user->hasPermission('responder_access');
 
         $rules = [
-            'barangay_id'     => 'required|exists:barangays,id',
-            'map_coordinates' => 'required|string',
-            'emergency_id'    => 'required|exists:emergencies,id',
-            'incident_id'     => 'required|exists:incidents,id',
-            'casualty_count'  => 'nullable|integer|min:0',
-            'distance'        => 'nullable|numeric|min:0',
-            'attachment'      => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
-            'remarks'         => 'nullable|string',
-            'priority_score'  => 'nullable|numeric|min:0|max:10',
-            'priority_level'  => 'nullable|string|max:10',
-            'priority_label'  => 'nullable|string|max:50',
+            'barangay_id'            => 'required|exists:barangays,id',
+            'map_coordinates'        => 'required|string',
+            'emergency_id'           => 'required|exists:emergencies,id',
+            'incident_id'            => 'required|exists:incidents,id',
+            'casualty_count'         => 'nullable|integer|min:0',
+            'minor_casualty_count'   => 'nullable|integer|min:0',
+            'serious_casualty_count' => 'nullable|integer|min:0',
+            'deceased_casualty_count'=> 'nullable|integer|min:0',
+            'distance'               => 'nullable|numeric|min:0',
+            'attachment'             => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'remarks'                => 'nullable|string',
+            'priority_score'         => 'nullable|numeric|min:0|max:10',
+            'priority_level'         => 'nullable|string|max:10',
+            'priority_label'         => 'nullable|string|max:50',
         ];
 
         if ($hasFullAccess) {
@@ -98,11 +86,11 @@ class IncidentReportController extends Controller
         DB::transaction(function () use ($request, $hasFullAccess) {
             $data = $request->only([
                 'barangay_id', 'map_coordinates', 'emergency_id', 'incident_id',
-                'casualty_count', 'distance', 'remarks',
+                'casualty_count', 'minor_casualty_count', 'serious_casualty_count', 'deceased_casualty_count',
+                'distance', 'remarks',
                 'priority_score', 'priority_level', 'priority_label',
             ]);
 
-            // Derive severity_level for incident_reports from the incident's base_severity
             $incident = Incident::find($request->incident_id);
             $data['severity_level'] = match(true) {
                 ($incident?->base_severity ?? 0) >= 7 => 'high',
@@ -126,7 +114,7 @@ class IncidentReportController extends Controller
             ->with('success', 'Incident report created successfully.');
     }
 
-    public function update(Request $request, IncidentReport $incidentReport)
+   public function update(Request $request, IncidentReport $incidentReport)
     {
         $user = Auth::user();
         if (!$user->hasPermission('admin_access') && !$user->hasPermission('responder_access')) {
@@ -134,18 +122,21 @@ class IncidentReportController extends Controller
         }
 
         $request->validate([
-            'distance'             => 'nullable|numeric|min:0',
-            'attachment'           => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
-            'responder_name'       => 'nullable|string|max:255',
-            'responder_contact_no' => 'nullable|string|max:20',
-            'estimated_arrival'    => 'nullable|date',
-            'datetime_arrived'     => 'nullable|date',
-            'plate_no'             => 'nullable|string|max:20',
-            'status'               => 'required|in:waiting,assigned,arriving,resolved,cancelled',
-            'remarks'              => 'nullable|string',
-            'priority_score'       => 'nullable|numeric|min:0|max:10',
-            'priority_level'       => 'nullable|string|max:10',
-            'priority_label'       => 'nullable|string|max:50',
+            'distance'               => 'nullable|numeric|min:0',
+            'attachment'             => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'responder_name'         => 'nullable|string|max:255',
+            'responder_contact_no'   => 'nullable|string|max:20',
+            'estimated_arrival'      => 'nullable|date',
+            'datetime_arrived'       => 'nullable|date',
+            'plate_no'               => 'nullable|string|max:20',
+            'status'                 => 'required|in:waiting,assigned,arriving,resolved,cancelled',
+            'remarks'                => 'nullable|string',
+            'priority_score'         => 'nullable|numeric|min:0|max:10',
+            'priority_level'         => 'nullable|string|max:10',
+            'priority_label'         => 'nullable|string|max:50',
+            'minor_casualty_count'   => 'nullable|integer|min:0',
+            'serious_casualty_count' => 'nullable|integer|min:0',
+            'deceased_casualty_count'=> 'nullable|integer|min:0',
         ]);
 
         DB::transaction(function () use ($request, $incidentReport) {
@@ -154,7 +145,12 @@ class IncidentReportController extends Controller
                 'estimated_arrival', 'datetime_arrived', 'plate_no',
                 'status', 'remarks',
                 'priority_score', 'priority_level', 'priority_label',
+                'minor_casualty_count', 'serious_casualty_count', 'deceased_casualty_count',
             ]);
+
+            $data['casualty_count'] = ($data['minor_casualty_count'] ?? 0)
+                                    + ($data['serious_casualty_count'] ?? 0)
+                                    + ($data['deceased_casualty_count'] ?? 0);
 
             $data['updated_by'] = Auth::id();
 
@@ -183,7 +179,6 @@ class IncidentReportController extends Controller
             if ($incidentReport->attachment) {
                 Storage::disk('public')->delete($incidentReport->attachment);
             }
-
             $incidentReport->update(['deleted_by' => Auth::id()]);
             $incidentReport->delete();
         });
