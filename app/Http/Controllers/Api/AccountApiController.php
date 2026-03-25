@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AccountApiController extends Controller
 {
@@ -187,7 +188,7 @@ class AccountApiController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'profile_picture' => 'required|string|max:5242880'
+                'profile_picture' => 'required|image|mimes:jpeg,png,jpg|max:5120'
             ]);
 
             if ($validator->fails()) {
@@ -198,16 +199,37 @@ class AccountApiController extends Controller
             }
 
             $user = $request->user();
-            $user->profile_picture = $request->profile_picture;
+
+            // Delete old picture if exists
+            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+
+            // Store in PUBLIC disk
+            $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+            $user->profile_picture = $path;
             $user->save();
+
+            // Generate full URL manually
+            $appUrl = rtrim(env('APP_URL', 'http://localhost'), '/');
+            $profilePictureUrl = $appUrl . '/storage/' . $path;
 
             return response()->json([
                 'success' => true,
                 'message' => 'Profile picture updated successfully',
-                'user' => $user  // ← Return FULL user object
+                'user' => [
+                    'id' => $user->id,
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                    'mobile_no' => $user->mobile_no,
+                    'role' => $user->role,
+                    'profile_picture' => $path,
+                    'profile_picture_url' => $profilePictureUrl
+                ]
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Profile picture upload error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update profile picture: ' . $e->getMessage()
