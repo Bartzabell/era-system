@@ -538,11 +538,10 @@ const closeModal = () => {
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.incident?.incident_name ?? '—' }}</p>
                     </div>
 
-                    <!-- severity_level read from incident_reports (auto-set on create by server) -->
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Severity Level</p>
-                        <span :class="severityBadgeClass(record?.severity_level ?? '')">
-                            {{ record?.severity_level ?? '—' }}
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Priority Level</p>
+                        <span :class="severityBadgeClass(record?.priority_label ?? '')">
+                            {{ record?.priority_label ?? '—' }}
                         </span>
                     </div>
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
+use App\Http\Controllers\RegisterController;
 
 Route::get('/', function () {
     return Inertia::render('auth/Login', [
@@ -18,16 +19,21 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [RegisterController::class, 'create'])->name('register');
+    Route::post('/register', [RegisterController::class, 'store']);
+});
+
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
     $user = User::findOrFail($id);
-    
+
     if (!hash_equals(sha1($user->email), $hash)) {
         abort(403);
     }
-    
+
     $user->email_verified_at = Carbon::now();
     $user->save();
-    
+
     return response('<h2 style="text-align:center; margin-top:50px;">✅ Email Verified! You may now go back to the app.</h2>');
 })->middleware(['signed'])->name('verification.verify');
 

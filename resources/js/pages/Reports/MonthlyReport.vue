@@ -119,7 +119,7 @@ const printPdf = () => {
                                 <th rowspan="2" class="px-3 py-3 items-center border border-black text-center">Barangay</th>
                                 <th rowspan="2" class="px-3 py-3 border border-black">Landmark</th>
                                 <th colspan="3" class="px-3 py-3 border border-black">
-                                    Medical Condition <span class="text-gray-500">(demo only)* </span>
+                                    Medical Condition
                                 </th>
                                 <th rowspan="2" class="px-3 py-3 border border-black">Total No. of<br>Incidents</th>
                                 <th rowspan="2" class="px-3 py-3 border border-black ">Incidents</th>
@@ -128,7 +128,7 @@ const printPdf = () => {
                             <tr class="bg-gray-800 text-white text-center text-xs font-semibold uppercase">
                                 <th class="px-3 py-2 border border-black">Minor</th>
                                 <th class="px-3 py-2 border border-black">Serious</th>
-                                <th class="px-3 py-2 border border-black">Dead</th>
+                                <th class="px-3 py-2 border border-black">DECEASED</th>
                             </tr>
                         </thead>
                         <tbody>

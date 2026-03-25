@@ -48,6 +48,11 @@ return new class extends Migration
             $table->text('treatment_provided')->nullable();
             $table->text('cancel_remarks')->nullable();
             $table->string('cancelled_by')->nullable();
+
+            $table->decimal('minor_casualty_count')->nullable();
+            $table->decimal('serious_casualty_count')->nullable();
+            $table->decimal('deceased_casualty_count')->nullable();
+
             $table->foreignIdFor(User::class, 'created_by')->nullable();
             $table->foreignIdFor(User::class, 'updated_by')->nullable();
             $table->foreignIdFor(User::class, 'deleted_by')->nullable();

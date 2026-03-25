@@ -11,6 +11,7 @@ use App\Models\Permission;
 use App\Models\Responder;
 use App\Models\Role;
 use App\Models\User;
+use Carbon\Carbon;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -25,6 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             SiteLocationSeeder::class,
+            IncidentReportImportSeeder::class,
         ]);
 
         $roles = [
@@ -550,6 +552,8 @@ class DatabaseSeeder extends Seeder
                 ]
             );
         }
+        $now = Carbon::now();
+        $now = now();
 
         $admin = User::firstOrCreate(
             ['username' => 'administrator',
@@ -560,6 +564,7 @@ class DatabaseSeeder extends Seeder
                 'last_name' => 'Administrator',
                 'role' => 'administrator',
                 'password' => Hash::make('password'),
+                'email_verified_at' => $now,
             ]
         );
 
@@ -579,6 +584,7 @@ class DatabaseSeeder extends Seeder
                 'barangay_id' => null,
                 'address' => '#123 Brgy Pulido GMA Cavite',
                 'password' => Hash::make('password'),
+                'email_verified_at' => $now,
             ],
             [
                 'username' => 'citizen',
@@ -592,6 +598,7 @@ class DatabaseSeeder extends Seeder
                 'barangay_id' => 1,
                 'address' => '#456 Brgy Pulido GMA Cavite',
                 'password' => Hash::make('password'),
+                'email_verified_at' => $now,
             ],
         ];
 
