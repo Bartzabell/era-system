@@ -14,6 +14,9 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
     Route::post('/auth/login', [AccountApiController::class, 'login']);
     Route::get('/dropdowns', [IncidentReportApiController::class, 'getDropdowns']);
 
+    Route::post('/email/resend', [AccountApiController::class, 'resendVerification']);
+    Route::post('/email/check', [AccountApiController::class, 'checkVerification']);
+
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
         // User

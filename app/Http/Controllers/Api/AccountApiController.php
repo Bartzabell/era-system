@@ -22,7 +22,7 @@ class AccountApiController extends Controller
             'first_name' => 'nullable|max:255',
             'middle_name' => 'nullable|max:255',
             'last_name' => 'nullable|max:255',
-            'email' => 'nullable|email|unique:users',
+            'email' => 'required|email|unique:users',
             'mobile_no' => 'nullable|max:20',
             'birth_date' => 'nullable|date',
             'address' => 'nullable|string',
@@ -51,13 +51,24 @@ class AccountApiController extends Controller
             'barangay_id' => $request->barangay_id,
             'role' => $request->role,
         ]);
-
-        $token = $user->createToken('mobile-app')->plainTextToken;
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Exception $e) {
+            // Delete the user if email fails so they can retry
+            $user->delete();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send verification email. Please try again.'
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,
-            'user' => $user,
-            'token' => $token
+            'message' => 'Registration successful. Please verify your email.',
+            'user' => [
+                'id' => $user->id,
+                'email' => $user->email,
+            ]
         ], 201);
     }
 
@@ -83,6 +94,18 @@ class AccountApiController extends Controller
                 'success' => false,
                 'message' => 'Invalid credentials'
             ], 401);
+        }
+
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not verified',
+                'email_verified' => false,
+                'user' => [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                ]
+            ], 403);
         }
 
         $token = $user->createToken('mobile-app')->plainTextToken;
@@ -235,5 +258,46 @@ class AccountApiController extends Controller
                 'message' => 'Failed to update profile picture: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function resendVerification(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email already verified'
+            ], 400);
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Verification email resent'
+        ]);
+    }
+
+    public function checkVerification(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not yet verified',
+                'email_verified' => false,
+            ]);
+        }
+
+        $token = $user->createToken('mobile-app')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'email_verified' => true,
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 }

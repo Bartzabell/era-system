@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\MonthlyReportController;
 use App\Http\Controllers\UserController;
+use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -15,6 +17,19 @@ Route::get('/', function () {
         'canRegister' => Features::enabled(Features::registration()),
     ]);
 })->name('home');
+
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    $user = User::findOrFail($id);
+    
+    if (!hash_equals(sha1($user->email), $hash)) {
+        abort(403);
+    }
+    
+    $user->email_verified_at = Carbon::now();
+    $user->save();
+    
+    return response('<h2 style="text-align:center; margin-top:50px;">✅ Email Verified! You may now go back to the app.</h2>');
+})->middleware(['signed'])->name('verification.verify');
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
