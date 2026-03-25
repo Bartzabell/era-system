@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\AnnouncementApiController;
 use App\Http\Controllers\Api\HotlineApiController;
 use App\Http\Controllers\Api\IncidentReportApiController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\Request;
 
 Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
     // Public routes
@@ -32,7 +34,7 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         Route::put('/incident-reports/{id}', [IncidentReportApiController::class, 'updateReport']);
         Route::post('/incident-reports/{id}/cancel', [IncidentReportApiController::class, 'cancelReport']);
         Route::get('/site-locations', [IncidentReportApiController::class, 'getSiteLocations']);
-        
+
         // Location tracking
         Route::post('/incident-reports/{id}/location', [IncidentReportApiController::class, 'updateResponderLocation']);
         Route::get('/incident-reports/{id}/location', [IncidentReportApiController::class, 'getResponderLocation']);

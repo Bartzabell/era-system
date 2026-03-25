@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Auth\Events\Registered;
 
 class AccountApiController extends Controller
 {
@@ -50,11 +51,13 @@ class AccountApiController extends Controller
             'barangay_id' => $request->barangay_id,
             'role' => $request->role,
         ]);
+        event(new Registered($user));
 
         $token = $user->createToken('mobile-app')->plainTextToken;
 
         return response()->json([
             'success' => true,
+            'message' => 'Registration successful. Please check your email to verify your account.',
             'user' => $user,
             'token' => $token
         ], 201);
