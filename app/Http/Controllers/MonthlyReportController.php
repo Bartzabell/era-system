@@ -100,8 +100,8 @@ class MonthlyReportController extends Controller
             'rows'      => $rows,
             'date_from' => $from,
             'date_to'   => $to,
-        ])->setPaper('a4', 'landscape');
+        ])->setPaper('a4', 'portrait');
 
-        return $pdf->download("monthly-report_{$from}_to_{$to}.pdf");
+        return $pdf->stream("monthly-report_{$from}_to_{$to}.pdf");
     }
 }

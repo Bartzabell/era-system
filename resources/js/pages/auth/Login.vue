@@ -134,7 +134,7 @@ defineProps<{
             </h1>
 
             <p className="text-white/90 max-w-xl">
-                Join the iKAPIT network and help us build safer, more resilient<br />
+                Join the GEARS network and help us build safer, more resilient<br />
                 communities through coordinated emergency response.
             </p>
         </div>

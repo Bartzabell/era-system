@@ -10,9 +10,9 @@
 
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #444; padding: 4px 6px; text-align: center; }
-        th { background-color: #d32f2f; color: #fff; }
-        th.group { background-color: #b71c1c; }
-        tr:nth-child(even) { background-color: #fce4ec; }
+        th { background-color: #ffce3be0; color: #000000; }
+        th.group { background-color: #ffe121; }
+        tr:nth-child(even) { background-color: #c3c3c3; }
 
         .text-left { text-align: left; }
     </style>
@@ -29,9 +29,9 @@
                 <th rowspan="2">No.</th>
                 <th rowspan="2">Barangay</th>
                 <th rowspan="2">Landmark</th>
-                <th colspan="3">Medical Condition (??)</th>
+                <th colspan="3">Medical Condition</th>
                 <th rowspan="2">Total No. of Incidents</th>
-                <th rowspan="2">Incidents (Top 3)</th>
+                <th rowspan="2">Incidents</th>
             </tr>
             <tr>
                 <th>Minor</th>

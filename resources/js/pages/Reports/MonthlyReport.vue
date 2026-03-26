@@ -59,7 +59,7 @@ const printPdf = () => {
 
                 <!-- Header -->
                 <div class="flex flex-col p-4 sm:flex-row sm:items-center sm:justify-between gap-4 bg-sky-900">
-                    <h1 class="flex justify-center items-center font-black text-xl text-white"><span><PhFirstAid :size="25" weight="fill" class="text-gray-500 bg-white rounded-full m-3"/></span>iKAPIT</h1>
+                    <h1 class="flex justify-center items-center font-black text-xl text-white"><span><PhFirstAid :size="25" weight="fill" class="text-gray-500 bg-white rounded-full m-3"/></span>GEARS</h1>
                     <h1 class="text-2xl font-bold text-white">MONTHLY REPORT</h1>
 
                     <div></div>
@@ -110,10 +110,10 @@ const printPdf = () => {
 
                 <!-- Table -->
                 <div class="overflow-x-auto shadow-sm px-4">
-                    <table class="min-w-full text-sm text-gray-700">
+                    <table class="min-w-full text-sm text-gray-700 border-2 border-black">
                         <thead>
                             <!-- Row 1: main headers -->
-                            <tr class="bg-gray-300 text-black text-center font-semibold uppercase tracking-wide">
+                            <tr class="bg-gray-300 text-black text-center font-semibold bg-white uppercase tracking-wide">
                                 <th rowspan="2" class="px-3 py-3 border border-black">No.</th>
                                 <th rowspan="2" class="px-3 py-3 items-center border border-black text-center">Barangay</th>
                                 <th rowspan="2" class="px-3 py-3 border border-black">Landmark</th>

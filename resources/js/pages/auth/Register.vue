@@ -52,7 +52,7 @@ const submit = () => {
                 Protect Your Community.
             </h1>
             <p class="text-white/90 max-w-xl">
-                Create your iKAPIT account and become part of a coordinated emergency
+                Create your GEARS account and become part of a coordinated emergency
                 response system built for safer, more resilient communities.
             </p>
         </div>

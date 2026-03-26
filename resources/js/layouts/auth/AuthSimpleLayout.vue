@@ -22,7 +22,7 @@ defineProps<{
                             <PhFirstAid :size="30" weight="fill" class="text-red-500 bg-white rounded-full m-1"/>
                         </div>
                         <span class="text-xl font-bold leading-none">
-                            iKAPIT<br/>
+                            GEARS<br/>
                             <span class="text-sm leading-none font-medium">Emergency Response System</span>
                         </span>
                     </div>
