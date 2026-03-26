@@ -8,7 +8,6 @@ interface ReportRow {
     no: number
     barangay_name: string
     landmark: string
-    medical_condition_raw: string
     minor: number
     serious: number
     dead: number
@@ -56,10 +55,10 @@ const printPdf = () => {
     <AppLayout :breadcrumbs="breadcrumbs">
 
         <div class="w-full flex justify-center mt-10">
-            <div class="w-[95%]">
+            <div class="w-[100%]">
 
                 <!-- Header -->
-                <div class="flex flex-col p-4 sm:flex-row sm:items-center sm:justify-between mb-6 gap-4 bg-sky-900">
+                <div class="flex flex-col p-4 sm:flex-row sm:items-center sm:justify-between gap-4 bg-sky-900">
                     <h1 class="flex justify-center items-center font-black text-xl text-white"><span><PhFirstAid :size="25" weight="fill" class="text-gray-500 bg-white rounded-full m-3"/></span>iKAPIT</h1>
                     <h1 class="text-2xl font-bold text-white">MONTHLY REPORT</h1>
 
@@ -67,14 +66,14 @@ const printPdf = () => {
                 </div>
 
                 <!-- Date Range Filter -->
-                <div class="flex flex-wrap items-end justify-between gap-4 mb-6 p-4 bg-gray-50 border rounded-lg">
+                <div class="flex flex-wrap items-end justify-between gap-4 mb-6 p-4 rounded-lg">
                     <div class="flex flex-wrap items-end gap-4 ">
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-semibold text-gray-600">Date From</label>
+                            <label class="text-xs font-semibold text-black">Date From:</label>
                             <input
                                 v-model="dateFrom"
                                 type="date"
-                                class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                class="border bg-white border-gray-900 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
                             />
                         </div>
                         <div class="flex flex-col gap-1">
@@ -82,12 +81,12 @@ const printPdf = () => {
                             <input
                                 v-model="dateTo"
                                 type="date"
-                                class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                class="border bg-white border-gray-900 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
                             />
                         </div>
                         <button
                             @click="applyFilter"
-                            class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-xl hover:bg-gray-600 transition"
+                            class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition border border-black"
                         >
                             Apply Filter
                         </button>
@@ -96,13 +95,13 @@ const printPdf = () => {
 
                         <button
                             @click="exportCsv"
-                            class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-xl hover:bg-green-700 transition"
+                            class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
                         >
                              Export CSV
                         </button>
                         <button
                             @click="printPdf"
-                            class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-xl hover:bg-orange-700 transition"
+                            class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition"
                         >
                              Print PDF
                         </button>
@@ -110,12 +109,12 @@ const printPdf = () => {
                 </div>
 
                 <!-- Table -->
-                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                <div class="overflow-x-auto shadow-sm px-4">
                     <table class="min-w-full text-sm text-gray-700">
                         <thead>
                             <!-- Row 1: main headers -->
-                            <tr class="bg-gray-500 text-white text-center font-semibold uppercase tracking-wide">
-                                <th rowspan="2" class="px-3 py-3 border border-black rounded-tl-lg">No.</th>
+                            <tr class="bg-gray-300 text-black text-center font-semibold uppercase tracking-wide">
+                                <th rowspan="2" class="px-3 py-3 border border-black">No.</th>
                                 <th rowspan="2" class="px-3 py-3 items-center border border-black text-center">Barangay</th>
                                 <th rowspan="2" class="px-3 py-3 border border-black">Landmark</th>
                                 <th colspan="3" class="px-3 py-3 border border-black">
@@ -125,33 +124,33 @@ const printPdf = () => {
                                 <th rowspan="2" class="px-3 py-3 border border-black ">Incidents</th>
                             </tr>
                             <!-- Row 2: sub-headers for medical condition -->
-                            <tr class="bg-gray-800 text-white text-center text-xs font-semibold uppercase">
+                            <tr class="bg-gray-400 text-black text-center text-xs font-semibold uppercase">
                                 <th class="px-3 py-2 border border-black">Minor</th>
                                 <th class="px-3 py-2 border border-black">Serious</th>
                                 <th class="px-3 py-2 border border-black">DECEASED</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <template v-if="reportData.length > 0">
+                            <template v-if="reportData.length > 0" class="border border-black">
                                 <tr
                                     v-for="row in reportData"
                                     :key="row.no"
-                                    class="border-b border-gray-100 even:bg-gray-50 hover:bg-orange-50 transition"
+                                    class="border border-black even:bg-gray-50 hover:bg-orange-50 transition text-black"
                                 >
-                                    <td class="px-3 py-2 text-center border border-gray-200">{{ row.no }}</td>
-                                    <td class="px-3 py-2 border border-gray-200 font-medium">{{ row.barangay_name }}</td>
-                                    <td class="px-3 py-2 border border-gray-200 text-gray-500">{{ row.landmark }}</td>
-                                    <td class="px-3 py-2 text-center border border-gray-200">
+                                    <td class="px-3 py-2 text-center ">{{ row.no }}</td>
+                                    <td class="px-3 py-2 border-r border-black font-medium">{{ row.barangay_name }}</td>
+                                    <td class="px-3 py-2 border-r border-black ">{{ row.landmark }}</td>
+                                    <td class="px-3 py-2 text-center border-r border-black">
                                         <span class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-semibold">{{ row.minor }}</span>
                                     </td>
-                                    <td class="px-3 py-2 text-center border border-gray-200">
+                                    <td class="px-3 py-2 text-center border-r border-black">
                                         <span class="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">{{ row.serious }}</span>
                                     </td>
-                                    <td class="px-3 py-2 text-center border border-gray-200">
-                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">{{ row.dead }}</span>
+                                    <td class="px-3 py-2 text-center border-r border-black">
+                                        <span class="px-2 py-0.5 bg-gray-100  rounded-full text-xs font-semibold">{{ row.dead }}</span>
                                     </td>
-                                    <td class="px-3 py-2 text-center border border-gray-200 font-bold text-gray-800">{{ row.total_incidents }}</td>
-                                    <td class="px-3 py-2 border border-gray-200 text-gray-600">{{ row.top_incidents }}</td>
+                                    <td class="px-3 py-2 text-center border-r border-black font-bold ">{{ row.total_incidents }}</td>
+                                    <td class="px-3 py-2">{{ row.top_incidents }}</td>
                                 </tr>
                             </template>
                             <tr v-else>
@@ -164,7 +163,9 @@ const printPdf = () => {
                 </div>
 
                 <p class="mt-3 text-xs text-gray-400">
-                    * Medical Condition column has no direct database field. Counts are derived from <code>severity_level</code>: <em>low = Minor, medium = Serious, high = Dead/Critical</em>.
+                    * Minor, Serious, and Deceased counts are summed from
+                    <code>minor_casualty_count</code>, <code>serious_casualty_count</code>,
+                    and <code>deceased_casualty_count</code> per barangay.
                 </p>
 
             </div>
