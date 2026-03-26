@@ -23,8 +23,6 @@ interface IncidentReport {
     responder_contact_no: string
     plate_no: string
     status: string
-    estimated_arrival: string | null
-    datetime_arrived: string | null
     created_at: string
     updated_at: string
 }

@@ -87,6 +87,7 @@ class IncidentReportController extends Controller
             'priority_score'         => 'nullable|numeric|min:0|max:10',
             'priority_level'         => 'nullable|string|max:10',
             'priority_label'         => 'nullable|string|max:50',
+            'reported_at'       => 'nullable|date',
         ];
 
         if ($hasFullAccess) {
@@ -100,7 +101,7 @@ class IncidentReportController extends Controller
                 'barangay_id', 'map_coordinates', 'emergency_id', 'incident_id',
                 'casualty_count', 'minor_casualty_count', 'serious_casualty_count', 'deceased_casualty_count',
                 'distance', 'remarks',
-                'priority_score', 'priority_level', 'priority_label',
+                'priority_score', 'priority_level', 'priority_label', 'reported_at'
             ]);
 
             $incident = Incident::find($request->incident_id);
@@ -149,6 +150,7 @@ class IncidentReportController extends Controller
             'minor_casualty_count'   => 'nullable|integer|min:0',
             'serious_casualty_count' => 'nullable|integer|min:0',
             'deceased_casualty_count'=> 'nullable|integer|min:0',
+            'reported_at'       => 'nullable|date',
         ]);
 
         DB::transaction(function () use ($request, $incidentReport) {
@@ -157,7 +159,7 @@ class IncidentReportController extends Controller
                 'estimated_arrival', 'datetime_arrived', 'plate_no',
                 'status', 'remarks',
                 'priority_score', 'priority_level', 'priority_label',
-                'minor_casualty_count', 'serious_casualty_count', 'deceased_casualty_count',
+                'minor_casualty_count', 'serious_casualty_count', 'deceased_casualty_count', 'reported_at'
             ]);
 
             $data['casualty_count'] = ($data['minor_casualty_count'] ?? 0)
