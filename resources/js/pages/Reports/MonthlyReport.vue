@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import { PhFirstAid } from '@phosphor-icons/vue'
@@ -27,6 +27,17 @@ const breadcrumbs = [
 
 const dateFrom = ref(props.filters.date_from ?? '')
 const dateTo   = ref(props.filters.date_to   ?? '')
+const searchQuery = ref('')
+
+const filteredData = computed(() => {
+    const q = searchQuery.value.trim().toLowerCase()
+    if (!q) return props.reportData
+    return props.reportData.filter(row =>
+        row.barangay_name.toLowerCase().includes(q) ||
+        row.landmark.toLowerCase().includes(q) ||
+        row.top_incidents.toLowerCase().includes(q)
+    )
+})
 
 const applyFilter = () => {
     router.get(('/monthly-report'), {
@@ -91,8 +102,16 @@ const printPdf = () => {
                             Apply Filter
                         </button>
                     </div>
-                    <div class="flex gap-2">
-
+                    <div class="flex flex-wrap items-end gap-4 ">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-semibold text-gray-600">Search</label>
+                            <input
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Barangay, landmark, incident..."
+                                class="border bg-white border-gray-900 rounded-lg px-3 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                            />
+                        </div>
                         <button
                             @click="exportCsv"
                             class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
@@ -113,7 +132,7 @@ const printPdf = () => {
                     <table class="min-w-full text-sm text-gray-700 border-2 border-black">
                         <thead>
                             <!-- Row 1: main headers -->
-                            <tr class="bg-gray-300 text-black text-center font-semibold bg-white uppercase tracking-wide">
+                            <tr class="bg-gray-300 text-black text-center font-semibold uppercase tracking-wide">
                                 <th rowspan="2" class="px-3 py-3 border border-black">No.</th>
                                 <th rowspan="2" class="px-3 py-3 items-center border border-black text-center">Barangay</th>
                                 <th rowspan="2" class="px-3 py-3 border border-black">Landmark</th>
@@ -133,7 +152,7 @@ const printPdf = () => {
                         <tbody>
                             <template v-if="reportData.length > 0" class="border border-black">
                                 <tr
-                                    v-for="row in reportData"
+                                    v-for="row in filteredData"
                                     :key="row.no"
                                     class="border border-black even:bg-gray-50 hover:bg-orange-50 transition text-black"
                                 >
