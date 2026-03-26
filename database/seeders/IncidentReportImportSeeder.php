@@ -20,10 +20,9 @@ class IncidentReportImportSeeder extends Seeder
             [
                 $user_id, $barangay_id, $emergency_id, $incident_id,
                 $casualty_count, $distance, $map_coordinates, $remarks,
-                $priority_score, $priority_level, $priority_label
+                $priority_score, $priority_level, $priority_label, $reported_at  // 👈 add here
             ] = $row;
 
-            // Derive severity_level from the incident's base_severity
             $incident = Incident::find($incident_id);
             $severity = match(true) {
                 ($incident?->base_severity ?? 0) >= 7 => 'high',
@@ -45,6 +44,7 @@ class IncidentReportImportSeeder extends Seeder
                 'priority_label'  => $priority_label,
                 'severity_level'  => $severity,
                 'status'          => 'waiting',
+                'reported_at'     => $reported_at,  // 👈 add here
                 'created_by'      => 1,
                 'updated_by'      => 1,
             ]);

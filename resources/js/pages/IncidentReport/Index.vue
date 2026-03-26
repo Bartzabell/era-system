@@ -136,7 +136,7 @@ const columns = [
         ),
     },
     { accessorKey: 'responder_name', header: 'Responder' },
-    { accessorKey: 'created_at',     header: 'Reported At' },
+    { accessorKey: 'reported_at',     header: 'Reported At' },
     {
         id: 'actions',
         header: 'Actions',
