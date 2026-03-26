@@ -48,7 +48,7 @@ const breadcrumbs = [
 const localFilters = ref(props.filters)
 const updateFilters = (newFilters: object) => {
     localFilters.value = newFilters
-    router.get(route('incident-report.index'), newFilters, { preserveState: true, replace: true })
+    router.get('/incident-report', newFilters, { preserveState: true, replace: true })
 }
 
 // Modal state — same pattern as RequestForm
@@ -119,13 +119,8 @@ const columns = [
         cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '—',
     },
     {
-        accessorKey: 'incident.incident_name',
-        header: 'Incident Type',
-        cell: ({ row }: any) => row.original.incident?.incident_name ?? '—',
-    },
-    {
         accessorKey: 'emergency.emergency_name',
-        header: 'Emergency Type',
+        header: 'Type',
         cell: ({ row }: any) => row.original.emergency?.emergency_name ?? '—',
     },
     {

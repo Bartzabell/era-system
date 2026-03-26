@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { Megaphone, FileCheckCorner, ChartColumnStacked, Users } from 'lucide-vue-next';
+import { Megaphone, FileCheckCorner, ChartColumnStacked, Users, CalendarRange } from 'lucide-vue-next';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -57,6 +57,7 @@ const navGroups: NavGroup[] = [
             {
                 title: 'Monthly Report',
                 href: '/monthly-report',
+                icon: CalendarRange,
 
             },
         ],

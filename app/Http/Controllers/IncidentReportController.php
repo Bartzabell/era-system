@@ -19,17 +19,29 @@ class IncidentReportController extends Controller
     {
         $user          = Auth::user();
         $hasFullAccess = $user->hasPermission('admin_access') || $user->hasPermission('responder_access');
-        $perPage       = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 10);
+        $search  = $request->input('search', '');
 
-        $query = IncidentReport::with([
-            'user:id,first_name,last_name,full_name',
-            'barangay:id,barangay_name',
-            'incident:id,incident_name',
-            'emergency:id,emergency_name',
-        ]);
+        $incidentReport = IncidentReport::with([
+                'user',
+                'barangay',
+                'emergency',
+            ])->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('user', function ($q) use ($search) {
+                        $q->where('full_name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('barangay', function ($q) use ($search) {
+                        $q->where('barangay_name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('emergency', function ($q) use ($search) {
+                        $q->where('emergency_name', 'like', "%{$search}%");
+                    });
+                });
+            });
 
         if (!$hasFullAccess) {
-            $query->where('user_id', $user->id);
+            $incidentReport->where('user_id', $user->id);
         }
 
         $barangays = Barangay::select('id', 'barangay_name')->orderBy('barangay_name')->get();
@@ -44,13 +56,13 @@ class IncidentReportController extends Controller
             ->map(fn($u) => ['id' => $u->id, 'full_name' => $u->first_name . ' ' . $u->last_name]);
 
         return Inertia::render('IncidentReport/Index', [
-            'incidentReports' => $query->latest()->paginate($perPage),
+            'incidentReports' => $incidentReport->latest()->paginate($perPage)->withQueryString(),
             'barangays'       => $barangays,
             'incidents'       => $incidents,
             'emergencies'     => $emergencies,
             'users'           => $users,
             'hasFullAccess'   => $hasFullAccess,
-            'filters'         => $request->only('per_page'),
+            'filters'         => $request->only('per_page', 'search'),
             'currentUserId'   => Auth::id(),
         ]);
     }

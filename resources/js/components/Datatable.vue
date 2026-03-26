@@ -4,7 +4,6 @@ import { Link } from '@inertiajs/vue3'
 import {
   FlexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useVueTable,
@@ -29,7 +28,7 @@ const props = defineProps({
     required: true
   },
   data: {
-    type: Object,
+    type: Object, // Changed from Array to Object to match Laravel pagination
     required: true
   },
   filters: {
@@ -47,97 +46,69 @@ const props = defineProps({
   perPageOptions: {
     type: Array,
     default: () => [
-      { value: 5,   label: '5' },
-      { value: 10,  label: '10' },
-      { value: 25,  label: '25' },
-      { value: 50,  label: '50' },
+      { value: 5, label: '5' },
+      { value: 10, label: '10' },
+      { value: 25, label: '25' },
+      { value: 50, label: '50' },
       { value: 100, label: '100' }
     ]
   }
 })
 
+const navigateToPage = (url) => {
+  if (!url) return;
+
+  // If using Inertia.js
+  if (window.Inertia) {
+    window.Inertia.visit(url);
+  } else {
+    // Otherwise use standard navigation
+    window.location.href = url;
+  }
+};
+
 const emit = defineEmits(['update:filters'])
 
-const sorting    = ref([])
+const sorting = ref([])
 const globalFilter = ref(props.filters.search || '')
-const perPage    = ref(props.filters.per_page || props.data.per_page || 10)
+const perPage = ref(props.filters.per_page || props.data.per_page || 10)
 
-// ── Date formatter ────────────────────────────────────────────────────────────
-// Detects ISO-like date strings and formats them to "Jan 1, 2025 12:12 AM"
-// Uses en-PH locale (Asia/Manila) to match Laravel's APP_TIMEZONE
-const DATE_REGEX = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/
-
-const formatDate = (value) => {
-  if (typeof value !== 'string' || !DATE_REGEX.test(value)) return value
-  const date = new Date(value)
-  if (isNaN(date.getTime())) return value
-  return date.toLocaleString('en-PH', {
-    month:  'short',
-    day:    'numeric',
-    year:   'numeric',
-    hour:   'numeric',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'Asia/Manila',
-  })
-}
-
-// Wrap columns so any plain accessorKey column (no custom cell)
-// automatically formats date values
-const processedColumns = computed(() =>
-  props.columns.map(col => {
-    // If the column already defines a custom cell renderer, leave it alone
-    if (col.cell) return col
-    // Otherwise wrap with date-aware renderer
-    return {
-      ...col,
-      cell: ({ getValue }) => {
-        const value = getValue()
-        return formatDate(value) ?? '—'
-      },
-    }
-  })
-)
-
+// Watch for changes in global filter and emit back to parent
+let searchTimeout = null
 watch(globalFilter, (newValue) => {
-  emit('update:filters', {
-    ...props.filters,
-    search: newValue
-  })
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    emit('update:filters', {
+      ...props.filters,
+      search: newValue,
+      page: 1  // reset to page 1 on new search
+    })
+  }, 350) // 350ms debounce
 })
 
+// Watch for changes in per page and emit back to parent
 watch(perPage, (newValue) => {
   emit('update:filters', {
     ...props.filters,
     per_page: newValue,
-    page: 1
+    page: 1 // Reset to first page when changing per page
   })
 })
 
-const navigateToPage = (url) => {
-  if (!url) return
-  if (window.Inertia) {
-    window.Inertia.visit(url)
-  } else {
-    window.location.href = url
-  }
-}
-
 const table = useVueTable({
-  get data()    { return props.data.data },
-  get columns() { return processedColumns.value },
+  get data() { return props.data.data },
+  get columns() { return props.columns },
   state: {
-    get sorting()      { return sorting.value },
-    get globalFilter() { return globalFilter.value }
+    get sorting() { return sorting.value },
   },
   onSortingChange: updaterOrValue => {
     sorting.value = typeof updaterOrValue === 'function'
       ? updaterOrValue(sorting.value)
       : updaterOrValue
   },
-  getCoreRowModel:     getCoreRowModel(),
-  getSortedRowModel:   getSortedRowModel(),
-  getFilteredRowModel: getFilteredRowModel(),
+  getCoreRowModel: getCoreRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  // ← getFilteredRowModel removed; filtering is server-side now
 })
 </script>
 
@@ -151,26 +122,19 @@ const table = useVueTable({
       </div>
       <div v-if="showSearch" class="flex items-center pt-4">
         <PhMagnifyingGlass class="relative text-gray-400 transform -translate-y-1/2 left-8 top-3" :size="24" />
-        <Input
-          class="w-full text-right bg-white border border-black"
-          placeholder=". . ."
-          :model-value="globalFilter"
-          @update:model-value="globalFilter = $event"
-        />
+        <Input class="w-full text-right bg-white border border-black" placeholder=". . ." :model-value="globalFilter"
+          @update:model-value="globalFilter = $event" />
       </div>
     </div>
 
     <!-- Table -->
-    <div class="overflow-hidden shadow-lg rounded-lg bg-white">
+    <div class="overflow-hidden shadow-lg rounded-lg  bg-white">
       <Table>
         <TableHeader>
           <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-            <TableHead
-              v-for="header in headerGroup.headers"
-              :key="header.id"
+            <TableHead v-for="header in headerGroup.headers" :key="header.id"
               :class="header.column.getCanSort() ? 'cursor-pointer text-left select-none' : ''"
-              @click="header.column.getCanSort() ? header.column.toggleSorting() : null"
-            >
+              @click="header.column.getCanSort() ? header.column.toggleSorting() : null">
               <FlexRender :render="header.column.columnDef.header" :props="header.getContext()" />
             </TableHead>
           </TableRow>
@@ -197,31 +161,21 @@ const table = useVueTable({
     <!-- Pagination -->
     <div class="flex flex-col items-center justify-between px-2 lg:flex-row">
       <div class="flex items-center space-x-2">
-        <nav class="flex w-full gap-2 -space-x-px lg:inline-flex" aria-label="Pagination">
+        <nav class="flex w-full gap-2 -space-x-px bg-gray-300lg:inline-flex" aria-label="Pagination">
           <template v-for="page in data.links" :key="page.label">
-            <Button
-              v-if="page.active"
-              size="sm"
-              class="z-10 text-xs h-auto border hover:!bg-orange-600/50 border-black bg-orange-600"
-            >
+
+            <Button v-if="page.active" size="sm"
+              :class="'z-10 text-xs h-auto border hover:!bg-sky-600/50 border-black bg-sky-600'">
               <span v-html="page.label"></span>
             </Button>
-            <Link
-              v-else-if="page.url"
-              :href="page.url"
-              method="get"
-              preserve-state
-              class="inline-block"
-            >
-              <Button size="sm" class="text-black bg-gray-200 border border-black text-xs hover:!bg-orange-600/50">
-                <span v-html="page.label"></span>
-              </Button>
+            <Link v-else-if="page.url" :href="page.url" method="get" preserve-state class="inline-block">
+            <Button size="sm" :class="'text-black bg-gray-200 border border-black text-xs hover:!bg-sky-600/50'">
+
+              <span v-html="page.label"></span>
+            </Button>
             </Link>
-            <Button
-              v-else
-              size="sm"
-              class="opacity-50 bg-white border border-black hover:!bg-orange-600/80 text-black text-xs"
-            >
+            <Button v-else size="sm"
+              :class="'opacity-50 bg-white border border-black hover:!bg-sky-600/80 text-black text-xs'">
               <span v-html="page.label"></span>
             </Button>
           </template>
