@@ -445,10 +445,9 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                         </select>
                         <p v-if="form.errors.status" class="text-xs text-red-500 mt-1">{{ form.errors.status }}</p>
                     </div>
-
+                    <div><CustomInput name="Reported At"       type="datetime-local" v-model="form.reported_at" /></div>
                     <div><CustomInput name="Estimated Arrival" type="datetime-local" v-model="form.estimated_arrival" /></div>
                     <div><CustomInput name="Datetime Arrived"  type="datetime-local" v-model="form.datetime_arrived" /></div>
-                    <div><CustomInput name="Reported At"       type="datetime-local" v-model="form.reported_at" /></div>
 
                     <div class="lg:col-span-2">
                         <label class="block m-1 text-sm font-semibold text-gray-600 dark:text-gray-200">Casualty Count</label>

@@ -41,6 +41,7 @@ class IncidentReport extends Model
         'treatment_provided',
         'responder_attachment',
         'cancel_remarks',
+        'reported_at',
 
         'minor_casualty_count',
         'serious_casualty_count',

@@ -105,6 +105,17 @@ const statusClass = (status: string) => {
     return `px-2 py-1 text-xs font-semibold rounded-full ${map[status] ?? 'bg-gray-100 text-gray-700'}`
 }
 
+const formatResponseTime = (reportedAt: string | null, datetimeArrived: string | null): string => {
+    if (!reportedAt || !datetimeArrived) return '—'
+    const diff = new Date(datetimeArrived).getTime() - new Date(reportedAt).getTime()
+    if (diff < 0) return '—'
+    const totalMinutes = Math.floor(diff / 60000)
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    if (hours > 0) return `${hours}h ${minutes}m`
+    return `${minutes}m`
+}
+
 const columns = [
    { accessorKey: 'incident_code', header: 'Code' },
     {
@@ -118,22 +129,30 @@ const columns = [
         cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '—',
     },
     {
-        accessorKey: 'user.full_name',
-        header: 'Reporter',
-        cell: ({ row }: any) => row.original.user?.full_name ?? '—',
+        accessorKey: 'reported_at',
+        header: 'Date Reported',
+        cell: ({ row }: any) => {
+            const val = row.original.reported_at
+            if (!val) return '—'
+            return new Date(val).toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+            })
+        },
     },
     {
-        accessorKey: 'barangay.barangay_name',
-        header: 'Barangay',
-        cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '—',
-    },
-    { accessorKey: 'reported_at',     header: 'Date Reported' },
+    accessorKey: 'datetime_arrived',
+    header: 'Response Time',
+    cell: ({ row }: any) => formatResponseTime(row.original.reported_at, row.original.datetime_arrived),
+},
     {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }: any) => h('span', { class: statusClass(row.original.status) },
-            row.original.status?.charAt(0).toUpperCase() + row.original.status?.slice(1)
-        ),
+        accessorKey: 'responder_count',
+        header: 'Responders',
+        cell: ({ row }: any) => row.original.responder_count ?? '—',
     },
     {
         id: 'actions',
