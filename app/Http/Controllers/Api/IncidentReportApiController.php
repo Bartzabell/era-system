@@ -86,6 +86,11 @@ class IncidentReportApiController extends Controller
             'priority_score' => $priorityData['priority_score'],
             'priority_level' => $priorityData['priority_level'],
             'priority_label' => $priorityData['priority_label'],
+            'reported_at' => now(),
+        ]);
+
+        $report->update([
+            'incident_code' => 'IND-' . now()->year . '-' . str_pad($report->id, 4, '0', STR_PAD_LEFT),
         ]);
 
         return $this->successResponse('Incident report submitted successfully', ['report' => $report], 201);
@@ -247,7 +252,10 @@ class IncidentReportApiController extends Controller
         $validator = Validator::make($request->all(), [
             'status' => 'nullable|in:arriving,resolved',
             'barangay_id' => 'nullable|exists:barangays,id',
-            'casualty_count' => 'nullable|integer|min:0',
+            'responder_count' => 'nullable|integer|min:0',
+            'minor_casualty_count' => 'nullable|integer|min:0',
+            'serious_casualty_count' => 'nullable|integer|min:0',
+            'deceased_casualty_count' => 'nullable|integer|min:0',
             'severity_level' => 'nullable|in:low,mid,high',
             'datetime_arrived' => 'nullable|date',
             'remarks' => 'nullable|string',
@@ -268,12 +276,12 @@ class IncidentReportApiController extends Controller
         $user = $request->user();
         
         // Citizen can only update their own reports
-        if ($user->role === 'Citizen' && $report->user_id !== $user->id) {
+        if ($user->role === 'citizen' && $report->user_id !== $user->id) {
             return $this->errorResponse('Unauthorized', 403);
         }
 
         // Responder can only update reports they accepted
-        if ($user->role === 'Responder' && $report->responder_name !== $user->full_name) {
+        if ($user->role === 'responder' && $report->responder_name !== $user->full_name) {
             return $this->errorResponse('Unauthorized', 403);
         }
 
@@ -456,7 +464,14 @@ class IncidentReportApiController extends Controller
         }
         
         if ($request->has('barangay_id')) $updateData['barangay_id'] = $request->barangay_id;
-        if ($request->has('casualty_count')) $updateData['casualty_count'] = $request->casualty_count;
+        if ($request->has('responder_count')) $updateData['responder_count'] = $request->responder_count;
+        if ($request->has('minor_casualty_count')) $updateData['minor_casualty_count'] = $request->minor_casualty_count;
+        if ($request->has('serious_casualty_count')) $updateData['serious_casualty_count'] = $request->serious_casualty_count;
+        if ($request->has('deceased_casualty_count')) $updateData['deceased_casualty_count'] = $request->deceased_casualty_count;
+        $minor = $request->minor_casualty_count ?? $report->minor_casualty_count ?? 0;
+        $serious = $request->serious_casualty_count ?? $report->serious_casualty_count ?? 0;
+        $deceased = $request->deceased_casualty_count ?? $report->deceased_casualty_count ?? 0;
+        $updateData['casualty_count'] = $minor + $serious + $deceased;
         if ($request->has('severity_level')) $updateData['severity_level'] = $request->severity_level;
         if ($request->has('datetime_arrived')) $updateData['datetime_arrived'] = $request->datetime_arrived;
         if ($request->has('remarks')) $updateData['remarks'] = $request->remarks;
