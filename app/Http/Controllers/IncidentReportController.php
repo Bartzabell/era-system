@@ -128,6 +128,8 @@ class IncidentReportController extends Controller
 
             $data['distance_km'] = $this->computeDistance($request->map_coordinates, $request->site_location_id)
                                    ?? $request->distance_km;
+            $data['distance'] = $this->computeDistance($request->map_coordinates, $request->site_location_id)
+                                   ?? $request->distance_km;
 
             if ($full) {
                 $data += $request->only([
