@@ -105,7 +105,17 @@ const statusClass = (status: string) => {
 }
 
 const columns = [
-   { accessorKey: 'id', header: 'ID' },
+   { accessorKey: 'incident_code', header: 'Code' },
+    {
+        accessorKey: 'emergency.emergency_name',
+        header: 'Type',
+        cell: ({ row }: any) => row.original.emergency?.emergency_name ?? '—',
+    },
+    {
+        accessorKey: 'barangay.barangay_name',
+        header: 'Barangay',
+        cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '—',
+    },
     {
         accessorKey: 'user.full_name',
         header: 'Reporter',
@@ -116,18 +126,7 @@ const columns = [
         header: 'Barangay',
         cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '—',
     },
-    {
-        accessorKey: 'emergency.emergency_name',
-        header: 'Type',
-        cell: ({ row }: any) => row.original.emergency?.emergency_name ?? '—',
-    },
-    {
-        accessorKey: 'severity_level',
-        header: 'Severity',
-        cell: ({ row }: any) => h('span', { class: severityClass(row.original.severity_level) },
-            row.original.severity_level?.toUpperCase() ?? 'N/A'
-        ),
-    },
+    { accessorKey: 'reported_at',     header: 'Date Reported' },
     {
         accessorKey: 'status',
         header: 'Status',
@@ -135,8 +134,6 @@ const columns = [
             row.original.status?.charAt(0).toUpperCase() + row.original.status?.slice(1)
         ),
     },
-    { accessorKey: 'responder_name', header: 'Responder' },
-    { accessorKey: 'reported_at',     header: 'Reported At' },
     {
         id: 'actions',
         header: 'Actions',

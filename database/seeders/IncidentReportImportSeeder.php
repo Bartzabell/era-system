@@ -18,7 +18,7 @@ class IncidentReportImportSeeder extends Seeder
 
         while (($row = fgetcsv($handle)) !== false) {
             [
-                $user_id, $barangay_id, $emergency_id, $incident_id,
+                $incident_code, $user_id, $barangay_id, $emergency_id, $incident_id,
                 $casualty_count, $distance, $map_coordinates, $remarks,
                 $priority_score, $priority_level, $priority_label, $reported_at  // 👈 add here
             ] = $row;
@@ -31,6 +31,7 @@ class IncidentReportImportSeeder extends Seeder
             };
 
             IncidentReport::create([
+                'incident_code'   => $incident_code,
                 'user_id'         => $user_id,
                 'barangay_id'     => $barangay_id,
                 'emergency_id'    => $emergency_id,

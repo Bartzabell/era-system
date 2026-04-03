@@ -24,6 +24,8 @@ return new class extends Migration
             $table->foreignIdFor(Emergency::class, 'emergency_id')->nullable();
             $table->foreignIdFor(Incident::class, 'incident_id')->nullable();
 
+            $table->integer('responder_count')->nullable();
+            $table->string('incident_code')->nullable();
 
             $table->string('severity_level')->nullable();
             $table->integer('casualty_count')->nullable();
