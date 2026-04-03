@@ -30,6 +30,7 @@ interface IncidentReport {
 const props = defineProps<{
     incidentReports: object
     barangays: Array<{ id: number; barangay_name: string }>
+    siteLocations: Array<{ id: number; site_name: string }>
     incidents: Array<{ id: number; incident_name: string; severity_level: string }>
     emergencies: Array<{ id: number; emergency_name: string; severity_level: string }>
     users: Array<{ id: number; full_name: string }>
@@ -171,6 +172,7 @@ const columns = [
                 :record="currentRecord"
                 :barangays="barangays"
                 :incidents="incidents"
+                :siteLocations="siteLocations"
                 :emergencies="emergencies"
                 :users="users"
                 :has-full-access="hasFullAccess"

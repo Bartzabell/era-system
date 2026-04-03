@@ -21,6 +21,7 @@ const props = defineProps<{
     barangays: Array<{ id: number; barangay_name: string }>
     incidents: Array<{ id: number; incident_name: string; emergency_id: number; base_severity: number; base_time: number; base_resources: number; base_secondary: number }>
     emergencies: Array<{ id: number; emergency_name: string }>
+    siteLocations: Array<{ id: number; site_name: string; site_type: string; coordinates: string }>
     users: Array<{ id: number; full_name: string }>
     hasFullAccess: boolean
     currentUserId: number
@@ -42,26 +43,31 @@ const form = useForm({
     serious_casualty_count:  props.record?.serious_casualty_count   ?? 0,
     deceased_casualty_count: props.record?.deceased_casualty_count  ?? 0,
     distance:                props.record?.distance                 ?? null,
+    distance_km:             props.record?.distance_km              ?? null,
     remarks:                 props.record?.remarks                  ?? '',
     attachment:              null as File | null,
     responder_name:          props.record?.responder_name           ?? '',
     responder_contact_no:    props.record?.responder_contact_no     ?? '',
     responder_count:         props.record?.responder_count          ?? null,
+    responder_remarks:       props.record?.responder_remarks        ?? '',
+    responder_attachment:    null as File | null,
+    treatment_provided:      props.record?.treatment_provided       ?? '',
+    cancel_remarks:          props.record?.cancel_remarks           ?? '',
     estimated_arrival:       props.record?.estimated_arrival        ?? '',
     datetime_arrived:        props.record?.datetime_arrived         ?? '',
     plate_no:                props.record?.plate_no                 ?? '',
     status:                  props.record?.status                   ?? 'waiting',
+    reported_at:             props.record?.reported_at              ?? '',
+    site_location_id:        props.record?.site_location_id         ?? null,
     priority_score:          props.record?.priority_score           ?? null,
     priority_level:          props.record?.priority_level           ?? null,
     priority_label:          props.record?.priority_label           ?? null,
 })
 
-// ── Emergency → Incident filtering ──────────────────────────────────────────
 const filteredIncidents = computed(() =>
     form.emergency_id ? props.incidents.filter(i => i.emergency_id === form.emergency_id) : props.incidents
 )
 
-// ── Priority ─────────────────────────────────────────────────────────────────
 const WEIGHTS = { severity: 0.35, time: 0.25, distance: 0.20, resources: 0.10, secondary: 0.10 }
 
 const normDist = (km: number | null) =>
@@ -77,10 +83,11 @@ const mapToLevel = (s: number) =>
 const recomputePriority = () => {
     const inc = props.incidents.find(i => i.id === form.incident_id)
     if (!inc) { form.priority_score = null; form.priority_level = null; form.priority_label = null; return }
+    const distKm = form.distance_km ?? form.distance
     const score = parseFloat((
         inc.base_severity  * WEIGHTS.severity  +
         inc.base_time      * WEIGHTS.time       +
-        normDist(form.distance) * WEIGHTS.distance +
+        normDist(distKm)   * WEIGHTS.distance   +
         inc.base_resources * WEIGHTS.resources  +
         inc.base_secondary * WEIGHTS.secondary
     ).toFixed(2))
@@ -88,13 +95,33 @@ const recomputePriority = () => {
     form.priority_score = score; form.priority_level = level; form.priority_label = label
 }
 
+const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371, toRad = (d: number) => d * Math.PI / 180
+    const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1)
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
+    return parseFloat((R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(2))
+}
+
+const recomputeDistanceFromSite = () => {
+    if (!form.site_location_id || !form.map_coordinates) { recomputePriority(); return }
+    const site = props.siteLocations.find(s => s.id === form.site_location_id)
+    if (!site?.coordinates) { recomputePriority(); return }
+    const [iLat, iLng] = form.map_coordinates.split(',').map(Number)
+    const [sLat, sLng] = site.coordinates.split(',').map(Number)
+    form.distance_km = haversineKm(iLat, iLng, sLat, sLng)
+    recomputePriority()
+}
+
 watch(() => form.emergency_id, (val) => {
     if (!val) return
     if (!props.incidents.find(i => i.id === form.incident_id && i.emergency_id === val)) form.incident_id = null
     recomputePriority()
 })
-watch(() => form.incident_id, recomputePriority)
-watch(() => form.distance, recomputePriority)
+watch(() => form.incident_id,     recomputePriority)
+watch(() => form.distance,        recomputePriority)
+watch(() => form.distance_km,     recomputePriority)
+watch(() => form.site_location_id, recomputeDistanceFromSite)
+watch(() => form.map_coordinates,  recomputeDistanceFromSite)
 
 const priorityDisplay = computed(() => form.priority_score ? { score: form.priority_score, level: form.priority_level, label: form.priority_label } : null)
 
@@ -112,12 +139,11 @@ const statusOptions = [
     { value: 'cancelled', label: 'Cancelled' },
 ]
 
-const handleFileChange = (e: Event) => {
+const handleFileChange = (e: Event, field: 'attachment' | 'responder_attachment') => {
     const f = (e.target as HTMLInputElement).files?.[0]
-    if (f) form.attachment = f
+    if (f) form[field] = f
 }
 
-// ── Map ──────────────────────────────────────────────────────────────────────
 const showMap         = ref(false)
 const mapContainer    = ref<HTMLElement | null>(null)
 const isLocating      = ref(false)
@@ -144,9 +170,8 @@ const parseCoordsFromString = (str: string): [number, number] | null => {
 
 const reverseGeocodeAddress = async (lat: number, lng: number): Promise<string> => {
     try {
-        const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, { headers: { 'Accept-Language': 'en' } })
-        const data = await res.json()
-        const p    = data.address ?? {}
+        const data = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, { headers: { 'Accept-Language': 'en' } })).json()
+        const p = data.address ?? {}
         const nearby = p.amenity || p.leisure || p.tourism || p.road || p.neighbourhood || p.suburb || p.village || p.town || p.city
         return nearby ? `${nearby}${(p.city || p.town || p.municipality) ? `, ${p.city || p.town || p.municipality}` : ''}` : (data.display_name ?? 'Unknown location')
     } catch { return 'Unable to resolve address' }
@@ -156,8 +181,7 @@ const initMiniMap = async () => {
     if (!miniMapContainer.value) return
     const coords = parseCoordsFromString(props.record?.map_coordinates ?? '')
     if (!coords) return
-    isMiniGeocoding.value = true
-    miniMapAddress.value  = ''
+    isMiniGeocoding.value = true; miniMapAddress.value = ''
     await nextTick()
     if (miniMap) { miniMap.remove(); miniMap = null }
     miniMap = L.map(miniMapContainer.value, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false, keyboard: false, attributionControl: false }).setView(coords, 16)
@@ -173,11 +197,9 @@ onMounted(() => {
 })
 
 const reverseGeocode = async (lat: number, lng: number) => {
-    isGeocoding.value     = true
-    resolvedAddress.value = ''
+    isGeocoding.value = true; resolvedAddress.value = ''
     try {
-        const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, { headers: { 'Accept-Language': 'en' } })
-        const data = await res.json()
+        const data = await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, { headers: { 'Accept-Language': 'en' } })).json()
         resolvedAddress.value = data.display_name ?? 'Address not found'
     } catch { resolvedAddress.value = 'Unable to resolve address' }
     finally { isGeocoding.value = false }
@@ -186,10 +208,8 @@ const reverseGeocode = async (lat: number, lng: number) => {
 const searchAddress = async () => {
     if (!searchQuery.value.trim()) return
     isSearching.value = true; searchResults.value = []
-    try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery.value)}&format=json&limit=5`, { headers: { 'Accept-Language': 'en' } })
-        searchResults.value = await res.json()
-    } catch { searchResults.value = [] }
+    try { searchResults.value = await (await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery.value)}&format=json&limit=5`, { headers: { 'Accept-Language': 'en' } })).json() }
+    catch { searchResults.value = [] }
     finally { isSearching.value = false }
 }
 
@@ -221,20 +241,20 @@ const closeMapModal = () => { showMap.value = false; searchQuery.value = ''; sea
 
 const getCurrentLocation = () => {
     isLocating.value = true
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            ({ coords }) => { const { latitude: lat, longitude: lng } = coords; markerPos.value = [lat, lng]; map?.setView([lat, lng], 16); mapMarker?.setLatLng([lat, lng]); reverseGeocode(lat, lng); isLocating.value = false },
+    navigator.geolocation
+        ? navigator.geolocation.getCurrentPosition(
+            ({ coords }) => { markerPos.value = [coords.latitude, coords.longitude]; map?.setView(markerPos.value, 16); mapMarker?.setLatLng(markerPos.value); reverseGeocode(coords.latitude, coords.longitude); isLocating.value = false },
             async () => locateByIp(), { timeout: 8000 }
-        )
-    } else { locateByIp() }
+          )
+        : locateByIp()
 }
 
 const locateByIp = async () => {
     try {
         const data = await (await fetch('https://ipapi.co/json/')).json()
         if (data.latitude && data.longitude) {
-            const lat = parseFloat(data.latitude), lng = parseFloat(data.longitude)
-            markerPos.value = [lat, lng]; map?.setView([lat, lng], 13); mapMarker?.setLatLng([lat, lng]); reverseGeocode(lat, lng)
+            markerPos.value = [parseFloat(data.latitude), parseFloat(data.longitude)]
+            map?.setView(markerPos.value, 13); mapMarker?.setLatLng(markerPos.value); reverseGeocode(markerPos.value[0], markerPos.value[1])
         } else { alert('Unable to determine location.') }
     } catch { alert('Unable to determine location.') }
     finally { isLocating.value = false }
@@ -256,7 +276,6 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
 
 <template>
     <div class="w-full lg:w-[80vw] xl:w-[90vw]">
-        <!-- Header -->
         <div class="flex items-center justify-between w-full px-8 py-1 bg-form-header border-b border-black dark:border-gray-500 dark:bg-gray-800">
             <h1 class="text-base lg:text-2xl font-extrabold dark:text-gray-200">
                 {{ isEdit ? `Edit Incident Report : ${record?.incident_code ?? '—'}` : 'Create Incident Report' }}
@@ -268,7 +287,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
 
         <form @submit.prevent="submitForm" class="p-4 bg-form-body dark:bg-gray-800 max-h-[85vh]">
 
-            <!-- ── INCIDENT DETAILS (create always; edit read-only card) ── -->
+            <!-- INCIDENT DETAILS (create) -->
             <template v-if="!isEdit">
                 <h2 class="mb-2 font-semibold text-gray-700 dark:text-gray-200">Incident Details</h2>
                 <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
@@ -304,11 +323,6 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                         <p v-if="form.errors.incident_id" class="text-xs text-red-500 mt-1">{{ form.errors.incident_id }}</p>
                     </div>
 
-                    <div>
-                        <CustomInput name="Distance (km)" type="number" v-model="form.distance" />
-                        <p class="text-xs text-gray-400 mt-0.5">Optional — improves priority accuracy</p>
-                    </div>
-
                     <div class="lg:col-span-2">
                         <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Map Coordinates <span class="text-red-500">*</span></label>
                         <div class="flex gap-2">
@@ -336,11 +350,11 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                 </div>
             </template>
 
-            <!-- ── READ-ONLY REPORT CARD (edit mode) ──────────────────────── -->
+            <!-- READ-ONLY CARD (edit) -->
             <template v-else>
                 <h2 class="mb-2 font-semibold text-gray-700 dark:text-gray-200">Report Details</h2>
                 <div class="grid grid-cols-1 gap-4 p-4 mb-4 rounded-lg border border-orange-200 bg-orange-50 dark:bg-gray-700/50 dark:border-orange-700 lg:grid-cols-3">
-                    <div v-for="(item, key) in {
+                    <div v-for="(val, key) in {
                         Reporter: record?.user?.full_name,
                         Barangay: record?.barangay?.barangay_name,
                         'Emergency Type': record?.emergency?.emergency_name,
@@ -348,7 +362,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                         'Distance (km)': record?.distance != null ? `${record.distance} km` : null,
                     }" :key="key">
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">{{ key }}</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ item ?? '—' }}</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ val ?? '—' }}</p>
                     </div>
 
                     <div class="lg:col-span-2">
@@ -404,18 +418,41 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                 </div>
             </template>
 
-            <!-- ── RESPONDER DETAILS (edit always; create only for admin) ── -->
+            <!-- RESPONDER DETAILS (edit always; create if admin) -->
             <template v-if="isEdit || hasFullAccess">
                 <h2 class="mb-2 font-semibold text-gray-700 dark:text-gray-200">Responder Details</h2>
                 <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
+
                     <div><CustomInput name="Responder Name"       v-model="form.responder_name" /></div>
                     <div><CustomInput name="Responder Contact No" v-model="form.responder_contact_no" /></div>
                     <div><CustomInput name="Responder Count" type="number" v-model="form.responder_count" /></div>
-                    <div><CustomInput name="Plate No" v-model="form.plate_no" /></div>
+                    <div><CustomInput name="Plate No"             v-model="form.plate_no" /></div>
+
+                    <div>
+                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Site Location</label>
+                        <Boombox :items="siteLocations" :existing-value="form.site_location_id" label-field="site_name"
+                            placeholder="Select site location" @change="(v: any) => form.site_location_id = v?.id ?? null" />
+                        <p v-if="form.distance_km != null" class="text-xs text-orange-600 mt-1">
+                            Computed distance: <strong>{{ form.distance_km }} km</strong>
+                        </p>
+                        <p v-if="form.errors.site_location_id" class="text-xs text-red-500 mt-1">{{ form.errors.site_location_id }}</p>
+                    </div>
+
+                    <div>
+                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Status</label>
+                        <select v-model="form.status" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:text-white">
+                            <option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                        </select>
+                        <p v-if="form.errors.status" class="text-xs text-red-500 mt-1">{{ form.errors.status }}</p>
+                    </div>
+
+                    <div><CustomInput name="Estimated Arrival" type="datetime-local" v-model="form.estimated_arrival" /></div>
+                    <div><CustomInput name="Datetime Arrived"  type="datetime-local" v-model="form.datetime_arrived" /></div>
+                    <div><CustomInput name="Reported At"       type="datetime-local" v-model="form.reported_at" /></div>
 
                     <div class="lg:col-span-2">
                         <label class="block m-1 text-sm font-semibold text-gray-600 dark:text-gray-200">Casualty Count</label>
-                        <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                        <div class="grid grid-cols-3 gap-3">
                             <div>
                                 <CustomInput name="Minor"    type="number" v-model="form.minor_casualty_count" />
                                 <p v-if="form.errors.minor_casualty_count" class="text-xs text-red-500 mt-1">{{ form.errors.minor_casualty_count }}</p>
@@ -431,30 +468,30 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Status</label>
-                        <select v-model="form.status" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:text-white">
-                            <option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                        </select>
-                        <p v-if="form.errors.status" class="text-xs text-red-500 mt-1">{{ form.errors.status }}</p>
-                    </div>
+                    <div class="lg:col-span-2"><CustomInput name="Responder Remarks"  v-model="form.responder_remarks" /></div>
+                    <div class="lg:col-span-2"><CustomInput name="Treatment Provided" v-model="form.treatment_provided" /></div>
+                    <div class="lg:col-span-2"><CustomInput name="Cancel Remarks"     v-model="form.cancel_remarks" /></div>
 
-                    <div><CustomInput name="Estimated Arrival" type="datetime-local" v-model="form.estimated_arrival" /></div>
-                    <div><CustomInput name="Datetime Arrived"  type="datetime-local" v-model="form.datetime_arrived" /></div>
-                    <div v-if="isEdit">
-                        <CustomInput name="Distance (km)" type="number" v-model="form.distance" />
-                        <p v-if="form.errors.distance" class="text-xs text-red-500 mt-1">{{ form.errors.distance }}</p>
+                    <div>
+                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Responder Attachment</label>
+                        <input type="file" @change="(e) => handleFileChange(e, 'responder_attachment')" accept="image/*,application/pdf"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                        <p v-if="form.errors.responder_attachment" class="text-xs text-red-500 mt-1">{{ form.errors.responder_attachment }}</p>
+                    </div>
+                    <div v-if="isEdit && record?.responder_attachment">
+                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Current Responder Attachment</label>
+                        <a :href="`/storage/${record.responder_attachment}`" target="_blank" class="text-sm text-orange-600 hover:underline">View File</a>
                     </div>
                 </div>
             </template>
 
-            <!-- ── NOTES & ATTACHMENT ──────────────────────────────────────── -->
+            <!-- NOTES & ATTACHMENT -->
             <h2 class="mb-2 font-semibold text-gray-700 dark:text-gray-200">Notes & Attachment</h2>
             <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
                 <div><CustomInput name="Remarks" v-model="form.remarks" /></div>
                 <div>
                     <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Attachment</label>
-                    <input type="file" @change="handleFileChange" accept="image/*,application/pdf"
+                    <input type="file" @change="(e) => handleFileChange(e, 'attachment')" accept="image/*,application/pdf"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
                     <p v-if="form.errors.attachment" class="text-xs text-red-500 mt-1">{{ form.errors.attachment }}</p>
                 </div>
