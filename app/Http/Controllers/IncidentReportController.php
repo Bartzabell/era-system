@@ -126,8 +126,8 @@ class IncidentReportController extends Controller
                 'reported_at', 'site_location_id',
             ]);
 
-            $data['distance_km'] = $this->computeDistance($request->map_coordinates, $request->site_location_id)
-                                   ?? $request->distance_km;
+            // $data['distance_km'] = $this->computeDistance($request->map_coordinates, $request->site_location_id)
+            //                        ?? $request->distance_km;
             $data['distance'] = $this->computeDistance($request->map_coordinates, $request->site_location_id)
                                    ?? $request->distance_km;
 
@@ -208,10 +208,10 @@ class IncidentReportController extends Controller
                 'reported_at', 'site_location_id',
             ]);
 
-            $data['distance_km'] = $this->computeDistance(
-                $incidentReport->map_coordinates,
-                $request->site_location_id
-            ) ?? $request->distance_km ?? $incidentReport->distance_km;
+            // $data['distance_km'] = $this->computeDistance(
+            //     $incidentReport->map_coordinates,
+            //     $request->site_location_id
+            // ) ?? $request->distance_km ?? $incidentReport->distance_km;
 
             $data['distance'] = $this->computeDistance(
                 $incidentReport->map_coordinates,
