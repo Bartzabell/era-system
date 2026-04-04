@@ -102,13 +102,31 @@ const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number): nu
     return parseFloat((R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(2))
 }
 
-const recomputeDistanceFromSite = () => {
+const recomputeDistanceFromSite = async () => {
     if (!form.site_location_id || !form.map_coordinates) { recomputePriority(); return }
     const site = props.siteLocations.find(s => s.id === form.site_location_id)
     if (!site?.coordinates) { recomputePriority(); return }
+
     const [iLat, iLng] = form.map_coordinates.split(',').map(Number)
     const [sLat, sLng] = site.coordinates.split(',').map(Number)
-    form.distance_km = haversineKm(iLat, iLng, sLat, sLng)
+
+    try {
+        const url  = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${iLng},${iLat}?overview=false`
+        const res  = await fetch(url)
+        const data = await res.json()
+
+        if (data.code === 'Ok' && data.routes?.length) {
+            // ✅ Road distance from OSRM
+            form.distance_km = parseFloat((data.routes[0].distance / 1000).toFixed(2))
+        } else {
+            // Fallback to Haversine if OSRM can't route
+            form.distance_km = haversineKm(iLat, iLng, sLat, sLng)
+        }
+    } catch {
+        // Network error fallback
+        form.distance_km = haversineKm(iLat, iLng, sLat, sLng)
+    }
+
     recomputePriority()
 }
 
@@ -120,8 +138,8 @@ watch(() => form.emergency_id, (val) => {
 watch(() => form.incident_id,     recomputePriority)
 watch(() => form.distance,        recomputePriority)
 watch(() => form.distance_km,     recomputePriority)
-watch(() => form.site_location_id, recomputeDistanceFromSite)
-watch(() => form.map_coordinates,  recomputeDistanceFromSite)
+watch(() => form.site_location_id, () => recomputeDistanceFromSite())
+watch(() => form.map_coordinates,  () => recomputeDistanceFromSite())
 
 const priorityDisplay = computed(() => form.priority_score ? { score: form.priority_score, level: form.priority_level, label: form.priority_label } : null)
 
@@ -153,6 +171,7 @@ const resolvedAddress = ref('')
 const searchQuery     = ref('')
 const searchResults   = ref<any[]>([])
 const isSearching     = ref(false)
+const miniMapRoadDistance = ref<number | null>(null)
 
 let map: L.Map | null = null
 let mapMarker: L.Marker | null = null
@@ -230,24 +249,25 @@ const initMiniMap = async () => {
                 const data = await res.json()
 
                 if (data.code === 'Ok' && data.routes?.length) {
-                    const routeGeoJSON = data.routes[0].geometry  // GeoJSON LineString
+                    const route = data.routes[0]
+                    const routeGeoJSON = route.geometry
 
-                    // Draw the road route as a solid orange polyline
-                    L.geoJSON(routeGeoJSON, {
-                        style: {
-                            color:   '#f97316',
-                            weight:  4,
-                            opacity: 0.85,
-                        },
-                    }).addTo(miniMap)
+                    // Road distance in km (OSRM returns meters)
+                    const roadDistanceKm = parseFloat((route.distance / 1000).toFixed(2))
 
-                    // Fit map to the route bounding box
+                    // Draw route...
+                    L.geoJSON(routeGeoJSON, { style: { color: '#f97316', weight: 4, opacity: 0.85 } }).addTo(miniMap)
+
+                    // Fit bounds...
                     const lats = routeGeoJSON.coordinates.map((c: number[]) => c[1])
                     const lngs = routeGeoJSON.coordinates.map((c: number[]) => c[0])
                     miniMap.fitBounds(
                         [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]],
                         { padding: [24, 24] }
                     )
+
+                    // ✅ Store road distance on the mini map (read-only display)
+                    miniMapRoadDistance.value = roadDistanceKm
                 } else {
                     // OSRM couldn't find a route (e.g. different islands) — fall back to straight line
                     L.polyline([siteCoords, coords], {
@@ -438,7 +458,9 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                         Barangay: record?.barangay?.barangay_name,
                         'Emergency Type': record?.emergency?.emergency_name,
                         'Incident Type': record?.incident?.incident_name,
-                        'Distance (km)': record?.distance != null ? `${record.distance} km` : null,
+                        'Distance (road)': miniMapRoadDistance != null
+                            ? `${miniMapRoadDistance} km`
+                            : record?.distance != null ? `${record.distance} km` : null,
                     }" :key="key">
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">{{ key }}</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ val ?? '—' }}</p>

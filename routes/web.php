@@ -43,7 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('incident-report', [IncidentReportController::class, 'store'])->name('incident-report.store');
     Route::put('incident-report/{incidentReport}', [IncidentReportController::class, 'update'])->name('incident-report.update');
     Route::delete('incident-report/{incidentReport}', [IncidentReportController::class, 'destroy'])->name('incident-report.destroy');
-    Route::get('incident-report/{incidentReport}', [IncidentReportController::class, 'show'])->name('incident-report.show');
+    Route::get('incident-report/{incidentReport}/print', [IncidentReportController::class, 'print'])->name('incident-report.print');
 
     Route::get('citizen-page', [CitizenController::class, 'index'])->name('citizen-page.index');
 

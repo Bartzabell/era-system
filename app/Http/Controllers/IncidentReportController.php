@@ -128,8 +128,7 @@ class IncidentReportController extends Controller
 
             // $data['distance_km'] = $this->computeDistance($request->map_coordinates, $request->site_location_id)
             //                        ?? $request->distance_km;
-            $data['distance'] = $this->computeDistance($request->map_coordinates, $request->site_location_id)
-                                   ?? $request->distance_km;
+            $data['distance'] = $request->distance_km ?? $request->distance;
 
             if ($full) {
                 $data += $request->only([
@@ -213,10 +212,7 @@ class IncidentReportController extends Controller
             //     $request->site_location_id
             // ) ?? $request->distance_km ?? $incidentReport->distance_km;
 
-            $data['distance'] = $this->computeDistance(
-                $incidentReport->map_coordinates,
-                $request->site_location_id
-            ) ?? $request->distance_km ?? $incidentReport->distance_km;
+            $data['distance'] = $request->distance_km ?? $request->distance ?? $incidentReport->distance;
 
             $data['casualty_count'] = ($data['minor_casualty_count'] ?? 0)
                                     + ($data['serious_casualty_count'] ?? 0)
@@ -251,12 +247,21 @@ class IncidentReportController extends Controller
         return redirect()->route('incident-report.index')->with('success', 'Incident report deleted successfully.');
     }
 
-    public function show(IncidentReport $incidentReport)
+    public function print(IncidentReport $incidentReport)
     {
-        if (!$this->hasFullAccess() && $incidentReport->user_id !== Auth::id()) abort(403, 'Unauthorized.');
+        if (!$this->hasFullAccess() && $incidentReport->user_id !== Auth::id()) abort(403);
 
-        $incidentReport->load(['user:id,first_name,last_name,full_name', 'barangay:id,barangay_name', 'incident:id,incident_name', 'emergency:id,emergency_name', 'siteLocation:id,site_name']);
+        $incidentReport->load([
+            'user:id,first_name,last_name',
+            'barangay:id,barangay_name',
+            'incident:id,incident_name',
+            'emergency:id,emergency_name',
+            'siteLocation:id,site_name',
+        ]);
 
-        return Inertia::render('IncidentReport/Show', ['incidentReport' => $incidentReport]);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.incident_report', compact('incidentReport'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream("incident-report-{$incidentReport->incident_code}.pdf");
     }
 }

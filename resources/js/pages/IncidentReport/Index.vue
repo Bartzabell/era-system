@@ -160,7 +160,7 @@ const columns = [
         cell: ({ row }: any) => h('div', { class: 'flex space-x-2' }, [
             h(Button, {
                 variant: 'outline', size: 'icon',
-                onClick: () => router.get(`/incident-report/${row.original.id}`),
+                onClick: () => window.open(`/incident-report/${row.original.id}/print`, '_blank'),
                 class: 'text-black bg-slate-500 rounded-full hover:bg-slate-400',
             }, () => h(PhEye, { size: 18 })),
             ...(props.hasFullAccess ? [
