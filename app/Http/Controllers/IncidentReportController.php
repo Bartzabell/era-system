@@ -90,7 +90,7 @@ class IncidentReportController extends Controller
             'deceased_casualty_count' => 'nullable|integer|min:0',
             'distance'                => 'nullable|numeric|min:0',
             'distance_km'             => 'nullable|numeric|min:0',
-            'attachment'              => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'attachment'              => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
             'remarks'                 => 'nullable|string',
             'priority_score'          => 'nullable|numeric|min:0|max:10',
             'priority_level'          => 'nullable|string|max:10',
@@ -112,7 +112,7 @@ class IncidentReportController extends Controller
                 'responder_remarks'    => 'nullable|string',
                 'treatment_provided'   => 'nullable|string',
                 'cancel_remarks'       => 'nullable|string',
-                'responder_attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
+                'responder_attachment' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
             ];
         }
 
@@ -174,8 +174,8 @@ class IncidentReportController extends Controller
         $request->validate([
             'distance'                => 'nullable|numeric|min:0',
             'distance_km'             => 'nullable|numeric|min:0',
-            'attachment'              => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
-            'responder_attachment'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'attachment'              => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
+            'responder_attachment'    => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
             'responder_name'          => 'nullable|string|max:255',
             'responder_contact_no'    => 'nullable|string|max:20',
             'responder_count'         => 'nullable|integer|min:0',
