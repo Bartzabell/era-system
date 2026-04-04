@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -8,21 +9,27 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthBase from '@/layouts/AuthLayout.vue';
+import Modal from '@/components/Modal.vue';
+import TermsAndConditions from '@/pages/auth/TermsAndConditions.vue';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { PhFirstAid } from '@phosphor-icons/vue'
+import { PhFirstAid } from '@phosphor-icons/vue';
 
 defineProps<{
     status?: string;
     canResetPassword: boolean;
     canRegister: boolean;
 }>();
+
+const termsAccepted = ref(false);
+const showTermsModal = ref(false);
 </script>
 
 <template>
-    <div className="flex bg-orange-400/75 ">
-        <AuthBase className="bg-gray-400 allign-center w-fit h-screen p-10 flex justify-center"
+    <div className="flex bg-orange-400/75">
+        <AuthBase
+            className="bg-gray-400 allign-center w-fit h-screen p-10 flex justify-center"
             title="Welcome Back!"
             description="Sign in to your account to continue"
         >
@@ -42,22 +49,10 @@ defineProps<{
                 class="flex flex-col gap-6"
             >
                 <div class="grid gap-6">
-                    <!-- <div class="grid gap-2">
-                        <Label for="username">Username</Label>
-                        <Input
-                            id="username"
-                            name="username"
-                            required
-                            autofocus
-                            :tabindex="1"
-                            autocomplete="username"
-                            placeholder="username"
-                        />
-                        <InputError :message="errors.username" />
-                    </div> -->
                     <div class="grid gap-2">
                         <Label for="email">Email Address</Label>
-                        <Input class="bg-gray-200 border-gray-200"
+                        <Input
+                            class="bg-gray-200 border-gray-200"
                             id="email"
                             name="email"
                             required
@@ -74,7 +69,6 @@ defineProps<{
                         <div class="flex items-center justify-between">
                             <Label for="password">Password</Label>
                             <TextLink
-
                                 v-if="canResetPassword"
                                 :href="request()"
                                 class="text-sm"
@@ -103,11 +97,31 @@ defineProps<{
                         </Label>
                     </div>
 
+                    <!-- Terms and Conditions Checkbox -->
+                    <div class="flex items-start space-x-3">
+                        <Checkbox
+                            id="terms"
+                            :tabindex="4"
+                            v-model="termsAccepted"
+                            class="mt-0.5"
+                        />
+                        <Label for="terms" class="text-sm text-gray-600 leading-snug cursor-pointer select-none">
+                            I have read and agree to the
+                            <button
+                                type="button"
+                                @click="showTermsModal = true"
+                                class="text-orange-600 underline underline-offset-2 hover:text-orange-700 font-medium transition-colors"
+                            >
+                                Terms and Conditions
+                            </button>
+                        </Label>
+                    </div>
+
                     <Button
                         type="submit"
                         class="mt-4 w-full rounded-full bg-orange-600"
-                        :tabindex="4"
-                        :disabled="processing"
+                        :tabindex="5"
+                        :disabled="processing || !termsAccepted"
                         data-test="login-button"
                     >
                         <Spinner v-if="processing" />
@@ -115,28 +129,39 @@ defineProps<{
                     </Button>
                 </div>
 
-                <div
-                    class="text-center text-sm text-muted-foreground"
-
-                >
+                <div class="text-center text-sm text-muted-foreground">
                     Don't have an account?
-                    <TextLink :href="register()" :tabindex="5"  class="underline underline-offset-4 text-red-600">Sign up</TextLink>
+                    <TextLink
+                        :href="register()"
+                        :tabindex="6"
+                        class="underline underline-offset-4 text-red-600"
+                    >
+                        Sign up
+                    </TextLink>
                 </div>
             </Form>
         </AuthBase>
+
         <div className="flex flex-1 flex-col items-center justify-center text-center gap-4">
             <div class="rounded-md bg-red-500">
-                <PhFirstAid :size="52" weight="fill" class="text-red-500 bg-white rounded-full m-3"/>
+                <PhFirstAid :size="52" weight="fill" class="text-red-500 bg-white rounded-full m-3" />
             </div>
             <h1 className="text-5xl text-white font-black">
                 Reliable Response,<br />
                 Reliable Protection
             </h1>
-
             <p className="text-white/90 max-w-xl">
                 Join the GEARS network and help us build safer, more resilient<br />
                 communities through coordinated emergency response.
             </p>
         </div>
+
+        <!-- Terms and Conditions Modal -->
+        <Modal :show="showTermsModal" @close="showTermsModal = false" maxWidth="2xl">
+            <TermsAndConditions
+                @close="showTermsModal = false"
+                @accept="termsAccepted = true; showTermsModal = false"
+            />
+        </Modal>
     </div>
 </template>
