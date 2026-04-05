@@ -27,7 +27,7 @@ class DashboardController extends Controller
             ->whereNull('deleted_at')
             ->get()
             ->map(function ($report) {
-                $created = Carbon::parse($report->created_at);
+                $created = Carbon::parse($report->reported_at);
                 $arrived = Carbon::parse($report->datetime_arrived);
                 return $created->diffInMinutes($arrived);
             })
@@ -62,16 +62,16 @@ class DashboardController extends Controller
                     'emergency_type' => $report->emergency->emergency_name ?? 'Unknown',
                     'barangay'       => $report->barangay->barangay_name ?? 'Unknown',
                     'casualty_count' => $report->casualty_count,
-                    'created_at'     => $report->created_at->diffForHumans(),
+                    'reported_at'     => $report->reported_at,
                 ];
             });
 
-        // Sort feed by priority_score desc (most urgent first), then by created_at desc
+        // Sort feed by priority_score desc (most urgent first), then by reported_at desc
         $incidentFeed = IncidentReport::with(['incident', 'barangay'])
             ->whereNotIn('status', ['resolved', 'cancelled'])
             ->whereNull('deleted_at')
             ->orderByRaw('COALESCE(priority_score, 0) DESC')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('reported_at', 'desc')
             ->limit(10)
             ->get()
             ->map(function ($report) {
@@ -82,12 +82,12 @@ class DashboardController extends Controller
                     'incident_name'  => $report->incident->incident_name ?? 'Unknown Incident',
                     'landmark'       => $report->barangay->barangay_name ?? 'Unknown Location',
                     'coordinates'    => $coords,
-                    'time_ago'       => $this->formatTimeAgo($report->created_at),
+                    'time_ago'       => $this->formatTimeAgo($report->reported_at),
                     'priority_score' => $report->priority_score,
                     'priority_level' => $report->priority_level,
                     'priority_label' => $report->priority_label,
                     'status'         => $report->status,
-                    'created_at'     => $report->created_at,
+                    'reported_at'     => $report->reported_at,
                 ];
             });
 

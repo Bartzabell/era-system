@@ -77,7 +77,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function responder()
     {
-        return $this->hasOne(Responder::class);
+        return $this->hasOne(Responder::class, 'user_id', 'id');
     }
 
     public function siteLocation()

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import IncidentMap from '@/components/IncidentMap.vue';
@@ -6,6 +7,12 @@ import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { PhFireTruck, PhClockCountdown, PhCheckCircle, PhDotsThreeOutline, PhFunnel, PhMapPin } from '@phosphor-icons/vue'
 import { Flame } from 'lucide-vue-next';
+
+// Dashboard modals
+import AIModal  from '@/components/Dashboard/AIModal.vue'
+import ARModal  from '@/components/Dashboard/ARModal.vue'
+import ARTModal from '@/components/Dashboard/ARTModal.vue'
+import RModal   from '@/components/Dashboard/RModal.vue'
 
 interface DashboardStats {
     activeIncidents: number;
@@ -26,7 +33,7 @@ interface IncidentMarker {
     emergency_type: string;
     barangay: string;
     casualty_count: number;
-    created_at: string;
+    reported_at: string;
 }
 
 interface IncidentFeedItem {
@@ -39,7 +46,7 @@ interface IncidentFeedItem {
     priority_level: string;
     priority_label: string;
     status: string;
-    created_at: string;
+    reported_at: string;
 }
 
 const props = defineProps<{
@@ -51,6 +58,12 @@ const props = defineProps<{
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
 ];
+
+// Modal visibility state
+const showAIModal  = ref(false)
+const showARModal  = ref(false)
+const showARTModal = ref(false)
+const showRModal   = ref(false)
 
 // Color by priority_level (P1–P5)
 const getPriorityLevelColor = (level: string) => {
@@ -96,7 +109,13 @@ const exportCitizenReport = () => {
             <div class="col-span-1 lg:col-span-2 flex flex-col gap-4">
                 <!-- Stats -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+
+                    <!-- Active Incidents -->
+                    <button
+                        type="button"
+                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar text-left transition hover:shadow-md hover:scale-[1.02] active:scale-100 cursor-pointer"
+                        @click="showAIModal = true"
+                    >
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
                                 <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active Incidents</p>
@@ -108,8 +127,14 @@ const exportCitizenReport = () => {
                                 <p class="text-3xl font-bold">{{ stats.activeIncidents }}</p>
                             </div>
                         </div>
-                    </div>
-                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+                    </button>
+
+                    <!-- Active Responders -->
+                    <button
+                        type="button"
+                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar text-left transition hover:shadow-md hover:scale-[1.02] active:scale-100 cursor-pointer"
+                        @click="showARModal = true"
+                    >
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
                                 <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Active Responders</p>
@@ -121,8 +146,14 @@ const exportCitizenReport = () => {
                                 <p class="text-3xl font-bold">{{ stats.activeResponders }}</p>
                             </div>
                         </div>
-                    </div>
-                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+                    </button>
+
+                    <!-- Avg Response Time -->
+                    <button
+                        type="button"
+                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar text-left transition hover:shadow-md hover:scale-[1.02] active:scale-100 cursor-pointer"
+                        @click="showARTModal = true"
+                    >
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
                                 <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Avg Response Time</p>
@@ -134,8 +165,14 @@ const exportCitizenReport = () => {
                                 <p class="text-3xl font-bold">{{ stats.avgResponseTime }}</p>
                             </div>
                         </div>
-                    </div>
-                    <div class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar">
+                    </button>
+
+                    <!-- Resolved Today -->
+                    <button
+                        type="button"
+                        class="relative overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 dark:border-sidebar-border dark:bg-sidebar text-left transition hover:shadow-md hover:scale-[1.02] active:scale-100 cursor-pointer"
+                        @click="showRModal = true"
+                    >
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
                                 <p class="text-lg font-black col-span-2 leading-5 text-muted-foreground">Resolved Today</p>
@@ -147,14 +184,13 @@ const exportCitizenReport = () => {
                                 <p class="text-3xl font-bold">{{ stats.resolvedToday }}</p>
                             </div>
                         </div>
-                    </div>
+                    </button>
                 </div>
 
                 <!-- Map -->
-                <div class="relative bg-white overflow-hidden rounded-xl dark:border-sidebar-border">
+                <div class="relative bg-white overflow-hidden rounded-xl dark:border-sidebar-border isolate z-0">
                     <div class="flex justify-between items-center p-4">
                         <h1 class="text-2xl font-black">Live Incident Map</h1>
-                        <!-- Legend now uses priority levels -->
                         <div class="flex gap-2 text-sm">
                             <span class="flex items-center gap-1">
                                 <span class="w-3 h-3 rounded-full bg-red-600"></span> P1 Critical
@@ -200,27 +236,22 @@ const exportCitizenReport = () => {
                                 <div class="flex flex-col gap-2">
                                     <div class="flex justify-between items-start gap-2">
                                         <h3 class="font-bold text-sm line-clamp-1">{{ incident.incident_name }}</h3>
-                                        <!-- Priority badge replaces raw score -->
                                         <span
                                             v-if="incident.priority_level"
                                             class="shrink-0 text-xs font-bold px-1.5 py-0.5 rounded"
                                             :class="{
-                                                'bg-red-100 text-red-700':    incident.priority_level === 'P1',
+                                                'bg-red-100 text-red-700':       incident.priority_level === 'P1',
                                                 'bg-orange-100 text-orange-700': incident.priority_level === 'P2',
                                                 'bg-yellow-100 text-yellow-700': incident.priority_level === 'P3',
-                                                'bg-blue-100 text-blue-700':  incident.priority_level === 'P4',
-                                                'bg-gray-100 text-gray-600':  incident.priority_level === 'P5',
+                                                'bg-blue-100 text-blue-700':     incident.priority_level === 'P4',
+                                                'bg-gray-100 text-gray-600':     incident.priority_level === 'P5',
                                             }"
                                         >
                                             {{ incident.priority_level }}
                                         </span>
                                     </div>
-                                    <!-- Priority label + score -->
                                     <div class="flex items-center gap-1">
-                                        <span
-                                            class="text-xs font-medium"
-                                            :class="getPriorityScoreColor(incident.priority_score)"
-                                        >
+                                        <span class="text-xs font-medium" :class="getPriorityScoreColor(incident.priority_score)">
                                             {{ incident.priority_label ?? '—' }}
                                         </span>
                                         <span v-if="incident.priority_score" class="text-xs text-gray-400">
@@ -270,4 +301,31 @@ const exportCitizenReport = () => {
             </div>
         </div>
     </AppLayout>
+
+    <!-- Dashboard Modals -->
+    <AIModal
+        :show="showAIModal"
+        :active-incidents="stats.activeIncidents"
+        :incident-markers="incidentMarkers"
+        @close="showAIModal = false"
+    />
+
+    <ARModal
+        :show="showARModal"
+        :active-responders="stats.activeResponders"
+        @close="showARModal = false"
+    />
+
+    <ARTModal
+        :show="showARTModal"
+        :avg-response-time="stats.avgResponseTime"
+        :incident-feed="incidentFeed"
+        @close="showARTModal = false"
+    />
+
+    <RModal
+        :show="showRModal"
+        :resolved-today="stats.resolvedToday"
+        @close="showRModal = false"
+    />
 </template>
