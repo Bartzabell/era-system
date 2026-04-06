@@ -12,6 +12,7 @@ use App\Services\ClosestFacilityFinder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Services\PriorityScoreCalculator;
 
@@ -405,6 +406,72 @@ class IncidentReportApiController extends Controller
         }
 
         return $this->successResponse(null, ['location' => $location]);
+    }
+
+    // Get attachments from folder
+    public function getAttachments($id)
+    {
+        try {
+            $report = IncidentReport::findOrFail($id);
+
+            if (!$report->attachment) {
+                return $this->successResponse(null, ['attachments' => []]);
+            }
+
+            // Handle old Google Drive URLs
+            if (str_starts_with($report->attachment, 'http')) {
+                return $this->successResponse(null, [
+                    'attachments' => [['url' => $report->attachment, 'type' => 'legacy']]
+                ]);
+            }
+
+            // New folder-based attachments
+            $files = Storage::disk('public')->files($report->attachment);
+            $attachments = array_map(function ($file) {
+                return [
+                    'url' => asset('storage/' . $file),
+                    'name' => basename($file),
+                    'type' => 'file'
+                ];
+            }, $files);
+
+            return $this->successResponse(null, ['attachments' => $attachments]);
+        } catch (\Exception $e) {
+            Log::error('Get Attachments Error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to fetch attachments', 500);
+        }
+    }
+
+    // Upload multiple attachments
+    public function uploadAttachments(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'attachments' => 'required|array|max:5',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,mp4,mov|max:51200' // 50MB per file
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->errors(), 422);
+        }
+
+        try {
+            $report = IncidentReport::findOrFail($id);
+            $folderPath = 'incident-attachments/' . $report->incident_code;
+
+            foreach ($request->file('attachments') as $file) {
+                $file->store($folderPath, 'public');
+            }
+
+            // Update attachment field with folder path
+            $report->update(['attachment' => $folderPath]);
+
+            return $this->successResponse('Attachments uploaded successfully', [
+                'folder' => $folderPath
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Upload Attachments Error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to upload attachments', 500);
+        }
     }
 
     // ========== HELPER METHODS ==========
