@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Incident Report – {{ $incidentReport->incident_code ?? 'N/A' }}</title>
+    <title>Incident Report – {{ $incidentReport->incident_code ?? '' }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -272,12 +272,12 @@
                     <div class="header-subtitle">Emergency Response Management System</div>
                 </td>
                 <td style="width:40%;">
-                    <div class="header-code">{{ $incidentReport->incident_code ?? '—' }}</div>
+                    <div class="header-code">{{ $incidentReport->incident_code ?? '' }}</div>
                     <div class="header-meta">
                         Generated: {{ now()->format('M d, Y h:i A') }}
                     </div>
                     <div class="header-meta">
-                        Reported by: {{ optional($incidentReport->user)->full_name ?? '—' }}
+                        Reported by: {{ optional($incidentReport->user)->full_name ?? '' }}
                     </div>
                 </td>
             </tr>
@@ -290,19 +290,19 @@
         <table class="field-table">
             <tr>
                 <td class="field-label">Emergency Type</td>
-                <td class="field-value">{{ optional($incidentReport->emergency)->emergency_name ?? '—' }}</td>
+                <td class="field-value">{{ optional($incidentReport->emergency)->emergency_name ?? '' }}</td>
                 <td class="field-label">Incident Type</td>
-                <td class="field-value">{{ optional($incidentReport->incident)->incident_name ?? '—' }}</td>
+                <td class="field-value">{{ optional($incidentReport->incident)->incident_name ?? '' }}</td>
             </tr>
             <tr>
                 <td class="field-label">Barangay</td>
-                <td class="field-value">{{ optional($incidentReport->barangay)->barangay_name ?? '—' }}</td>
+                <td class="field-value">{{ optional($incidentReport->barangay)->barangay_name ?? '' }}</td>
                 <td class="field-label">Site Location</td>
-                <td class="field-value">{{ optional($incidentReport->siteLocation)->site_name ?? '—' }}</td>
+                <td class="field-value">{{ optional($incidentReport->siteLocation)->site_name ?? '' }}</td>
             </tr>
             <tr>
                 <td class="field-label">Map Coordinates</td>
-                <td class="field-value">{{ $incidentReport->map_coordinates ?? '—' }}</td>
+                <td class="field-value">{{ $incidentReport->map_coordinates ?? '' }}</td>
                 <td class="field-label">Distance (road)</td>
                 <td class="field-value">
                     @if($incidentReport->distance)
@@ -317,13 +317,13 @@
                 <td class="field-value">
                     {{ $incidentReport->reported_at
                         ? \Carbon\Carbon::parse($incidentReport->reported_at)->format('M d, Y h:i A')
-                        : '—' }}
+                        : '' }}
                 </td>
                 <td class="field-label">Severity Level</td>
                 <td class="field-value">
                     {{ $incidentReport->severity_level
                         ? ucfirst($incidentReport->severity_level)
-                        : '—' }}
+                        : '' }}
                 </td>
             </tr>
             <tr>
@@ -377,28 +377,28 @@
         <table class="field-table">
             <tr>
                 <td class="field-label">Responder Name</td>
-                <td class="field-value">{{ $incidentReport->responder_name ?: '—' }}</td>
+                <td class="field-value">{{ $incidentReport->responder_name ?: '' }}</td>
                 <td class="field-label">Contact No.</td>
-                <td class="field-value">{{ $incidentReport->responder_contact_no ?: '—' }}</td>
+                <td class="field-value">{{ $incidentReport->responder_contact_no ?: '' }}</td>
             </tr>
             <tr>
                 <td class="field-label">Responder Count</td>
-                <td class="field-value">{{ $incidentReport->responder_count ?? '—' }}</td>
+                <td class="field-value">{{ $incidentReport->responder_count ?? '' }}</td>
                 <td class="field-label">Plate No.</td>
-                <td class="field-value">{{ $incidentReport->plate_no ?: '—' }}</td>
+                <td class="field-value">{{ $incidentReport->plate_no ?: '' }}</td>
             </tr>
             <tr>
                 <td class="field-label">Estimated Arrival</td>
                 <td class="field-value">
                     {{ $incidentReport->estimated_arrival
                         ? \Carbon\Carbon::parse($incidentReport->estimated_arrival)->format('M d, Y h:i A')
-                        : '—' }}
+                        : '' }}
                 </td>
                 <td class="field-label">Datetime Arrived</td>
                 <td class="field-value">
                     {{ $incidentReport->datetime_arrived
                         ? \Carbon\Carbon::parse($incidentReport->datetime_arrived)->format('M d, Y h:i A')
-                        : '—' }}
+                        : '' }}
                 </td>
             </tr>
             @if($incidentReport->reported_at && $incidentReport->datetime_arrived)
@@ -460,13 +460,13 @@
                 <td class="field-value">
                     {{ $incidentReport->created_at
                         ? \Carbon\Carbon::parse($incidentReport->created_at)->format('M d, Y h:i A')
-                        : '—' }}
+                        : '' }}
                 </td>
                 <td class="field-label">Last Updated</td>
                 <td class="field-value">
                     {{ $incidentReport->updated_at
                         ? \Carbon\Carbon::parse($incidentReport->updated_at)->format('M d, Y h:i A')
-                        : '—' }}
+                        : '' }}
                 </td>
             </tr>
         </table>
@@ -518,7 +518,7 @@
 <div class="page">
 
     <div class="attachment-header">
-        Attachments — {{ $incidentReport->incident_code ?? 'N/A' }}
+        Attachments — {{ $incidentReport->incident_code ?? '' }}
     </div>
 
     {{-- Reporter Attachment --}}

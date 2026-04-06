@@ -95,7 +95,7 @@ class AnnouncementAlertController extends Controller
             'for_citizens'         => $a->for_citizens,
             'for_responders'       => $a->for_responders,
             'audience'             => implode(' & ', $audience) ?: 'None',
-            'created_by_name'      => $a->creator?->full_name ?? '—',
+            'created_by_name'      => $a->creator?->full_name ?? '',
             'time_ago'             => Carbon::parse($a->created_at)->diffForHumans(),
             'created_at'           => $a->created_at->format('M d, Y h:i A'),
         ];

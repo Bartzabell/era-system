@@ -377,7 +377,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
     <div class="w-full lg:w-[80vw] xl:w-[90vw]">
         <div class="flex items-center justify-between w-full px-8 py-1 bg-form-header border-b border-black dark:border-gray-500 dark:bg-gray-800">
             <h1 class="text-base lg:text-2xl font-extrabold dark:text-gray-200">
-                {{ isEdit ? `Edit Incident Report : ${record?.incident_code ?? '—'}` : 'Create Incident Report' }}
+                {{ isEdit ? `Edit Incident Report : ${record?.incident_code ?? ''}` : 'Create Incident Report' }}
             </h1>
             <button @click="closeModal" class="p-3 text-white rounded-full bg-red-500 hover:bg-red-600">
                 <PhX :size="16" />
@@ -463,7 +463,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                             : record?.distance != null ? `${record.distance} km` : null,
                     }" :key="key">
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">{{ key }}</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ val ?? '—' }}</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ val ?? '' }}</p>
                     </div>
 
                     <div class="lg:col-span-2">
@@ -483,7 +483,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
 
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Date Reported</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.created_at ? new Date(record.created_at).toLocaleString() : '—' }}</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ record?.created_at ? new Date(record.created_at).toLocaleString() : '' }}</p>
                     </div>
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Current Status</p>
@@ -493,7 +493,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                             'bg-purple-100 text-purple-700': record?.status === 'arriving',
                             'bg-green-100 text-green-700':   record?.status === 'resolved',
                             'bg-red-100 text-red-700':       record?.status === 'cancelled',
-                        }">{{ record?.status ?? '—' }}</span>
+                        }">{{ record?.status ?? '' }}</span>
                     </div>
 
                     <div class="lg:col-span-3">
@@ -502,7 +502,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                             <PhMapPin :size="16" class="text-orange-500 mt-0.5 shrink-0" />
                             <p class="text-sm font-medium text-gray-800 dark:text-gray-100">
                                 <span v-if="isMiniGeocoding" class="text-gray-400 italic">Resolving location...</span>
-                                <span v-else>{{ miniMapAddress || '—' }}</span>
+                                <span v-else>{{ miniMapAddress || '' }}</span>
                             </p>
                         </div>
                         <div v-if="record?.map_coordinates" class="relative">
@@ -653,7 +653,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                 <p class="text-sm text-gray-700">
                     <strong>Address:</strong>
                     <span v-if="isGeocoding" class="text-gray-400 italic"> Resolving address...</span>
-                    <span v-else class="text-gray-600"> {{ resolvedAddress || '—' }}</span>
+                    <span v-else class="text-gray-600"> {{ resolvedAddress || '' }}</span>
                 </p>
             </div>
 

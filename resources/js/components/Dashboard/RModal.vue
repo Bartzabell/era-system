@@ -44,7 +44,7 @@ const fetchResolved = async () => {
 watch(() => props.show, (val) => { if (val) fetchResolved() })
 
 const formatTime = (iso?: string) => {
-    if (!iso) return '—'
+    if (!iso) return ''
     return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
 }
 

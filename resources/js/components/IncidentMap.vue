@@ -103,12 +103,12 @@ const updateMarkers = () => {
                         <p>
                             <strong>Priority:</strong>
                             <span style="color: ${color}; font-weight: 600;">
-                                ${incident.priority_level ?? '—'} — ${incident.priority_label ?? '—'}
+                                ${incident.priority_level ?? ''} — ${incident.priority_label ?? ''}
                             </span>
                         </p>
                         <p>
                             <strong>Score:</strong>
-                            ${incident.priority_score != null ? incident.priority_score + ' / 10' : '—'}
+                            ${incident.priority_score != null ? incident.priority_score + ' / 10' : ''}
                         </p>
                         <p><strong>Status:</strong> ${incident.status}</p>
                         ${incident.casualty_count ? `<p><strong>Casualties:</strong> ${incident.casualty_count}</p>` : ''}

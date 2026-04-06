@@ -58,7 +58,7 @@ class MonthlyReportController extends Controller
             $rows->push([
                 'no'              => $index++,
                 'barangay_name'   => $barangay?->barangay_name ?? 'Unknown',
-                'landmark'        => $barangay?->landmark      ?? '—',
+                'landmark'        => $barangay?->landmark      ?? '',
                 'minor'           => $minor,
                 'serious'         => $serious,
                 'dead'            => $dead,
@@ -93,8 +93,8 @@ class MonthlyReportController extends Controller
     public function exportPdf(Request $request)
     {
         $rows  = $this->aggregateReports($request);
-        $from  = $request->input('date_from', '—');
-        $to    = $request->input('date_to',   '—');
+        $from  = $request->input('date_from', '');
+        $to    = $request->input('date_to',   '');
 
         $pdf = Pdf::loadView('reports.monthly_report_pdf', [
             'rows'      => $rows,

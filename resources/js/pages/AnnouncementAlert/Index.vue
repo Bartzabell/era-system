@@ -35,17 +35,16 @@ const breadcrumbs = [
     { title: 'Announcements & Alerts', href: '/announcement-alert' },
 ]
 
-const localFilters  = ref(props.filters)
+const localFilters = ref(props.filters)
 const updateFilters = (newFilters: object) => {
     localFilters.value = newFilters
     router.get(route('announcement-alert.index'), newFilters, { preserveState: true, replace: true })
 }
 
-// Delete modal
 const showDeleteModal = ref(false)
-const deletingRecord  = ref<Announcement | null>(null)
+const deletingRecord = ref<Announcement | null>(null)
 const openDeleteModal = (record: Announcement) => {
-    deletingRecord.value  = record
+    deletingRecord.value = record
     showDeleteModal.value = true
 }
 const deleteRecord = () => {
@@ -54,12 +53,11 @@ const deleteRecord = () => {
     })
 }
 
-// Create form
 const form = useForm({
-    announcement_title:   '',
+    announcement_title: '',
     announcement_message: '',
-    for_citizens:         false,
-    for_responders:       false,
+    for_citizens: false,
+    for_responders: false,
 })
 
 const submitForm = () => {
@@ -68,33 +66,31 @@ const submitForm = () => {
     })
 }
 
-// Format date to "Jan 1, 2025 12:12 AM" respecting browser locale
-// The server sends UTC strings — we display in local time
 const formatDate = (dateStr: string | null): string => {
-    if (!dateStr) return '—'
+    if (!dateStr) return ''
     const date = new Date(dateStr)
     if (isNaN(date.getTime())) return dateStr
     return date.toLocaleString('en-PH', {
-        month:  'short',
-        day:    'numeric',
-        year:   'numeric',
-        hour:   'numeric',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
         minute: '2-digit',
         hour12: true,
     })
 }
 
 const audienceBadgeClass = (record: any) => {
-    if (record.for_citizens && record.for_responders) return 'bg-purple-100 text-purple-700'
-    if (record.for_responders) return 'bg-blue-100 text-blue-700'
-    if (record.for_citizens)   return 'bg-green-100 text-green-700'
+    if (record.for_citizens && record.for_responders) return 'bg-red-100 text-red-700'
+    if (record.for_responders) return 'bg-orange-100 text-orange-700'
+    if (record.for_citizens) return 'bg-green-100 text-green-700'
     return 'bg-gray-100 text-gray-600'
 }
 
 const audienceBadgeLabel = (record: any) => {
     if (record.for_citizens && record.for_responders) return 'General'
     if (record.for_responders) return 'Responders'
-    if (record.for_citizens)   return 'Citizens'
+    if (record.for_citizens) return 'Citizens'
     return 'None'
 }
 
@@ -122,7 +118,7 @@ const columns = [
     {
         accessorKey: 'creator.full_name',
         header: 'Created By',
-        cell: ({ row }: any) => row.original.creator?.full_name ?? row.original.created_by_name ?? '—',
+        cell: ({ row }: any) => row.original.creator?.full_name ?? row.original.created_by_name ?? '',
     },
     {
         accessorKey: 'created_at',
@@ -136,7 +132,7 @@ const columns = [
             h(Button, {
                 variant: 'outline', size: 'icon',
                 onClick: () => openDeleteModal(row.original),
-                class: 'text-white bg-red-500 rounded-full hover:bg-red-400',
+                class: 'text-white bg-red-500 rounded-full hover:bg-red-600',
             }, () => h(PhTrash, { size: 16 })),
         ]),
     },
@@ -150,14 +146,12 @@ const columns = [
         <div class="w-full flex justify-center mt-6">
             <div class="w-[92%] flex flex-col gap-6">
 
-                <!-- Top section: Form + Broadcast Panels -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    <!-- Create Announcement Form -->
                     <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-2">
-                        <div class="flex items-center justify-center text-center gap-2 mb-4 bg-yellow-200 rounded-lg p-2">
-                            <Megaphone :size="22" weight="fill" />
-                            <h2 class="text-xl font-black text-black">Broadcast Message</h2>
+                        <div class="flex items-center justify-center text-center gap-2 mb-4 bg-orange-100 rounded-lg p-2">
+                            <Megaphone :size="22" weight="fill" class="text-orange-600" />
+                            <h2 class="text-xl font-black text-gray-800">Broadcast Message</h2>
                         </div>
 
                         <form @submit.prevent="submitForm" class="flex flex-col gap-4 m-4">
@@ -180,14 +174,13 @@ const columns = [
                                     v-model="form.announcement_message"
                                     rows="4"
                                     placeholder="Write your announcement..."
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400 dark:bg-gray-700 dark:text-white"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
                                 />
                                 <p v-if="form.errors.announcement_message" class="text-xs text-red-500 mt-1">
                                     {{ form.errors.announcement_message }}
                                 </p>
                             </div>
 
-                            <!-- Audience Toggles -->
                             <div>
                                 <label class="block mb-2 text-sm text-gray-600">
                                     Broadcast To <span class="text-red-500">*</span>
@@ -228,15 +221,13 @@ const columns = [
                         </form>
                     </div>
 
-                    <!-- Right: Broadcast Alerts + History -->
                     <div class="flex flex-col gap-4">
 
-                        <!-- Today's Broadcasts -->
                         <div class="bg-white rounded-xl border border-gray-200 flex flex-col gap-2">
-                            <div class="flex items-center gap-2 mb-1 bg-gray-300 p-2 rounded-xl">
+                            <div class="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-xl">
                                 <PhSiren :size="32" class="text-red-500" weight="fill" />
                                 <h3 class="text-sm font-bold text-gray-700">Today's Broadcasted Alerts</h3>
-                                <span class="ml-auto text-xs bg-orange-100 text-orange-600 font-semibold px-2 py-0.5 rounded-full">
+                                <span class="ml-auto text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">
                                     {{ broadcastAlerts.length }}
                                 </span>
                             </div>
@@ -245,7 +236,7 @@ const columns = [
                                 <div
                                     v-for="alert in broadcastAlerts"
                                     :key="alert.id"
-                                    class="rounded-lg border border-orange-100 bg-orange-50 p-3"
+                                    class="rounded-lg border border-red-100 bg-red-50 p-3"
                                 >
                                     <div class="flex items-start justify-between gap-1 mb-1">
                                         <p class="text-xs font-bold text-gray-800 line-clamp-1">
@@ -274,12 +265,11 @@ const columns = [
                             </div>
                         </div>
 
-                        <!-- This Week's History -->
                         <div class="bg-white rounded-xl border border-gray-200 flex flex-col gap-2">
-                            <div class="flex items-center gap-2 mb-1 bg-gray-300 p-2 rounded-xl">
+                            <div class="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-xl">
                                 <PhCalendar :size="32" class="text-gray-500" weight="fill" />
                                 <h3 class="text-sm font-bold text-gray-700">Previous Broadcast (Weekly)</h3>
-                                <span class="ml-auto text-xs bg-gray-100 text-gray-600 font-semibold px-2 py-0.5 rounded-full">
+                                <span class="ml-auto text-xs bg-gray-200 text-gray-600 font-semibold px-2 py-0.5 rounded-full">
                                     {{ broadcastHistory.length }}
                                 </span>
                             </div>
@@ -288,7 +278,7 @@ const columns = [
                                 <div
                                     v-for="item in broadcastHistory"
                                     :key="item.id"
-                                    class="rounded-lg border border-gray-100 bg-gray-50 p-3"
+                                    class="rounded-lg border border-gray-200 bg-gray-50 p-3"
                                 >
                                     <div class="flex items-start justify-between gap-1 mb-1">
                                         <p class="text-xs font-bold text-gray-800 line-clamp-1">
@@ -306,7 +296,6 @@ const columns = [
                                         <span class="text-[10px] text-gray-400 flex items-center gap-1">
                                             <PhUser :size="10" /> {{ item.created_by_name }}
                                         </span>
-                                        <!-- formatted date on history items -->
                                         <span class="text-[10px] text-gray-400">{{ formatDate(item.created_at) }}</span>
                                     </div>
                                 </div>
@@ -320,7 +309,6 @@ const columns = [
                     </div>
                 </div>
 
-                <!-- All Announcements Datatable -->
                 <div class="bg-white rounded-xl border border-gray-200 p-4">
                     <h2 class="text-lg font-bold text-gray-800 mb-4">All Announcements</h2>
                     <DataTable
@@ -335,7 +323,6 @@ const columns = [
             </div>
         </div>
 
-        <!-- Delete Modal -->
         <Modal :show="showDeleteModal" @close="showDeleteModal = false">
             <div class="p-6">
                 <h2 class="mb-4 text-lg font-medium text-gray-900">Delete Announcement</h2>
