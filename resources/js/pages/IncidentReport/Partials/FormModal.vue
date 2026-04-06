@@ -102,13 +102,31 @@ const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number): nu
     return parseFloat((R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(2))
 }
 
-const recomputeDistanceFromSite = () => {
+const recomputeDistanceFromSite = async () => {
     if (!form.site_location_id || !form.map_coordinates) { recomputePriority(); return }
     const site = props.siteLocations.find(s => s.id === form.site_location_id)
     if (!site?.coordinates) { recomputePriority(); return }
+
     const [iLat, iLng] = form.map_coordinates.split(',').map(Number)
     const [sLat, sLng] = site.coordinates.split(',').map(Number)
-    form.distance_km = haversineKm(iLat, iLng, sLat, sLng)
+
+    try {
+        const url  = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${iLng},${iLat}?overview=false`
+        const res  = await fetch(url)
+        const data = await res.json()
+
+        if (data.code === 'Ok' && data.routes?.length) {
+            // ✅ Road distance from OSRM
+            form.distance_km = parseFloat((data.routes[0].distance / 1000).toFixed(2))
+        } else {
+            // Fallback to Haversine if OSRM can't route
+            form.distance_km = haversineKm(iLat, iLng, sLat, sLng)
+        }
+    } catch {
+        // Network error fallback
+        form.distance_km = haversineKm(iLat, iLng, sLat, sLng)
+    }
+
     recomputePriority()
 }
 
@@ -120,8 +138,8 @@ watch(() => form.emergency_id, (val) => {
 watch(() => form.incident_id,     recomputePriority)
 watch(() => form.distance,        recomputePriority)
 watch(() => form.distance_km,     recomputePriority)
-watch(() => form.site_location_id, recomputeDistanceFromSite)
-watch(() => form.map_coordinates,  recomputeDistanceFromSite)
+watch(() => form.site_location_id, () => recomputeDistanceFromSite())
+watch(() => form.map_coordinates,  () => recomputeDistanceFromSite())
 
 const priorityDisplay = computed(() => form.priority_score ? { score: form.priority_score, level: form.priority_level, label: form.priority_label } : null)
 
@@ -153,6 +171,7 @@ const resolvedAddress = ref('')
 const searchQuery     = ref('')
 const searchResults   = ref<any[]>([])
 const isSearching     = ref(false)
+const miniMapRoadDistance = ref<number | null>(null)
 
 let map: L.Map | null = null
 let mapMarker: L.Marker | null = null
@@ -177,16 +196,96 @@ const reverseGeocodeAddress = async (lat: number, lng: number): Promise<string> 
     } catch { return 'Unable to resolve address' }
 }
 
+const isMiniRouting = ref(false)
+
 const initMiniMap = async () => {
     if (!miniMapContainer.value) return
     const coords = parseCoordsFromString(props.record?.map_coordinates ?? '')
     if (!coords) return
-    isMiniGeocoding.value = true; miniMapAddress.value = ''
+
+    isMiniGeocoding.value = true
+    isMiniRouting.value   = true
+    miniMapAddress.value  = ''
+
     await nextTick()
     if (miniMap) { miniMap.remove(); miniMap = null }
-    miniMap = L.map(miniMapContainer.value, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false, keyboard: false, attributionControl: false }).setView(coords, 16)
+
+    miniMap = L.map(miniMapContainer.value, {
+        zoomControl: false, dragging: false, scrollWheelZoom: false,
+        doubleClickZoom: false, touchZoom: false, keyboard: false, attributionControl: false,
+    }).setView(coords, 16)
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(miniMap)
+
+    // Incident marker (red default pin)
     L.marker(coords).addTo(miniMap)
+
+    // Site location marker + OSRM road route
+    const siteId = props.record?.site_location_id
+    if (siteId) {
+        const site       = props.siteLocations.find(s => s.id === siteId)
+        const siteCoords = parseCoordsFromString(site?.coordinates ?? '')
+
+        if (siteCoords) {
+            // Green dot for site
+            const siteIcon = L.divIcon({
+                className: '',
+                html: `<div style="width:14px;height:14px;border-radius:50%;background:#16a34a;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>`,
+                iconSize: [14, 14],
+                iconAnchor: [7, 7],
+            })
+            L.marker(siteCoords, { icon: siteIcon })
+                .addTo(miniMap)
+                .bindTooltip(site?.site_name ?? 'Site', { permanent: false })
+
+            try {
+                // OSRM public API — driving route, no API key needed
+                // Format: lon,lat (note: OSRM uses longitude first)
+                const [sLat, sLng] = siteCoords
+                const [iLat, iLng] = coords
+                const url = `https://router.project-osrm.org/route/v1/driving/${sLng},${sLat};${iLng},${iLat}?overview=full&geometries=geojson`
+
+                const res  = await fetch(url)
+                const data = await res.json()
+
+                if (data.code === 'Ok' && data.routes?.length) {
+                    const route = data.routes[0]
+                    const routeGeoJSON = route.geometry
+
+                    // Road distance in km (OSRM returns meters)
+                    const roadDistanceKm = parseFloat((route.distance / 1000).toFixed(2))
+
+                    // Draw route...
+                    L.geoJSON(routeGeoJSON, { style: { color: '#f97316', weight: 4, opacity: 0.85 } }).addTo(miniMap)
+
+                    // Fit bounds...
+                    const lats = routeGeoJSON.coordinates.map((c: number[]) => c[1])
+                    const lngs = routeGeoJSON.coordinates.map((c: number[]) => c[0])
+                    miniMap.fitBounds(
+                        [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]],
+                        { padding: [24, 24] }
+                    )
+
+                    // ✅ Store road distance on the mini map (read-only display)
+                    miniMapRoadDistance.value = roadDistanceKm
+                } else {
+                    // OSRM couldn't find a route (e.g. different islands) — fall back to straight line
+                    L.polyline([siteCoords, coords], {
+                        color: '#f97316', weight: 3, dashArray: '6 6', opacity: 0.75,
+                    }).addTo(miniMap)
+                    miniMap.fitBounds(L.latLngBounds([siteCoords, coords]), { padding: [24, 24] })
+                }
+            } catch {
+                // Network error — graceful straight-line fallback
+                L.polyline([siteCoords, coords], {
+                    color: '#f97316', weight: 3, dashArray: '6 6', opacity: 0.75,
+                }).addTo(miniMap)
+                miniMap.fitBounds(L.latLngBounds([siteCoords, coords]), { padding: [24, 24] })
+            }
+        }
+    }
+
+    isMiniRouting.value   = false
     miniMapAddress.value  = await reverseGeocodeAddress(coords[0], coords[1])
     isMiniGeocoding.value = false
 }
@@ -359,7 +458,9 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                         Barangay: record?.barangay?.barangay_name,
                         'Emergency Type': record?.emergency?.emergency_name,
                         'Incident Type': record?.incident?.incident_name,
-                        'Distance (km)': record?.distance != null ? `${record.distance} km` : null,
+                        'Distance (road)': miniMapRoadDistance != null
+                            ? `${miniMapRoadDistance} km`
+                            : record?.distance != null ? `${record.distance} km` : null,
                     }" :key="key">
                         <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">{{ key }}</p>
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ val ?? '—' }}</p>
@@ -404,7 +505,14 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                                 <span v-else>{{ miniMapAddress || '—' }}</span>
                             </p>
                         </div>
-                        <div v-if="record?.map_coordinates" ref="miniMapContainer" class="w-full rounded-lg border border-orange-200 overflow-hidden" style="height: 200px;" />
+                        <div v-if="record?.map_coordinates" class="relative">
+                            <div ref="miniMapContainer" class="w-full rounded-lg border border-orange-200 overflow-hidden" style="height: 200px;" />
+                            <!-- Route loading overlay -->
+                            <div v-if="isMiniRouting"
+                                class="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-gray-800/60 rounded-lg z-[999]">
+                                <span class="text-xs text-gray-500 italic">Loading road route...</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div v-if="record?.remarks" class="lg:col-span-2">

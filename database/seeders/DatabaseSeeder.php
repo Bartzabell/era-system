@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             SiteLocationSeeder::class,
-            IncidentReportImportSeeder::class,
+            // IncidentReportImportSeeder::class,
         ]);
 
         $roles = [

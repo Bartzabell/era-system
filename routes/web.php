@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\RegisterController;
+use App\Models\IncidentReport;
+use App\Models\Responder;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return Inertia::render('auth/Login', [
@@ -43,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('incident-report', [IncidentReportController::class, 'store'])->name('incident-report.store');
     Route::put('incident-report/{incidentReport}', [IncidentReportController::class, 'update'])->name('incident-report.update');
     Route::delete('incident-report/{incidentReport}', [IncidentReportController::class, 'destroy'])->name('incident-report.destroy');
-    Route::get('incident-report/{incidentReport}', [IncidentReportController::class, 'show'])->name('incident-report.show');
+    Route::get('incident-report/{incidentReport}/print', [IncidentReportController::class, 'print'])->name('incident-report.print');
 
     Route::get('citizen-page', [CitizenController::class, 'index'])->name('citizen-page.index');
 
@@ -55,6 +58,40 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/export/monthly-report', [DashboardController::class, 'exportMonthlyReport'])->name('dashboard.export.monthly');
         Route::get('/dashboard/export/citizen-report', [DashboardController::class, 'exportCitizenReport'])->name('dashboard.export.citizen');
+
+        Route::get('/api/responders', function () {
+            return Responder::with('user')
+                ->where('is_active', true)
+                ->whereNull('deleted_at')
+                ->get()
+                ->map(fn($r) => [
+                    'id'              => $r->id,
+                    'first_name'      => $r->user?->first_name ?? '',
+                    'last_name'       => $r->user?->last_name  ?? '',
+                    'contact_no'      => $r->user?->mobile_no  ?? null,
+                    'profile_picture' => $r->user?->profile_picture ?? null,
+                    'is_active'       => $r->is_active,
+                ]);
+        });
+
+        Route::get('/api/incident-reports', function (Request $request) {
+            return IncidentReport::with(['incident', 'barangay'])
+                ->when($request->status, fn($q) => $q->where('status', $request->status))
+                ->when($request->date,   fn($q) => $q->whereDate('updated_at', $request->date))
+                ->whereNull('deleted_at')
+                ->latest('updated_at')
+                ->get()
+                ->map(fn($r) => [
+                    'id'             => $r->id,
+                    'incident_code'  => $r->incident_code,
+                    'incident_name'  => $r->incident->incident_name ?? 'Unknown',
+                    'barangay_name'  => $r->barangay->barangay_name ?? 'Unknown',
+                    'priority_level' => $r->priority_level,
+                    'priority_label' => $r->priority_label,
+                    'status'         => $r->status,
+                    'updated_at'     => $r->updated_at,
+                ]);
+        });
     });
 
     Route::middleware('permission:admin_access')->group(function () {
