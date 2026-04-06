@@ -229,7 +229,7 @@ class IncidentReportApiController extends Controller
         $report->update([
             'status' => 'assigned',
             'responder_name' => $request->user()->full_name,
-            'responder_contact_no' => $request->user()->mobile_no ?? 'N/A',
+            'responder_contact_no' => $request->user()->mobile_no ?? '',
             'plate_no' => $request->plate_no,
             'distance' => $distanceData['distance_km'],
             'estimated_arrival' => $estimatedArrival,
@@ -255,7 +255,7 @@ class IncidentReportApiController extends Controller
             'treatment_provided' => 'nullable|string', // ✅ NEW
             'responder_attachment' => 'nullable|string|url', // ✅ NEW
             'site_location_id' => 'nullable|exists:site_locations,id',
-            'distance_km' => 'nullable|numeric|min:0', 
+            'distance_km' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -266,7 +266,7 @@ class IncidentReportApiController extends Controller
 
         // Authorization check
         $user = $request->user();
-        
+
         // Citizen can only update their own reports
         if ($user->role === 'Citizen' && $report->user_id !== $user->id) {
             return $this->errorResponse('Unauthorized', 403);
@@ -450,11 +450,11 @@ class IncidentReportApiController extends Controller
     private function buildUpdateData($request, $report)
     {
         $updateData = [];
-        
+
         if ($request->has('status')) {
             $updateData['status'] = $request->status;
         }
-        
+
         if ($request->has('barangay_id')) $updateData['barangay_id'] = $request->barangay_id;
         if ($request->has('casualty_count')) $updateData['casualty_count'] = $request->casualty_count;
         if ($request->has('severity_level')) $updateData['severity_level'] = $request->severity_level;
@@ -464,8 +464,8 @@ class IncidentReportApiController extends Controller
         if ($request->has('treatment_provided')) $updateData['treatment_provided'] = $request->treatment_provided;
         if ($request->has('responder_attachment')) $updateData['responder_attachment'] = $request->responder_attachment;
         if ($request->has('site_location_id')) $updateData['site_location_id'] = $request->site_location_id;
-        if ($request->has('distance_km')) $updateData['distance_km'] = $request->distance_km;                  
-        
+        if ($request->has('distance_km')) $updateData['distance_km'] = $request->distance_km;
+
         return $updateData;
     }
 
@@ -508,7 +508,7 @@ class IncidentReportApiController extends Controller
     private function getDistanceFromGoogle($originLat, $originLng, $destLat, $destLng)
     {
         $apiKey = env('GOOGLE_MAPS_API_KEY');
-        
+
         if (!$apiKey) {
             return [
                 'distance_km' => $this->calculateDistance($originLat, $originLng, $destLat, $destLng),
@@ -529,7 +529,7 @@ class IncidentReportApiController extends Controller
 
             if ($data['status'] === 'OK' && isset($data['rows'][0]['elements'][0])) {
                 $element = $data['rows'][0]['elements'][0];
-                
+
                 if ($element['status'] === 'OK') {
                     return [
                         'distance_km' => round($element['distance']['value'] / 1000, 2),

@@ -65,19 +65,19 @@ class MonthlyReportExport implements FromCollection, WithHeadings, WithMapping, 
         return [
             $report->id,
             Carbon::parse($report->created_at)->format('Y-m-d H:i:s'),
-            $report->incident->incident_name ?? 'N/A',
-            $report->emergency->emergency_name ?? 'N/A',
-            $report->barangay->barangay_name ?? 'N/A',
+            $report->incident->incident_name ?? '',
+            $report->emergency->emergency_name ?? '',
+            $report->barangay->barangay_name ?? '',
             ucfirst($report->severity_level),
             ucfirst($report->status),
             $report->casualty_count ?? 0,
-            $report->user->name ?? 'N/A',
-            $report->responder_name ?? 'N/A',
-            $report->responder_contact_no ?? 'N/A',
-            $report->plate_no ?? 'N/A',
-            $responseTime ?? 'N/A',
-            $report->distance ?? 'N/A',
-            $report->remarks ?? 'N/A'
+            $report->user->name ?? '',
+            $report->responder_name ?? '',
+            $report->responder_contact_no ?? '',
+            $report->plate_no ?? '',
+            $responseTime ?? '',
+            $report->distance ?? '',
+            $report->remarks ?? ''
         ];
     }
 

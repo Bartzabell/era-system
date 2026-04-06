@@ -68,7 +68,7 @@ class CitizenReportExport implements FromCollection, WithHeadings, WithMapping, 
             $dateResolved = Carbon::parse($report->updated_at)->format('Y-m-d H:i:s');
         }
 
-        $coordinates = 'N/A';
+        $coordinates = '';
         if ($report->map_coordinates) {
             $coords = json_decode($report->map_coordinates, true);
             if ($coords && isset($coords['lat']) && isset($coords['lng'])) {
@@ -81,16 +81,16 @@ class CitizenReportExport implements FromCollection, WithHeadings, WithMapping, 
             $report->user->name ?? 'Anonymous',
             Carbon::parse($report->created_at)->format('Y-m-d'),
             Carbon::parse($report->created_at)->format('H:i:s'),
-            $report->incident->incident_name ?? 'N/A',
-            $report->emergency->emergency_name ?? 'N/A',
-            $report->barangay->barangay_name ?? 'N/A',
+            $report->incident->incident_name ?? '',
+            $report->emergency->emergency_name ?? '',
+            $report->barangay->barangay_name ?? '',
             $coordinates,
             ucfirst($report->severity_level),
             $report->casualty_count ?? 0,
             ucfirst($report->status),
             $dateResolved ?? 'Ongoing',
-            $responseTime ?? 'N/A',
-            $report->remarks ?? 'N/A'
+            $responseTime ?? '',
+            $report->remarks ?? ''
         ];
     }
 

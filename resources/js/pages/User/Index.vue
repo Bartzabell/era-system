@@ -95,7 +95,7 @@ const columns = [
     {
         accessorKey: 'full_name',
         header: 'Full Name',
-        cell: ({ row }: any) => row.original.full_name || '—',
+        cell: ({ row }: any) => row.original.full_name || '',
     },
     { accessorKey: 'email', header: 'Email' },
     { accessorKey: 'mobile_no', header: 'Mobile No.' },
@@ -105,13 +105,13 @@ const columns = [
         cell: ({ row }: any) => h(
             'span',
             { class: roleBadgeClass(row.original.role) },
-            row.original.role ?? '—'
+            row.original.role ?? ''
         ),
     },
     {
         accessorKey: 'barangay.barangay_name',
         header: 'Barangay',
-        cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '—',
+        cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '',
     },
     {
         accessorKey: 'permissions',
