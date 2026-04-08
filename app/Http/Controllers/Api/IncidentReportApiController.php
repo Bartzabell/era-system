@@ -108,6 +108,16 @@ class IncidentReportApiController extends Controller
         return $this->successResponse(null, ['reports' => $reports]);
     }
 
+    public function getUserReports(Request $request)
+    {
+        $reports = IncidentReport::where('user_id', $request->user()->id)
+            ->with($this->reportRelations)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return $this->successResponse(null, ['reports' => $reports]);
+    }
+
     // Update responder's current facility location
     public function updateResponderFacility(Request $request)
     {

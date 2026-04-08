@@ -108,6 +108,7 @@ class AccountApiController extends Controller
             ], 403);
         }
 
+        $user->tokens()->delete();
         $token = $user->createToken('mobile-app')->plainTextToken;
 
         return response()->json([
