@@ -14,7 +14,7 @@ import TermsAndConditions from '@/pages/auth/TermsAndConditions.vue';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { PhFirstAid } from '@phosphor-icons/vue';
+import { PhFirstAid, PhPhone, PhBell, PhMapPin, PhClipboardText } from '@phosphor-icons/vue';
 
 defineProps<{
     status?: string;
@@ -27,9 +27,9 @@ const showTermsModal = ref(false);
 </script>
 
 <template>
-    <div className="flex bg-orange-400/75">
+    <div class="flex bg-orange-400/75 h-screen overflow-hidden">
         <AuthBase
-            className="bg-gray-400 allign-center w-fit h-screen p-10 flex justify-center"
+            class="bg-gray-400 w-fit h-screen p-10 flex justify-center"
             title="Welcome Back!"
             description="Sign in to your account to continue"
         >
@@ -140,20 +140,73 @@ const showTermsModal = ref(false);
                     </TextLink>
                 </div>
             </Form>
+
+            <!-- Stats Grid (added below the form) -->
+            <div class="grid grid-cols-2 gap-2 mt-6">
+                <div class="bg-gray-300/60 rounded-lg p-3 text-center">
+                    <div class="text-xl font-bold text-gray-900">24/7</div>
+                    <div class="text-xs text-gray-600">Always on</div>
+                </div>
+                <div class="bg-gray-300/60 rounded-lg p-3 text-center">
+                    <div class="text-xl font-bold text-gray-900">4</div>
+                    <div class="text-xs text-gray-600">Major Emergency Type</div>
+                </div>
+                <div class="bg-gray-300/60 rounded-lg p-3 text-center">
+                    <div class="text-sm font-bold text-gray-900">GEARS</div>
+                    <div class="text-xs text-gray-600">Mobile App</div>
+                </div>
+                <div class="bg-gray-300/60 rounded-lg p-3 text-center">
+                    <div class="text-sm font-bold text-gray-900">MDRRMO</div>
+                    <div class="text-xs text-gray-600">Centralized System</div>
+                </div>
+            </div>
         </AuthBase>
 
-        <div className="flex flex-1 flex-col items-center justify-center text-center gap-4">
+        <div class="flex flex-1 flex-col items-center justify-center text-center gap-4">
             <div class="rounded-md bg-red-500">
                 <PhFirstAid :size="52" weight="fill" class="text-red-500 bg-white rounded-full m-3" />
             </div>
-            <h1 className="text-5xl text-white font-black">
+            <h1 class="text-5xl text-white font-black">
                 Reliable Response,<br />
                 Reliable Protection
             </h1>
-            <p className="text-white/90 max-w-xl">
+            <p class="text-white/90 max-w-xl">
                 Join the GEARS network and help us build safer, more resilient<br />
                 communities through coordinated emergency response.
             </p>
+
+            <!-- Feature Cards Grid (added below the text) -->
+            <div class="grid grid-cols-2 gap-3 max-w-lg w-full mt-2">
+                <div class="bg-white/20 rounded-xl p-5 text-center">
+                    <PhPhone :size="28" weight="fill" class="text-white mx-auto mb-2" />
+                    <div class="text-sm font-bold text-white mb-1">One-tap reporting</div>
+                    <div class="text-xs text-white/85 leading-relaxed">
+                        Report any emergency in seconds using just a photo and your location
+                    </div>
+                </div>
+                <div class="bg-white/20 rounded-xl p-5 text-center">
+                    <PhBell :size="28" weight="fill" class="text-white mx-auto mb-2" />
+                    <div class="text-sm font-bold text-white mb-1">Instant Alerts</div>
+                    <div class="text-xs text-white/85 leading-relaxed">
+                        Community-wide notifications keep all GMA residents informed and prepared
+                    </div>
+                </div>
+                <div class="bg-white/20 rounded-xl p-5 text-center">
+                    <PhMapPin :size="28" weight="fill" class="text-white mx-auto mb-2" />
+                    <div class="text-sm font-bold text-white mb-1">Live Incident Map</div>
+                    <div class="text-xs text-white/85 leading-relaxed">
+                        Track emergencies and responders location across GMA
+                    </div>
+                </div>
+                <div class="bg-white/20 rounded-xl p-5 text-center">
+                    <PhClipboardText :size="28" weight="fill" class="text-white mx-auto mb-2" />
+                    <div class="text-sm font-bold text-white mb-1">Priority-ranked Incidents</div>
+                    <div class="text-xs text-white/85 leading-relaxed">
+                        Incidents are ranked using AHP-TOPSIS scoring
+                    </div>
+                </div>
+            </div>
+            <div class="text-white font-black text-sm mt-10">Powered by GMA Cavite MDRRMO - Serving all 55 berangays of General Mariano Alvarez</div>
         </div>
 
         <!-- Terms and Conditions Modal -->
