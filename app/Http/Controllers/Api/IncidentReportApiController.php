@@ -12,6 +12,7 @@ use App\Services\ClosestFacilityFinder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Services\PriorityScoreCalculator;
 
@@ -86,6 +87,11 @@ class IncidentReportApiController extends Controller
             'priority_score' => $priorityData['priority_score'],
             'priority_level' => $priorityData['priority_level'],
             'priority_label' => $priorityData['priority_label'],
+            'reported_at' => now(),
+        ]);
+
+        $report->update([
+            'incident_code' => 'IND-' . now()->year . '-' . str_pad($report->id, 4, '0', STR_PAD_LEFT),
         ]);
 
         return $this->successResponse('Incident report submitted successfully', ['report' => $report], 201);
@@ -93,6 +99,16 @@ class IncidentReportApiController extends Controller
 
     // Get user's incident reports
     public function index(Request $request)
+    {
+        $reports = IncidentReport::where('user_id', $request->user()->id)
+            ->with($this->reportRelations)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return $this->successResponse(null, ['reports' => $reports]);
+    }
+
+    public function getUserReports(Request $request)
     {
         $reports = IncidentReport::where('user_id', $request->user()->id)
             ->with($this->reportRelations)
@@ -247,7 +263,10 @@ class IncidentReportApiController extends Controller
         $validator = Validator::make($request->all(), [
             'status' => 'nullable|in:arriving,resolved',
             'barangay_id' => 'nullable|exists:barangays,id',
-            'casualty_count' => 'nullable|integer|min:0',
+            'responder_count' => 'nullable|integer|min:0',
+            'minor_casualty_count' => 'nullable|integer|min:0',
+            'serious_casualty_count' => 'nullable|integer|min:0',
+            'deceased_casualty_count' => 'nullable|integer|min:0',
             'severity_level' => 'nullable|in:low,mid,high',
             'datetime_arrived' => 'nullable|date',
             'remarks' => 'nullable|string',
@@ -268,12 +287,12 @@ class IncidentReportApiController extends Controller
         $user = $request->user();
 
         // Citizen can only update their own reports
-        if ($user->role === 'Citizen' && $report->user_id !== $user->id) {
+        if ($user->role === 'citizen' && $report->user_id !== $user->id) {
             return $this->errorResponse('Unauthorized', 403);
         }
 
         // Responder can only update reports they accepted
-        if ($user->role === 'Responder' && $report->responder_name !== $user->full_name) {
+        if ($user->role === 'responder' && $report->responder_name !== $user->full_name) {
             return $this->errorResponse('Unauthorized', 403);
         }
 
@@ -399,6 +418,72 @@ class IncidentReportApiController extends Controller
         return $this->successResponse(null, ['location' => $location]);
     }
 
+    // Get attachments from folder
+    public function getAttachments($id)
+    {
+        try {
+            $report = IncidentReport::findOrFail($id);
+
+            if (!$report->attachment) {
+                return $this->successResponse(null, ['attachments' => []]);
+            }
+
+            // Handle old Google Drive URLs
+            if (str_starts_with($report->attachment, 'http')) {
+                return $this->successResponse(null, [
+                    'attachments' => [['url' => $report->attachment, 'type' => 'legacy']]
+                ]);
+            }
+
+            // New folder-based attachments
+            $files = Storage::disk('public')->files($report->attachment);
+            $attachments = array_map(function ($file) {
+                return [
+                    'url' => asset('storage/' . $file),
+                    'name' => basename($file),
+                    'type' => 'file'
+                ];
+            }, $files);
+
+            return $this->successResponse(null, ['attachments' => $attachments]);
+        } catch (\Exception $e) {
+            Log::error('Get Attachments Error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to fetch attachments', 500);
+        }
+    }
+
+    // Upload multiple attachments
+    public function uploadAttachments(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'attachments' => 'required|array|max:5',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,mp4,mov|max:51200' // 50MB per file
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->errors(), 422);
+        }
+
+        try {
+            $report = IncidentReport::findOrFail($id);
+            $folderPath = 'incident-attachments/' . $report->incident_code;
+
+            foreach ($request->file('attachments') as $file) {
+                $file->store($folderPath, 'public');
+            }
+
+            // Update attachment field with folder path
+            $report->update(['attachment' => $folderPath]);
+
+            return $this->successResponse('Attachments uploaded successfully', [
+                'folder' => $folderPath
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Upload Attachments Error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to upload attachments', 500);
+        }
+    }
+
     // ========== HELPER METHODS ==========
 
     // Standard success response
@@ -456,7 +541,14 @@ class IncidentReportApiController extends Controller
         }
 
         if ($request->has('barangay_id')) $updateData['barangay_id'] = $request->barangay_id;
-        if ($request->has('casualty_count')) $updateData['casualty_count'] = $request->casualty_count;
+        if ($request->has('responder_count')) $updateData['responder_count'] = $request->responder_count;
+        if ($request->has('minor_casualty_count')) $updateData['minor_casualty_count'] = $request->minor_casualty_count;
+        if ($request->has('serious_casualty_count')) $updateData['serious_casualty_count'] = $request->serious_casualty_count;
+        if ($request->has('deceased_casualty_count')) $updateData['deceased_casualty_count'] = $request->deceased_casualty_count;
+        $minor = $request->minor_casualty_count ?? $report->minor_casualty_count ?? 0;
+        $serious = $request->serious_casualty_count ?? $report->serious_casualty_count ?? 0;
+        $deceased = $request->deceased_casualty_count ?? $report->deceased_casualty_count ?? 0;
+        $updateData['casualty_count'] = $minor + $serious + $deceased;
         if ($request->has('severity_level')) $updateData['severity_level'] = $request->severity_level;
         if ($request->has('datetime_arrived')) $updateData['datetime_arrived'] = $request->datetime_arrived;
         if ($request->has('remarks')) $updateData['remarks'] = $request->remarks;
