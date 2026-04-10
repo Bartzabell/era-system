@@ -39,7 +39,9 @@ return new class extends Migration
 
             $table->text('attachment')->nullable();
             $table->text('responder_attachment')->nullable();
+
             $table->string('responder_name')->nullable();
+
             $table->string('responder_contact_no')->nullable();
             $table->datetime('estimated_arrival')->nullable();
             $table->datetime('datetime_arrived')->nullable();

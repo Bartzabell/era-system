@@ -81,4 +81,9 @@ class IncidentReport extends Model
     public function siteLocation(){
         return $this->belongsTo(SiteLocation::class, 'site_location_id', 'id');
     }
+
+    public function irResponders()
+    {
+        return $this->hasMany(IrResponder::class, 'ir_id', 'id');
+    }
 }

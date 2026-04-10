@@ -3,6 +3,7 @@
 use App\Http\Controllers\AnnouncementAlertController;
 use App\Http\Controllers\CitizenController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\MonthlyReportController;
 use App\Http\Controllers\UserController;
@@ -47,6 +48,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('incident-report/{incidentReport}', [IncidentReportController::class, 'update'])->name('incident-report.update');
     Route::delete('incident-report/{incidentReport}', [IncidentReportController::class, 'destroy'])->name('incident-report.destroy');
     Route::get('incident-report/{incidentReport}/print', [IncidentReportController::class, 'print'])->name('incident-report.print');
+
+    Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
+    Route::post('/dispatch', [DispatchController::class, 'store'])->name('dispatch.store');
+    Route::put('/dispatch/{incidentReport}', [DispatchController::class, 'update'])->name('dispatch.update');
+    Route::delete('/dispatch/{incidentReport}', [DispatchController::class, 'destroy'])->name('dispatch.destroy');
+    Route::post('/dispatch/{incidentReport}/assign-team', [DispatchController::class, 'assignTeam'])->name('dispatch.assignTeam');
 
     Route::get('citizen-page', [CitizenController::class, 'index'])->name('citizen-page.index');
 
