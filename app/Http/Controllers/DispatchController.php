@@ -15,6 +15,7 @@ use App\Models\SiteLocation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class DispatchController extends Controller
@@ -48,6 +49,14 @@ class DispatchController extends Controller
         ])->orderBy('reported_at', 'desc')->orderBy('created_at', 'desc');
 
         if (!$this->hasFullAccess()) $query->where('user_id', Auth::id());
+
+        $reports = $query->get();
+        Log::info('DEBUG irResponders', $reports->map(fn($r) => [
+            'id'           => $r->id,
+            'code'         => $r->incident_code,
+            'ir_count'     => $r->irResponders->count(),
+            'ir_responders'=> $r->irResponders->toArray(),
+        ])->toArray());
 
         return Inertia::render('Dispatch/Index', [
             ...$this->sharedData(),
