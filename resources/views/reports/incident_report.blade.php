@@ -377,28 +377,28 @@
         <table class="field-table">
             <tr>
                 <td class="field-label">Responder Name</td>
-                <td class="field-value">{{ $incidentReport->responder_name ?: '' }}</td>
+                <td class="field-value">{{ $incidentReport->responder_name ?: '—' }}</td>
                 <td class="field-label">Contact No.</td>
-                <td class="field-value">{{ $incidentReport->responder_contact_no ?: '' }}</td>
+                <td class="field-value">{{ $incidentReport->responder_contact_no ?: '—' }}</td>
             </tr>
             <tr>
                 <td class="field-label">Responder Count</td>
-                <td class="field-value">{{ $incidentReport->responder_count ?? '' }}</td>
+                <td class="field-value">{{ $incidentReport->irResponders->count() }}</td>
                 <td class="field-label">Plate No.</td>
-                <td class="field-value">{{ $incidentReport->plate_no ?: '' }}</td>
+                <td class="field-value">{{ $incidentReport->plate_no ?: '—' }}</td>
             </tr>
             <tr>
                 <td class="field-label">Estimated Arrival</td>
                 <td class="field-value">
                     {{ $incidentReport->estimated_arrival
                         ? \Carbon\Carbon::parse($incidentReport->estimated_arrival)->format('M d, Y h:i A')
-                        : '' }}
+                        : '—' }}
                 </td>
                 <td class="field-label">Datetime Arrived</td>
                 <td class="field-value">
                     {{ $incidentReport->datetime_arrived
                         ? \Carbon\Carbon::parse($incidentReport->datetime_arrived)->format('M d, Y h:i A')
-                        : '' }}
+                        : '—' }}
                 </td>
             </tr>
             @if($incidentReport->reported_at && $incidentReport->datetime_arrived)
@@ -417,6 +417,31 @@
             @endif
         </table>
     </div>
+
+        {{-- ── SECTION 3b: ASSIGNED RESPONDERS LIST ── --}}
+        @if($incidentReport->irResponders->isNotEmpty())
+        <div class="section">
+            <div class="section-title">Assigned Responders</div>
+            <table class="field-table">
+                <thead>
+                    <tr>
+                        <td class="field-label" style="width:40px; text-align:center;">#</td>
+                        <td class="field-label">Name</td>
+                        <td class="field-label">Type</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($incidentReport->irResponders as $i => $responder)
+                    <tr>
+                        <td class="field-value" style="text-align:center; color:#888;">{{ $i + 1 }}</td>
+                        <td class="field-value">{{ $responder->responder_name ?: '—' }}</td>
+                        <td class="field-value">{{ $responder->responder_type ?: '—' }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
     {{-- ── SECTION 4: NOTES & REMARKS ── --}}
     @if($incidentReport->remarks || $incidentReport->responder_remarks || $incidentReport->treatment_provided || $incidentReport->cancel_remarks)

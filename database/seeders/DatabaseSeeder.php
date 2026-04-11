@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
 
         $roles = [
             ['role_name' => 'administrator'],
+            ['role_name' => 'assistant admin'],
             ['role_name' => 'citizen'],
             ['role_name' => 'responder'],
         ];
@@ -603,10 +604,24 @@ class DatabaseSeeder extends Seeder
             [
                 'username' => 'citizen',
                 'email' => 'citizen@local',
-                'full_name' => 'Citizen User',
-                'first_name' => 'Citizen',
-                'last_name' => 'User',
+                'full_name' => 'John Doe',
+                'first_name' => 'John',
+                'last_name' => 'Doe',
                 'role' => 'citizen',
+                'mobile_no' => '09987654321',
+                'birth_date' => '1995-01-01',
+                'barangay_id' => 1,
+                'address' => '#456 Brgy Pulido GMA Cavite',
+                'password' => Hash::make('password'),
+                'email_verified_at' => $now,
+            ],
+            [
+                'username' => 'assistant_admin',
+                'email' => 'assitantadmin@local',
+                'full_name' => 'Mark Anthony',
+                'first_name' => 'Mark',
+                'last_name' => 'Anthony',
+                'role' => 'assistant admin',
                 'mobile_no' => '09987654321',
                 'birth_date' => '1995-01-01',
                 'barangay_id' => 1,

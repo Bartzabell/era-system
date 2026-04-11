@@ -57,7 +57,8 @@ class IncidentReportController extends Controller
         $perPage = $request->input('per_page', 10);
         $search  = $request->input('search', '');
 
-        $query = IncidentReport::with(['user', 'barangay', 'emergency'])
+        $query = IncidentReport::with(['user', 'barangay', 'emergency', 'incident'])
+            ->withCount('irResponders')
             ->when($search, fn($q) => $q->where(fn($q) =>
                 $q->whereHas('user',       fn($q) => $q->where('full_name',      'like', "%{$search}%"))
                   ->orWhereHas('barangay',  fn($q) => $q->where('barangay_name', 'like', "%{$search}%"))
@@ -258,6 +259,7 @@ class IncidentReportController extends Controller
             'incident:id,incident_name',
             'emergency:id,emergency_name',
             'siteLocation:id,site_name',
+            'irResponders',  // ← add this
         ]);
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.incident_report', compact('incidentReport'))

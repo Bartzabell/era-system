@@ -47,7 +47,8 @@ class IncidentReport extends Model
         'serious_casualty_count',
         'deceased_casualty_count',
 
-        'cancelled_by'
+        'cancelled_by',
+        'other_incident'
     ];
 
     public function creator(){

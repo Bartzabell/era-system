@@ -129,17 +129,23 @@ const priorityColors: Record<string, string> = {
 }
 
 const baseColumns = [
-    { accessorKey: 'incident_code',            header: 'Code'       },
-    { accessorKey: 'emergency.emergency_name', header: 'Type',       cell: ({ row }: any) => row.original.emergency?.emergency_name ?? '' },
-    { accessorKey: 'barangay.barangay_name',   header: 'Barangay',   cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '' },
-    { accessorKey: 'reported_at',              header: 'Reported',   cell: ({ row }: any) => formatDate(row.original.reported_at) },
-    { accessorKey: 'datetime_arrived',         header: 'Response',   cell: ({ row }: any) => formatResponseTime(row.original.reported_at, row.original.datetime_arrived) },
-    { accessorKey: 'responder_count',          header: 'Responders', cell: ({ row }: any) => row.original.responder_count ?? '' },
+    { accessorKey: 'incident_code',            header: 'Code' },
+    { accessorKey: 'emergency.emergency_name', header: 'Emergency', cell: ({ row }: any) => row.original.emergency?.emergency_name ?? '' },
+    { accessorKey: 'incident.incident_name',   header: 'Incident',  cell: ({ row }: any) => row.original.incident?.incident_name ?? '' },
+    { accessorKey: 'barangay.barangay_name',   header: 'Location',  cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '' },
+    { accessorKey: 'reported_at',              header: 'Reported',  cell: ({ row }: any) => formatDate(row.original.reported_at) },
+    { accessorKey: 'datetime_arrived',         header: 'Response',  cell: ({ row }: any) => formatResponseTime(row.original.reported_at, row.original.datetime_arrived) },
+    { accessorKey: 'user.full_name',           header: 'Reporter',  cell: ({ row }: any) => row.original.user.full_name ?? '' },
+    {
+        accessorKey: 'ir_responders_count',
+        header: 'Responders',
+        cell: ({ row }: any) => row.original.ir_responders_count ?? 0
+    },
 ]
 
 const priorityCol = {
     accessorKey: 'priority_level',
-    header: 'Priority',
+    header: 'Severity',
     cell: ({ row }: any) => {
         const { priority_level: lvl, priority_label: lbl } = row.original
         if (!lvl) return h('span', { class: 'text-gray-400 text-xs' }, '—')
@@ -166,7 +172,7 @@ const columns = computed(() => {
         ]),
     }
     return activeTab.value === 'priority'
-        ? [...baseColumns, priorityCol, statusCol, actionCol]
+        ? [baseColumns[0], priorityCol, ...baseColumns.slice(1), statusCol, actionCol]
         : [...baseColumns, actionCol]
 })
 

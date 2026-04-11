@@ -59,6 +59,8 @@ return new class extends Migration
 
             $table->datetime('reported_at')->nullable();
 
+            $table->string('other_incident')->nullable();
+
             $table->foreignIdFor(User::class, 'created_by')->nullable();
             $table->foreignIdFor(User::class, 'updated_by')->nullable();
             $table->foreignIdFor(User::class, 'deleted_by')->nullable();
