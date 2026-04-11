@@ -45,22 +45,17 @@ class DispatchController extends Controller
             'incident:id,incident_name',
             'emergency:id,emergency_name',
             'siteLocation:id,site_name',
-            'irResponders',
+            'irResponders',   // Laravel will serialize this as "ir_responders" in JSON
         ])->orderBy('reported_at', 'desc')->orderBy('created_at', 'desc');
 
         if (!$this->hasFullAccess()) $query->where('user_id', Auth::id());
 
+        // ✅ Execute the query ONCE and reuse the result
         $reports = $query->get();
-        Log::info('DEBUG irResponders', $reports->map(fn($r) => [
-            'id'           => $r->id,
-            'code'         => $r->incident_code,
-            'ir_count'     => $r->irResponders->count(),
-            'ir_responders'=> $r->irResponders->toArray(),
-        ])->toArray());
 
         return Inertia::render('Dispatch/Index', [
             ...$this->sharedData(),
-            'incidentReports' => $query->get(),
+            'incidentReports' => $reports,   // ✅ pass $reports, NOT $query->get() again
             'hasFullAccess'   => $this->hasFullAccess(),
             'currentUserId'   => Auth::id(),
         ]);

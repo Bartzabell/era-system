@@ -62,6 +62,7 @@ class IncidentReportController extends Controller
                 $q->whereHas('user',       fn($q) => $q->where('full_name',      'like', "%{$search}%"))
                   ->orWhereHas('barangay',  fn($q) => $q->where('barangay_name', 'like', "%{$search}%"))
                   ->orWhereHas('emergency', fn($q) => $q->where('emergency_name','like', "%{$search}%"))
+                  ->orWhere('incident_code', 'like', "%{$search}%")
             ));
 
         if (!$this->hasFullAccess()) $query->where('user_id', Auth::id());

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { Megaphone, FileCheckCorner, ChartColumnStacked, Users, CalendarRange } from 'lucide-vue-next';
+import { PhAmbulance } from '@phosphor-icons/vue'
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -53,6 +54,11 @@ const navGroups: NavGroup[] = [
                 title: 'Incident Reports',
                 href: '/incident-report',
                 icon: FileCheckCorner,
+            },
+            {
+                title: 'Dispatch',
+                href: '/dispatch',
+                icon: PhAmbulance,
             },
             {
                 title: 'Monthly Report',

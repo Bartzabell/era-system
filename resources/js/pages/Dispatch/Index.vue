@@ -28,7 +28,7 @@ interface IncidentReport {
     incident?: { id: number; incident_name: string; emergency_id: number; base_severity: number; base_time: number; base_resources: number; base_secondary: number }
     emergency?: { id: number; emergency_name: string }
     siteLocation?: { id: number; site_name: string }
-    irResponders?: IrResponder[]
+    ir_responders?: IrResponder[]
 }
 
 const props = defineProps<{
@@ -387,8 +387,8 @@ const minutesAgo = (val: string | null) => {
                                 <div class="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-3">
                                     <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Responder Team</p>
 
-                                    <div v-if="selectedReport.irResponders?.length" class="space-y-1.5">
-                                        <div v-for="r in selectedReport.irResponders" :key="r.id"
+                                    <div v-if="selectedReport.ir_responders?.length" class="space-y-1.5">
+                                        <div v-for="r in selectedReport.ir_responders" :key="r.id"
                                             class="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
                                             <span :class="['text-[10px] font-bold px-1.5 py-0.5 rounded-full', r.responder_type === 'leader' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700']">
                                                 {{ r.responder_type === 'leader' ? 'Leader' : 'Member' }}
@@ -421,7 +421,7 @@ const minutesAgo = (val: string | null) => {
 
                                             <button @click="assignTeam(selectedReport)" :disabled="!teamLeaderId || isAssigning"
                                                 class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-2 shadow-sm">
-                                                <PhUser :size="16" />{{ isAssigning ? 'Saving…' : 'Assign Team' }}
+                                                <PhUser :size="16" />{{ isAssigning ? 'Dispatching…' : 'Dispatch Team' }}
                                             </button>
                                         </div>
                                     </template>

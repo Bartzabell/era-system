@@ -117,7 +117,7 @@ const table = useVueTable({
     <!-- Global Search -->
     <div class="flex flex-col gap-1 pt-1 sm:flex-row sm:items-end sm:justify-end">
       <div v-if="showPerPage" class="flex items-center gap-2">
-        <div class="text-gray-400 text-xs">Per page:</div>
+        <div class=" text-xs">Per page:</div>
         <CustomSelect label="" name="per_page" v-model="perPage" :options="perPageOptions" class="w-max" />
       </div>
       <div v-if="showSearch" class="flex items-center pt-4">
@@ -161,7 +161,7 @@ const table = useVueTable({
     <!-- Pagination -->
     <div class="flex flex-col items-center justify-between px-2 lg:flex-row">
       <div class="flex items-center space-x-2">
-        <nav class="flex w-full gap-2 -space-x-px bg-gray-300lg:inline-flex" aria-label="Pagination">
+        <nav class="flex w-full gap-2 -space-x-px lg:inline-flex" aria-label="Pagination">
           <template v-for="page in data.links" :key="page.label">
 
             <Button v-if="page.active" size="sm"
@@ -181,7 +181,7 @@ const table = useVueTable({
           </template>
         </nav>
       </div>
-      <div class="flex text-sm text-muted-foreground">
+      <div class="flex text-sm ">
         Showing {{ data.from }} to {{ data.to }} of {{ data.total }} entries
       </div>
     </div>
