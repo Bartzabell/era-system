@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, h } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import DataTable from '@/components/Datatable.vue'
 import Modal from '@/components/Modal.vue'
 import FormModal from './Partials/FormModal.vue'
 import { Button } from '@/components/ui/button'
-import { PhPencil, PhTrash, PhEye, PhPlus, PhMagnifyingGlass } from '@phosphor-icons/vue'
+import { PhPencil, PhTrash, PhEye, PhPlus } from '@phosphor-icons/vue'
 
 interface IncidentReport {
     id: number
@@ -25,6 +25,9 @@ interface IncidentReport {
     ir_responders_count: number
 }
 
+const page = usePage();
+const userRole = computed(() => (page.props.auth as any)?.user?.role ?? '');
+
 const props = defineProps<{
     incidentReports: object
     barangays: Array<{ id: number; barangay_name: string }>
@@ -32,10 +35,18 @@ const props = defineProps<{
     incidents: Array<{ id: number; incident_name: string }>
     emergencies: Array<{ id: number; emergency_name: string }>
     users: Array<{ id: number; full_name: string }>
-    hasFullAccess: boolean
     filters: object
+    hasFullAccess: boolean
     currentUserId: number
 }>()
+
+const isAdmin = computed(() => userRole.value === 'administrator');
+const isAssistantAdmin = computed(() => userRole.value === 'assistant admin');
+const isResponder = computed(() => userRole.value === 'responder');
+
+const canEdit = computed(() => isAdmin.value || isAssistantAdmin.value);
+const canDelete = computed(() => isAdmin.value);
+const canView = computed(() => isAdmin.value || isAssistantAdmin.value || isResponder.value);
 
 const breadcrumbs = [
     { title: 'Homepage', href: '/landing' },
@@ -171,18 +182,19 @@ const columns = computed(() => {
                 variant: 'ghost', size: 'icon',
                 onClick: () => window.open(`/incident-report/${row.original.id}/print`, '_blank'),
                 class: 'h-7 w-7 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded'
-            }, () => h(PhEye, { size: 15 })),
-            ...(props.hasFullAccess ? [
+            }, () => h(PhEye, { size: 15 })), //admin and assistant_admin, responder
+
                 h(Button, {
                     variant: 'ghost', size: 'icon',
                     onClick: () => openEditModal(row.original),
                     class: 'h-7 w-7 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded'
-                }, () => h(PhPencil, { size: 15 })),
+                }, () => h(PhPencil, { size: 15 })), //admin and assistant_admin
+            ...(props.hasFullAccess ? [
                 h(Button, {
                     variant: 'ghost', size: 'icon',
                     onClick: () => openDeleteModal(row.original),
                     class: 'h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded'
-                }, () => h(PhTrash, { size: 15 })),
+                }, () => h(PhTrash, { size: 15 })), //admin
             ] : []),
         ]),
     }

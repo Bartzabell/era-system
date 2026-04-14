@@ -65,6 +65,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->permissions()->where('slug', $permissionSlug)->exists();
     }
 
+    public function isAdmin()
+    {
+        return $this->role === 'administrator';
+    }
+
+    public function isAssistantAdmin()
+    {
+        return $this->role === 'assistant admin';
+    }
+
+    public function isResponder()
+    {
+        return $this->role === 'responder';
+    }
+
+    public function isCitizen()
+    {
+        return $this->role === 'citizen';
+    }
+
     public function barangay()
     {
         return $this->belongsTo(Barangay::class);
@@ -84,5 +104,4 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(SiteLocation::class, 'site_location_id', 'id');
     }
-
 }

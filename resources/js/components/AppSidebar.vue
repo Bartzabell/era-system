@@ -20,30 +20,40 @@ import AppLogo from './AppLogo.vue';
 import { computed } from 'vue';
 
 const page = usePage();
-const userPermissions = computed<string[]>(() =>
-    (page.props.auth as any)?.user?.permissions?.map((p: { slug: string }) => p.slug) ?? []
-);
-const can = (...perms: string[]) =>
-    perms.some(p => userPermissions.value.includes(p));
+const userRole = computed(() => (page.props.auth as any)?.user?.role ?? '');
 
-type NavItemWithPermissions = NavItem & { permissions?: string[] };
+const isAdmin = computed(() => userRole.value === 'administrator');
+const isAssistantAdmin = computed(() => userRole.value === 'assistant admin');
+const isResponder = computed(() => userRole.value === 'responder');
+
+type NavItemWithRoles = NavItem & {
+    admin?: boolean;
+    assistantAdmin?: boolean;
+    responder?: boolean;
+};
 
 interface NavGroup {
     label: string;
-    permissions?: string[];
-    items: NavItemWithPermissions[];
+    admin?: boolean;
+    assistantAdmin?: boolean;
+    responder?: boolean;
+    items: NavItemWithRoles[];
 }
 
 const navGroups: NavGroup[] = [
     {
         label: 'Dashboard',
-        permissions: ['admin_access', 'responder_access'],
+        admin: true,
+        assistantAdmin: true,
+        responder: true,
         items: [
             {
                 title: 'Dashboard',
                 href: dashboard(),
                 icon: ChartColumnStacked,
-                permissions: ['admin_access', 'responder_access'],
+                admin: true,
+                assistantAdmin: true,
+                responder: true,
             },
         ],
     },
@@ -54,35 +64,40 @@ const navGroups: NavGroup[] = [
                 title: 'Incident Reports',
                 href: '/incident-report',
                 icon: FileCheckCorner,
+                admin: true,
+                assistantAdmin: true,
+                responder: true,
             },
             {
                 title: 'Dispatch',
                 href: '/dispatch',
                 icon: PhAmbulance,
+                admin: true,
+                assistantAdmin: true,
             },
             {
                 title: 'Monthly Report',
                 href: '/monthly-report',
                 icon: CalendarRange,
-
+                admin: true,
             },
         ],
     },
     {
         label: 'Admin',
-        permissions: ['admin_access'],
+        admin: true,
         items: [
             {
                 title: 'Alerts Config',
                 href: '/announcement-alert',
                 icon: Megaphone,
-                permissions: ['admin_access'],
+                admin: true,
             },
             {
                 title: 'Users',
                 href: '/users',
                 icon: Users,
-                permissions: ['admin_access'],
+                admin: true,
             },
         ],
     },
@@ -90,14 +105,20 @@ const navGroups: NavGroup[] = [
 
 const visibleNavGroups = computed(() =>
     navGroups
-        .filter(group =>
-            !group.permissions || can(...group.permissions)
-        )
+        .filter(group => {
+            if (group.admin && isAdmin.value) return true;
+            if (group.assistantAdmin && isAssistantAdmin.value) return true;
+            if (group.responder && isResponder.value) return true;
+            return !group.admin && !group.assistantAdmin && !group.responder;
+        })
         .map(group => ({
             ...group,
-            items: group.items.filter(item =>
-                !item.permissions || can(...item.permissions)
-            ),
+            items: group.items.filter(item => {
+                if (item.admin && isAdmin.value) return true;
+                if (item.assistantAdmin && isAssistantAdmin.value) return true;
+                if (item.responder && isResponder.value) return true;
+                return !item.admin && !item.assistantAdmin && !item.responder;
+            }),
         }))
         .filter(group => group.items.length > 0)
 );

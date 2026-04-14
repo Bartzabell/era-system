@@ -43,25 +43,35 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('incident-report', [IncidentReportController::class, 'index'])->name('incident-report.index');
-    Route::post('incident-report', [IncidentReportController::class, 'store'])->name('incident-report.store');
-    Route::put('incident-report/{incidentReport}', [IncidentReportController::class, 'update'])->name('incident-report.update');
-    Route::delete('incident-report/{incidentReport}', [IncidentReportController::class, 'destroy'])->name('incident-report.destroy');
-    Route::get('incident-report/{incidentReport}/print', [IncidentReportController::class, 'print'])->name('incident-report.print');
+    // Incident Reports - accessible by admin, assistant admin, responder
+    Route::middleware('role:administrator,assistant admin,responder')->group(function () {
+        Route::get('incident-report', [IncidentReportController::class, 'index'])->name('incident-report.index');
+        Route::post('incident-report', [IncidentReportController::class, 'store'])->name('incident-report.store');
+        Route::put('incident-report/{incidentReport}', [IncidentReportController::class, 'update'])->name('incident-report.update');
+        Route::delete('incident-report/{incidentReport}', [IncidentReportController::class, 'destroy'])->name('incident-report.destroy');
+        Route::get('incident-report/{incidentReport}/print', [IncidentReportController::class, 'print'])->name('incident-report.print');
+    });
 
-    Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
-    Route::post('/dispatch', [DispatchController::class, 'store'])->name('dispatch.store');
-    Route::put('/dispatch/{incidentReport}', [DispatchController::class, 'update'])->name('dispatch.update');
-    Route::delete('/dispatch/{incidentReport}', [DispatchController::class, 'destroy'])->name('dispatch.destroy');
-    Route::post('/dispatch/{incidentReport}/assign-team', [DispatchController::class, 'assignTeam'])->name('dispatch.assignTeam');
+    // Dispatch - accessible by admin and assistant admin
+    Route::middleware('role:administrator,assistant admin')->group(function () {
+        Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
+        Route::post('/dispatch', [DispatchController::class, 'store'])->name('dispatch.store');
+        Route::put('/dispatch/{incidentReport}', [DispatchController::class, 'update'])->name('dispatch.update');
+        Route::delete('/dispatch/{incidentReport}', [DispatchController::class, 'destroy'])->name('dispatch.destroy');
+        Route::post('/dispatch/{incidentReport}/assign-team', [DispatchController::class, 'assignTeam'])->name('dispatch.assignTeam');
+    });
 
+    // Citizen page
     Route::get('citizen-page', [CitizenController::class, 'index'])->name('citizen-page.index');
 
-    // ── Notification routes — all authenticated roles need these ──────────────
-    Route::get('/announcement-alert/notifications', [AnnouncementAlertController::class, 'notifications'])->name('announcement-alert.notifications');
-    Route::post('/announcement-alert/mark-read', [AnnouncementAlertController::class, 'markAsRead'])->name('announcement-alert.mark-read');
+    // Announcement notifications - accessible by admin and assistant admin
+    Route::middleware('role:administrator,assistant admin')->group(function () {
+        Route::get('/announcement-alert/notifications', [AnnouncementAlertController::class, 'notifications'])->name('announcement-alert.notifications');
+        Route::post('/announcement-alert/mark-read', [AnnouncementAlertController::class, 'markAsRead'])->name('announcement-alert.mark-read');
+    });
 
-    Route::middleware('permission:admin_access|responder_access')->group(function () {
+    // Dashboard - accessible by admin, assistant admin, responder
+    Route::middleware('role:administrator,assistant admin,responder')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/export/monthly-report', [DashboardController::class, 'exportMonthlyReport'])->name('dashboard.export.monthly');
         Route::get('/dashboard/export/citizen-report', [DashboardController::class, 'exportCitizenReport'])->name('dashboard.export.citizen');
@@ -101,7 +111,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 
-    Route::middleware('permission:admin_access')->group(function () {
+    // Admin only routes
+    Route::middleware('role:administrator')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
