@@ -17,10 +17,18 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
+        $tab     = $request->input('tab', 'all'); // all | verified | pending
 
-        $users = User::with(['barangay:id,barangay_name', 'permissions', 'responder'])
-            ->latest()
-            ->paginate($perPage);
+        $query = User::with(['barangay:id,barangay_name', 'permissions', 'responder'])
+            ->latest();
+
+        if ($tab === 'verified') {
+            $query->where('admin_verified', 'yes');
+        } elseif ($tab === 'pending') {
+            $query->whereNull('admin_verified');
+        }
+
+        $users = $query->paginate($perPage)->withQueryString();
 
         $barangays   = Barangay::select('id', 'barangay_name')->orderBy('barangay_name')->get();
         $roles       = Role::orderBy('role_name')->get();
@@ -31,7 +39,7 @@ class UserController extends Controller
             'barangays'   => $barangays,
             'roles'       => $roles,
             'permissions' => $permissions,
-            'filters'     => $request->only('per_page'),
+            'filters'     => $request->only('per_page', 'tab'),
         ]);
     }
 
@@ -166,5 +174,32 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'User deleted successfully.');
+    }
+
+    /**
+     * Verify a user account (set admin_verified = 'yes').
+     */
+    public function verify(User $user)
+    {
+        $user->update(['admin_verified' => 'yes']);
+
+        return redirect()->route('users.index')
+            ->with('success', 'User account verified successfully.');
+    }
+
+    /**
+     * Reject / delete a user account pending verification.
+     */
+    public function rejectVerification(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->route('users.index')
+                ->with('error', 'You cannot delete your own account.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('users.index')
+            ->with('success', 'User account rejected and deleted.');
     }
 }

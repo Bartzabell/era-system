@@ -27,7 +27,7 @@ class FortifyServiceProvider extends ServiceProvider
                 $user = auth()->user();
 
                 // Check if user has admin_access or responder_access permission
-                if ($user->hasPermission('admin_access') || $user->hasPermission('responder_access')) {
+                if ($user->isAdmin() || $user->isAssistantAdmin() ||  $user->isResponder()) {
                     return redirect()->route('dashboard');
                 }
 

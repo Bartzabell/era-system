@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 
@@ -20,9 +21,6 @@ class RegisterController extends Controller
         $barangays = Barangay::select('id', 'barangay_name')
             ->orderBy('barangay_name')
             ->get();
-
-        // Add a dd() temporarily to confirm data exists
-        // dd($barangays);
 
         return Inertia::render('auth/Register', [
             'barangays' => $barangays,
@@ -42,25 +40,34 @@ class RegisterController extends Controller
             'birth_date'           => 'nullable|date',
             'address'              => 'nullable|string|max:500',
             'barangay_id'          => 'nullable|exists:barangays,id',
+            'valid_id'             => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
+        // Handle valid ID upload
+        $validIdPath = null;
+        if ($request->hasFile('valid_id') && $request->file('valid_id')->isValid()) {
+            $validIdPath = $request->file('valid_id')->store('valid_ids', 'public');
+        }
+
         $user = User::create([
-            'username'    => $validated['username'],
-            'password'    => Hash::make($validated['password']),
-            'full_name'   => trim(implode(' ', array_filter([
+            'username'       => $validated['username'],
+            'password'       => Hash::make($validated['password']),
+            'full_name'      => trim(implode(' ', array_filter([
                 $validated['first_name']  ?? null,
                 $validated['middle_name'] ?? null,
                 $validated['last_name']   ?? null,
             ]))),
-            'first_name'  => $validated['first_name']  ?? null,
-            'middle_name' => $validated['middle_name'] ?? null,
-            'last_name'   => $validated['last_name']   ?? null,
-            'email'       => $validated['email'],
-            'mobile_no'   => $validated['mobile_no']   ?? null,
-            'birth_date'  => $validated['birth_date']  ?? null,
-            'address'     => $validated['address']     ?? null,
-            'barangay_id' => $validated['barangay_id'] ?? null,
-            'role'        => 'citizen',
+            'first_name'     => $validated['first_name']  ?? null,
+            'middle_name'    => $validated['middle_name'] ?? null,
+            'last_name'      => $validated['last_name']   ?? null,
+            'email'          => $validated['email'],
+            'mobile_no'      => $validated['mobile_no']   ?? null,
+            'birth_date'     => $validated['birth_date']  ?? null,
+            'address'        => $validated['address']     ?? null,
+            'barangay_id'    => $validated['barangay_id'] ?? null,
+            'role'           => 'citizen',
+            'valid_id'       => $validIdPath,
+            'admin_verified' => 'pending',
         ]);
 
         $permissionId = Permission::where('slug', 'citizen_access')->pluck('id')->first();

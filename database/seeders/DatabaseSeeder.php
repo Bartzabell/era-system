@@ -617,7 +617,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'username' => 'assistant_admin',
-                'email' => 'assitantadmin@local',
+                'email' => 'assistantadmin@local',
                 'full_name' => 'Mark Anthony',
                 'first_name' => 'Mark',
                 'last_name' => 'Anthony',

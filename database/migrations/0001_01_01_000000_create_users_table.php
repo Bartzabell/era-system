@@ -31,6 +31,8 @@ return new class extends Migration
             $table->longText('profile_picture')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->longText('valid_id')->nullable();
+            $table->string('admin_verified')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

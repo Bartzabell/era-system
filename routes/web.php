@@ -118,6 +118,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::post('/users/{user}/verify', [UserController::class, 'verify'])
+            ->name('users.verify');
+
+        Route::delete('/users/{user}/reject-verification', [UserController::class, 'rejectVerification'])
+            ->name('users.rejectVerification');
 
         Route::get('/announcement-alert', [AnnouncementAlertController::class, 'index'])->name('announcement-alert.index');
         Route::post('/announcement-alert', [AnnouncementAlertController::class, 'store'])->name('announcement-alert.store');

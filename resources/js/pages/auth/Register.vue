@@ -6,8 +6,9 @@ import CustomInput from '@/components/CustomInput.vue'
 import Boombox from '@/components/BoomBox.vue'
 import ButtonCode from '@/components/ButtonCode.vue'
 import TextLink from '@/components/TextLink.vue'
-import { PhUserPlus, PhFirstAid } from '@phosphor-icons/vue'
+import { PhUserPlus, PhFirstAid, PhIdentificationCard, PhUploadSimple, PhX } from '@phosphor-icons/vue'
 import { login } from '@/routes'
+import { ref } from 'vue'
 
 const props = withDefaults(defineProps<{
     barangays: Array<{ id: number; barangay_name: string }>
@@ -27,12 +28,41 @@ const form = useForm({
     birth_date:            '',
     address:               '',
     barangay_id:           null as number | null,
+    valid_id:              null as File | null,
 })
 
+// Valid ID preview
+const validIdPreview = ref<string | null>(null)
+const validIdFileName = ref<string | null>(null)
 
+const handleValidIdChange = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0] ?? null
+
+    if (file) {
+        form.valid_id = file
+        validIdFileName.value = file.name
+
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            validIdPreview.value = e.target?.result as string
+        }
+        reader.readAsDataURL(file)
+    }
+}
+
+const clearValidId = () => {
+    form.valid_id = null
+    validIdPreview.value = null
+    validIdFileName.value = null
+    // Reset file input
+    const input = document.getElementById('valid_id_input') as HTMLInputElement
+    if (input) input.value = ''
+}
 
 const submit = () => {
     form.post('/register', {
+        forceFormData: true,
         onFinish: () => form.reset('password', 'password_confirmation'),
     })
 }
@@ -42,7 +72,7 @@ const submit = () => {
     <div class="flex min-h-screen">
         <Head title="Register" />
 
-        <!-- Left panel — decorative, matches your login style -->
+        <!-- Left panel — decorative -->
         <div class="hidden lg:flex flex-1 flex-col items-center justify-center text-center gap-4 bg-orange-500/90 p-12">
             <div class="rounded-md bg-red-500">
                 <PhFirstAid :size="52" weight="fill" class="text-red-500 bg-white rounded-full m-3" />
@@ -141,6 +171,72 @@ const submit = () => {
                                     @change="(v: any) => form.barangay_id = v?.id ?? null"
                                 />
                             </div>
+
+                        </div>
+                    </section>
+
+                    <!-- Valid ID Upload -->
+                    <section>
+                        <h3 class="mb-2 font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                            <PhIdentificationCard :size="18" />
+                            Valid ID
+                            <span class="text-xs font-normal text-gray-400">(required for account verification)</span>
+                        </h3>
+                        <div class="p-4 border border-dashed border-gray-300 rounded-lg">
+
+                            <!-- Upload area (shown when no file selected) -->
+                            <div v-if="!validIdPreview">
+                                <label
+                                    for="valid_id_input"
+                                    class="flex flex-col items-center justify-center gap-3 cursor-pointer rounded-lg border-2 border-dashed border-orange-300 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-800 py-8 px-4 text-center hover:bg-orange-100 dark:hover:bg-orange-950/30 transition-colors"
+                                >
+                                    <PhUploadSimple :size="36" class="text-orange-400" />
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                            Click to upload your valid ID
+                                        </p>
+                                        <p class="text-xs text-gray-400 mt-1">
+                                            Accepted: JPG, PNG, PDF — max 5MB
+                                        </p>
+                                        <p class="text-xs text-gray-400 mt-0.5">
+                                            e.g. PhilSys, Driver's License, Passport, SSS, UMID
+                                        </p>
+                                    </div>
+                                </label>
+                                <input
+                                    id="valid_id_input"
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/jpg,application/pdf"
+                                    class="hidden"
+                                    @change="handleValidIdChange"
+                                />
+                            </div>
+
+                            <!-- Preview (shown when file selected) -->
+                            <div v-else class="relative">
+                                <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                                    <img
+                                        :src="validIdPreview"
+                                        alt="Valid ID Preview"
+                                        class="w-full max-h-48 object-contain bg-gray-50 dark:bg-gray-800"
+                                    />
+                                </div>
+                                <div class="flex items-center justify-between mt-2">
+                                    <p class="text-xs text-gray-500 truncate flex-1 mr-2">
+                                        <span class="font-medium">Selected:</span> {{ validIdFileName }}
+                                    </p>
+                                    <button
+                                        type="button"
+                                        @click="clearValidId"
+                                        class="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 transition-colors"
+                                    >
+                                        <PhX :size="14" />
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p v-if="form.errors.valid_id" class="text-xs text-red-500 mt-2">{{ form.errors.valid_id }}</p>
 
                         </div>
                     </section>
