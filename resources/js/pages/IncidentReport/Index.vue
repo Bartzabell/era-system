@@ -4,16 +4,17 @@ import { Head, router } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import DataTable from '@/components/Datatable.vue'
 import Modal from '@/components/Modal.vue'
-import ButtonCode from '@/components/ButtonCode.vue'
 import FormModal from './Partials/FormModal.vue'
 import { Button } from '@/components/ui/button'
-import { PhPencil, PhTrash, PhEye, PhPlus } from '@phosphor-icons/vue'
+import { PhPencil, PhTrash, PhEye, PhPlus, PhMagnifyingGlass } from '@phosphor-icons/vue'
 
 interface IncidentReport {
     id: number
     incident_code: string
     barangay: { barangay_name: string }
     emergency: { emergency_name: string }
+    incident: { incident_name: string }
+    user: { full_name: string }
     severity_level: string
     responder_count: number
     priority_level: string
@@ -21,6 +22,7 @@ interface IncidentReport {
     status: string
     reported_at: string
     datetime_arrived: string
+    ir_responders_count: number
 }
 
 const props = defineProps<{
@@ -60,14 +62,13 @@ const tabs: { key: TabKey; label: string }[] = [
     { key: 'cancelled', label: 'Cancelled' },
 ]
 
-// Colors grade from orange → amber → gray
-const tabColors: Record<TabKey, { bg: string; text: string; }> = {
-    priority:  { bg: '#ff8c1a', text: '#fff7ed'},
-    waiting:   { bg: '#ffa64d', text: '#fffbeb'},
-    assigned:  { bg: '#ff5c33', text: '#fef3c7'},
-    arriving:  { bg: '#ff704d', text: '#fafaf9'},
-    resolved:  { bg: '#80aaff', text: '#f9fafb'},
-    cancelled: { bg: '#9494b8', text: '#f3f4f6'},
+const tabColors: Record<TabKey, { dot: string; border: string; bg: string }> = {
+    priority:  { dot: '#f97316', border: '#f97316', bg: '#ffedd5' }, // soft orange
+    waiting:   { dot: '#f59e0b', border: '#f59e0b', bg: '#fef3c7' }, // soft amber
+    assigned:  { dot: '#3b82f6', border: '#3b82f6', bg: '#dbeafe' }, // soft blue
+    arriving:  { dot: '#8b5cf6', border: '#8b5cf6', bg: '#ede9fe' }, // soft violet
+    resolved:  { dot: '#10b981', border: '#10b981', bg: '#d1fae5' }, // soft green
+    cancelled: { dot: '#9ca3af', border: '#9ca3af', bg: '#f3f4f6' }, // soft gray
 }
 
 // ── Data ───────────────────────────────────────────────────────────────────
@@ -100,12 +101,12 @@ const deleteRecord    = () => router.delete(`/incident-report/${currentRecord.va
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 const statusClass = (s: string) => ({
-    waiting:   'bg-yellow-100 text-yellow-800',
-    assigned:  'bg-blue-100 text-blue-800',
-    arriving:  'bg-purple-100 text-purple-800',
-    resolved:  'bg-green-100 text-green-800',
-    cancelled: 'bg-gray-100 text-gray-800',
-}[s] ?? 'bg-gray-100 text-gray-700')
+    waiting:   'bg-yellow-50 text-yellow-700',
+    assigned:  'bg-blue-50 text-blue-700',
+    arriving:  'bg-purple-50 text-purple-700',
+    resolved:  'bg-green-50 text-green-700',
+    cancelled: 'bg-gray-100 text-gray-500',
+}[s] ?? 'bg-gray-100 text-gray-500')
 
 const formatDate = (val: string) => val
     ? new Date(val).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })
@@ -121,11 +122,11 @@ const formatResponseTime = (a: string, b: string) => {
 
 // ── Columns ────────────────────────────────────────────────────────────────
 const priorityColors: Record<string, string> = {
-    P1: 'bg-red-100 text-red-700 border border-red-300',
-    P2: 'bg-orange-100 text-orange-700 border border-orange-300',
-    P3: 'bg-yellow-100 text-yellow-700 border border-yellow-300',
-    P4: 'bg-blue-100 text-blue-700 border border-blue-300',
-    P5: 'bg-gray-100 text-gray-600 border border-gray-300',
+    P1: 'bg-red-50 text-red-700 border border-red-200',
+    P2: 'bg-orange-50 text-orange-700 border border-orange-200',
+    P3: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+    P4: 'bg-blue-50 text-blue-700 border border-blue-200',
+    P5: 'bg-gray-100 text-gray-500 border border-gray-200',
 }
 
 const baseColumns = [
@@ -135,12 +136,8 @@ const baseColumns = [
     { accessorKey: 'barangay.barangay_name',   header: 'Location',  cell: ({ row }: any) => row.original.barangay?.barangay_name ?? '' },
     { accessorKey: 'reported_at',              header: 'Reported',  cell: ({ row }: any) => formatDate(row.original.reported_at) },
     { accessorKey: 'datetime_arrived',         header: 'Response',  cell: ({ row }: any) => formatResponseTime(row.original.reported_at, row.original.datetime_arrived) },
-    { accessorKey: 'user.full_name',           header: 'Reporter',  cell: ({ row }: any) => row.original.user.full_name ?? '' },
-    {
-        accessorKey: 'ir_responders_count',
-        header: 'Responders',
-        cell: ({ row }: any) => row.original.ir_responders_count ?? 0
-    },
+    { accessorKey: 'user.full_name',           header: 'Reporter',  cell: ({ row }: any) => row.original.user?.full_name ?? '' },
+    { accessorKey: 'ir_responders_count',      header: 'Responders', cell: ({ row }: any) => row.original.ir_responders_count ?? 0 },
 ]
 
 const priorityCol = {
@@ -148,26 +145,44 @@ const priorityCol = {
     header: 'Severity',
     cell: ({ row }: any) => {
         const { priority_level: lvl, priority_label: lbl } = row.original
-        if (!lvl) return h('span', { class: 'text-gray-400 text-xs' }, '—')
-        return h('span', { class: `px-2 py-0.5 text-xs font-semibold rounded-full ${priorityColors[lvl] ?? 'bg-gray-100 text-gray-600'}` }, `${lvl} · ${lbl}`)
+        if (!lvl) return h('span', { class: 'text-gray-300 text-xs' }, '—')
+        return h('span', { class: `px-2 py-0.5 text-xs font-medium rounded ${priorityColors[lvl] ?? 'bg-gray-100 text-gray-500'}` }, `${lvl} · ${lbl}`)
     },
 }
 
 const statusCol = {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }: any) => h('span', { class: `px-2 py-1 text-xs font-semibold rounded-full ${statusClass(row.original.status)}` }, row.original.status),
+    cell: ({ row }: any) => {
+        const s = row.original.status
+        return h('span', { class: `inline-flex items-center gap-1.5 text-xs font-medium ${statusClass(s)}` }, [
+            h('span', { class: 'w-1.5 h-1.5 rounded-full', style: `background: currentColor; opacity: 0.7` }),
+            s,
+        ])
+    },
 }
 
 const columns = computed(() => {
     const actionCol = {
         id: 'actions',
-        header: 'Actions',
-        cell: ({ row }: any) => h('div', { class: 'flex space-x-2' }, [
-            h(Button, { variant: 'outline', size: 'icon', onClick: () => window.open(`/incident-report/${row.original.id}/print`, '_blank'), class: 'text-white bg-gray-600 rounded-full hover:bg-gray-700' }, () => h(PhEye, { size: 18 })),
+        header: '',
+        cell: ({ row }: any) => h('div', { class: 'flex items-center gap-1.5' }, [
+            h(Button, {
+                variant: 'ghost', size: 'icon',
+                onClick: () => window.open(`/incident-report/${row.original.id}/print`, '_blank'),
+                class: 'h-7 w-7 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded'
+            }, () => h(PhEye, { size: 15 })),
             ...(props.hasFullAccess ? [
-                h(Button, { variant: 'outline', size: 'icon', onClick: () => openEditModal(row.original), class: 'text-white bg-orange-500 rounded-full hover:bg-orange-600' }, () => h(PhPencil, { size: 18 })),
-                h(Button, { variant: 'outline', size: 'icon', onClick: () => openDeleteModal(row.original), class: 'text-white bg-red-600 rounded-full hover:bg-red-700' }, () => h(PhTrash, { size: 16 })),
+                h(Button, {
+                    variant: 'ghost', size: 'icon',
+                    onClick: () => openEditModal(row.original),
+                    class: 'h-7 w-7 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded'
+                }, () => h(PhPencil, { size: 15 })),
+                h(Button, {
+                    variant: 'ghost', size: 'icon',
+                    onClick: () => openDeleteModal(row.original),
+                    class: 'h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded'
+                }, () => h(PhTrash, { size: 15 })),
             ] : []),
         ]),
     }
@@ -176,14 +191,14 @@ const columns = computed(() => {
         : [...baseColumns, actionCol]
 })
 
-const activeColor = computed(() => tabColors[activeTab.value].bg)
+const activeColor = computed(() => tabColors[activeTab.value].border)
+const activeBg = computed(() => tabColors[activeTab.value].bg)
 </script>
 
 <template>
     <Head title="Incident Reports" />
     <AppLayout :breadcrumbs="breadcrumbs">
 
-        <!-- Form Modal -->
         <Modal :show="isFormVisible" @close="closeFormModal" class="fixed inset-0 z-50">
             <FormModal
                 v-if="isFormVisible"
@@ -201,52 +216,62 @@ const activeColor = computed(() => tabColors[activeTab.value].bg)
             />
         </Modal>
 
-        <div class="w-full flex justify-center mt-10">
-            <div class="w-[92%]">
+        <div class="w-full flex justify-center py-8 px-4">
+            <div class="w-full max-w-7xl">
 
-                <ButtonCode
-                    @click="openCreateModal"
-                    text="Create Incident Report"
-                    :icon="PhPlus"
-                    color="bg-orange-500 hover:bg-orange-600 text-white"
-                />
-
-                <div class="relative mt-6 flex items-end gap-0" style="height: 42px;">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-7">
+                    <div>
+                        <h1 class="text-lg font-medium text-gray-900 dark:text-gray-100">Incident Reports</h1>
+                        <p class="text-xs text-gray-400 mt-0.5">Homepage / Incident Reports</p>
+                    </div>
                     <button
-                        v-for="(tab, index) in tabs"
+                        @click="openCreateModal"
+                        class="inline-flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700
+                               dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white
+                               text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                    >
+                        <PhPlus :size="14" />
+                        Create incident report
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-0.5">
+                    <button
+                        v-for="tab in tabs"
                         :key="tab.key"
                         @click="activeTab = tab.key"
-                        :style="{
-                            height: activeTab === tab.key ? '42px' : '34px',
-                            backgroundColor: tabColors[tab.key].bg,
-                            color: tabColors[tab.key].text,
-                            zIndex: activeTab === tab.key ? 20 : tabs.length - index,
-                            boxShadow: activeTab === tab.key
-                                ? `2px -3px 8px rgba(0,0,0,0.2)`
-                                : 'none',
-                            marginRight: '-1px',
-                        }"
-                        class="flex items-center gap-1.5 px-4 text-sm font-medium
-                            rounded-t-xl border-t-2 border-l-2 border-r-2
-                            transition-all duration-150 focus:outline-none
-                            whitespace-nowrap hover:brightness-110 self-end"
+                        :style="activeTab === tab.key
+                            ? { borderColor: tabColors[tab.key].border, borderBottomColor: 'white' }
+                            : {}"
+                        :class="[
+                            'flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-medium',
+                            'rounded-t-md border-2 border-b-0 transition-all select-none',
+                            activeTab === tab.key
+                                ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 z-10'
+                                : 'bg-gray-50 dark:bg-gray-800 border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                        ]"
                     >
+                        <span
+                            class="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            :style="{ background: tabColors[tab.key].dot }"
+                        />
                         {{ tab.label }}
                         <span
                             v-if="tab.key !== 'priority' && statusCounts[tab.key]"
-                            class="inline-flex items-center justify-center min-w-[18px] h-[18px]
-                                rounded-full px-1 text-[11px] font-semibold bg-white/25"
+                            class="text-[11px] font-medium bg-gray-100 dark:bg-gray-700
+                                   text-gray-400 rounded-full px-1.5 py-px min-w-[18px] text-center leading-4"
                         >
                             {{ statusCounts[tab.key] }}
                         </span>
                     </button>
                 </div>
 
-                <!-- Table — top border color tracks the active tab -->
+                <!-- Table card — border color tracks active tab -->
                 <div
-                    class="rounded-b-lg rounded-tr-lg overflow-hidden
-                           border border-gray-200 dark:border-gray-700 p-2"
-                    :style="{ borderTop: `3px solid ${activeColor}`, backgroundColor: `${activeColor}` }"
+                    class="bg-white p-2 dark:bg-gray-900 rounded-b-lg rounded-tr-lg overflow-hidden transition-colors"
+                    :style="{ border: `2px solid ${activeColor}`, backgroundColor: activeBg}"
                 >
                     <DataTable
                         :columns="columns"
@@ -260,14 +285,31 @@ const activeColor = computed(() => tabColors[activeTab.value].bg)
             </div>
         </div>
 
-        <!-- Delete Modal -->
+        <!-- Delete confirmation -->
         <Modal :show="showDeleteModal" @close="showDeleteModal = false">
-            <div class="p-6">
-                <h2 class="mb-2 text-lg font-medium text-gray-900">Delete Incident Report</h2>
-                <p class="text-sm text-gray-600">Are you sure? This action cannot be undone.</p>
-                <div class="flex justify-end mt-6 gap-2">
-                    <Button @click="showDeleteModal = false" class="bg-gray-500 hover:bg-gray-600 text-white">Cancel</Button>
-                    <Button @click="deleteRecord" class="bg-red-600 hover:bg-red-700 text-white">Delete</Button>
+            <div class="p-6 max-w-sm">
+                <h2 class="text-base font-medium text-gray-900 dark:text-gray-100 mb-1">
+                    Delete incident report
+                </h2>
+                <p class="text-sm text-gray-400 dark:text-gray-500">
+                    This action cannot be undone.
+                </p>
+                <div class="flex justify-end gap-2 mt-6">
+                    <button
+                        @click="showDeleteModal = false"
+                        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200
+                               dark:border-gray-700 text-gray-600 dark:text-gray-300
+                               hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        @click="deleteRecord"
+                        class="px-4 py-2 text-sm font-medium rounded-lg bg-red-600
+                               hover:bg-red-700 text-white transition-colors"
+                    >
+                        Delete
+                    </button>
                 </div>
             </div>
         </Modal>
