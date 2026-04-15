@@ -27,8 +27,13 @@ class PriorityScoreCalculator
      */
     public function calculate($incident, $distanceKm = null)
     {
+        // ✅ Handle null incident (quick reports)
         if (!$incident) {
-            return null;
+            return [
+                'priority_score' => 0,
+                'priority_level' => 'P5',
+                'priority_label' => 'Informational'
+            ];
         }
 
         $baseSeverity = $incident->base_severity ?? 0;

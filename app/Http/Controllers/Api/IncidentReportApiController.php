@@ -36,8 +36,8 @@ class IncidentReportApiController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'emergency_id' => 'required|exists:emergencies,id',
-            'incident_id' => 'required|exists:incidents,id',
+            'emergency_id' => 'nullable|exists:emergencies,id',
+            'incident_id' => 'nullable|exists:incidents,id',
             'barangay_id' => 'nullable|exists:barangays,id',
             'casualty_count' => 'required|integer|min:0',
             'map_coordinates' => 'nullable|string',
@@ -54,23 +54,38 @@ class IncidentReportApiController extends Controller
         $incidentLat = (float)$coords[0];
         $incidentLng = (float)$coords[1];
 
-        // Get incident
-        $incident = Incident::findOrFail($request->incident_id);
+        // ✅ Only fetch incident if incident_id is provided (manual form)
+        $incident = null;
+        $distance = null;
+        $priorityData = null;
 
-        // Find closest facility
-        $facilityFinder = new ClosestFacilityFinder();
-        $facilityResult = $facilityFinder->findClosest(
-            $incident->incident_name,
-            $incidentLat,
-            $incidentLng
-        );
+        if ($request->incident_id) {
+            $incident = Incident::findOrFail($request->incident_id);
 
-        // Use closest facility distance, or null if not found
-        $distance = $facilityResult['success'] ? $facilityResult['distance_km'] : null;
+            // Find closest facility
+            $facilityFinder = new ClosestFacilityFinder();
+            $facilityResult = $facilityFinder->findClosest(
+                $incident->incident_name,
+                $incidentLat,
+                $incidentLng
+            );
 
-        // Calculate priority score (with closest facility distance)
-        $calculator = new PriorityScoreCalculator();
-        $priorityData = $calculator->calculate($incident, $distance);
+            // Use closest facility distance, or null if not found
+            $distance = $facilityResult['success'] ? $facilityResult['distance_km'] : null;
+
+            // Calculate priority score (with closest facility distance)
+            $calculator = new PriorityScoreCalculator();
+            $priorityData = $calculator->calculate($incident, $distance);
+        } else {
+            // For quick report without incident, skip facility matching
+            $calculator = new PriorityScoreCalculator();
+            
+            // Get priority data with null incident (score will be 0, level=P5, label=Informational)
+            $priorityData = $calculator->calculate(null, null);
+            
+            // Skip facility matching - distance is null
+            $distance = null;
+        }
 
         $report = IncidentReport::create([
             'user_id' => $request->user()->id,

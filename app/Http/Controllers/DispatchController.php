@@ -257,6 +257,7 @@ class DispatchController extends Controller
 
             $incidentReport->update([
                 'responder_name' => $leader->first_name . ' ' . $leader->last_name,
+                'responder_contact_no' => $leader->mobile_no,
                 'status'         => 'assigned',
                 'updated_by'     => Auth::id(),
             ]);
