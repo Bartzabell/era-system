@@ -38,6 +38,7 @@ class IncidentReportApiController extends Controller
         $validator = Validator::make($request->all(), [
             'emergency_id' => 'nullable|exists:emergencies,id',
             'incident_id' => 'nullable|exists:incidents,id',
+            'other_incident' => 'nullable|string|max:255',  // ✅ Add validation
             'barangay_id' => 'nullable|exists:barangays,id',
             'casualty_count' => 'required|integer|min:0',
             'map_coordinates' => 'nullable|string',
@@ -54,15 +55,15 @@ class IncidentReportApiController extends Controller
         $incidentLat = (float)$coords[0];
         $incidentLng = (float)$coords[1];
 
-        // ✅ Only fetch incident if incident_id is provided (manual form)
+        // ✅ Determine if using incident or other_incident
         $incident = null;
         $distance = null;
         $priorityData = null;
 
         if ($request->incident_id) {
+            // Has specific incident - use full calculation
             $incident = Incident::findOrFail($request->incident_id);
 
-            // Find closest facility
             $facilityFinder = new ClosestFacilityFinder();
             $facilityResult = $facilityFinder->findClosest(
                 $incident->incident_name,
@@ -70,20 +71,22 @@ class IncidentReportApiController extends Controller
                 $incidentLng
             );
 
-            // Use closest facility distance, or null if not found
             $distance = $facilityResult['success'] ? $facilityResult['distance_km'] : null;
 
-            // Calculate priority score (with closest facility distance)
             $calculator = new PriorityScoreCalculator();
             $priorityData = $calculator->calculate($incident, $distance);
+        } elseif ($request->other_incident) {
+            // Has other incident - use default P3/Moderate
+            $priorityData = [
+                'priority_score' => 5,
+                'priority_level' => 'P3',
+                'priority_label' => 'Moderate'
+            ];
+            $distance = null;
         } else {
-            // For quick report without incident, skip facility matching
+            // Fallback (shouldn't happen if validation works)
             $calculator = new PriorityScoreCalculator();
-            
-            // Get priority data with null incident (score will be 0, level=P5, label=Informational)
             $priorityData = $calculator->calculate(null, null);
-            
-            // Skip facility matching - distance is null
             $distance = null;
         }
 
@@ -91,6 +94,7 @@ class IncidentReportApiController extends Controller
             'user_id' => $request->user()->id,
             'emergency_id' => $request->emergency_id,
             'incident_id' => $request->incident_id,
+            'other_incident' => $request->other_incident,  // ✅ Save this
             'barangay_id' => $request->barangay_id,
             'casualty_count' => $request->casualty_count,
             'map_coordinates' => $request->map_coordinates,
@@ -495,6 +499,48 @@ class IncidentReportApiController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Upload Attachments Error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to upload attachments', 500);
+        }
+    }
+
+    /**
+     * Upload responder attachments to folder: incident-attachments/{incident_code}/Responder Attachments/
+     */
+    public function uploadResponderAttachments(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'attachments' => 'required|array|max:5',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,mp4,mov|max:51200' // 50MB per file
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->errors(), 422);
+        }
+
+        try {
+            $report = IncidentReport::findOrFail($id);
+            
+            // Authorization check
+            $user = $request->user();
+            if ($user->role === 'responder' && $report->responder_name !== $user->full_name) {
+                return $this->errorResponse('Unauthorized', 403);
+            }
+
+            $folderPath = 'incident-attachments/' . $report->incident_code . '/Responder Attachments';
+
+            foreach ($request->file('attachments') as $file) {
+                $file->store($folderPath, 'public');
+            }
+
+            $report->update([
+                'responder_attachment' => $folderPath
+            ]);
+
+            return $this->successResponse('Responder attachments uploaded successfully', [
+                'folder' => $folderPath
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Upload Responder Attachments Error: ' . $e->getMessage());
             return $this->errorResponse('Failed to upload attachments', 500);
         }
     }

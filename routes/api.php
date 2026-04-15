@@ -37,6 +37,7 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         Route::post('/incident-reports/{id}/cancel', [IncidentReportApiController::class, 'cancelReport']);
         Route::get('/incident-reports/{id}/attachments', [IncidentReportApiController::class, 'getAttachments']);
         Route::post('/incident-reports/{id}/attachments', [IncidentReportApiController::class, 'uploadAttachments']);
+        Route::post('/incident-reports/{id}/responder-attachments', [IncidentReportApiController::class, 'uploadResponderAttachments']);
         Route::get('/site-locations', [IncidentReportApiController::class, 'getSiteLocations']);
 
         // Location tracking
