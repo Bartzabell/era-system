@@ -301,4 +301,31 @@ class AccountApiController extends Controller
             'user' => $user
         ]);
     }
+
+    public function submitValidId(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'valid_id' => 'required|image|mimes:jpeg,png,jpg|max:5120'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $user = $request->user();
+
+        // Delete old if exists
+        if ($user->valid_id && Storage::disk('public')->exists($user->valid_id)) {
+            Storage::disk('public')->delete($user->valid_id);
+        }
+
+        $path = $request->file('valid_id')->store('valid_ids', 'public');
+
+        $user->update([
+            'valid_id' => $path,
+            'admin_verified' => null  // reset on re-upload
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'ID submitted for review']);
+    }
 }
