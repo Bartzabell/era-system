@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { Megaphone, FileCheckCorner, ChartColumnStacked, Users, CalendarRange } from 'lucide-vue-next';
+import { Megaphone, FileCheckCorner, ChartColumnStacked, Users, CalendarRange, Squircle } from 'lucide-vue-next';
 import { PhAmbulance } from '@phosphor-icons/vue'
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -97,6 +97,12 @@ const navGroups: NavGroup[] = [
                 title: 'Users',
                 href: '/users',
                 icon: Users,
+                admin: true,
+            },
+            {
+                title: 'Login UI Settings',
+                href: '/login-settings',
+                icon: Squircle,
                 admin: true,
             },
         ],

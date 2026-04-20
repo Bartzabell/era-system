@@ -16,12 +16,10 @@ use App\Http\Controllers\RegisterController;
 use App\Models\IncidentReport;
 use App\Models\Responder;
 use Illuminate\Http\Request;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\LoginSettingController;
 
-Route::get('/', function () {
-    return Inertia::render('auth/Login', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('home');
+Route::get('/', [LoginController::class, 'create'])->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
@@ -131,6 +129,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/monthly-report',            [MonthlyReportController::class, 'index'])     ->name('monthly-report.index');
         Route::get('/monthly-report/export-csv', [MonthlyReportController::class, 'exportCsv'])->name('monthly-report.export-csv');
         Route::get('/monthly-report/export-pdf', [MonthlyReportController::class, 'exportPdf'])->name('monthly-report.export-pdf');
+
+        Route::get('/login-settings',         [LoginSettingController::class, 'index'])       ->name('login-settings.index');
+        Route::put('/login-settings/login',   [LoginSettingController::class, 'updateLogin']) ->name('login-settings.updateLogin');
+        Route::put('/login-settings/terms',   [LoginSettingController::class, 'updateTerms']) ->name('login-settings.updateTerms');
     });
 });
 
