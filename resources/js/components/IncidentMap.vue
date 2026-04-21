@@ -37,8 +37,22 @@ const getPriorityColor = (level: string) => {
     return map[level] ?? '#9ca3af'
 }
 
-const createCustomIcon = (level: string) => {
+const getEmergencyIcon = (emergencyType: string): string => {
+    const icons: Record<string, string> = {
+        'Medical Case': '🏥',
+        'Trauma Case': '🩹',
+        'Fire Incident': '🔥',
+        'Vehicle Accident': '🚗',
+        'Rescue Operation': '🚨',
+        'Crime / Security Case': '🚔',
+        'Disaster Response': '🌪️',
+    }
+    return icons[emergencyType] ?? '⚠️'
+}
+
+const createCustomIcon = (level: string, emergencyType: string = '') => {
     const color = getPriorityColor(level)
+    const icon = getEmergencyIcon(emergencyType)
 
     return L.divIcon({
         className: 'custom-incident-marker',
@@ -55,7 +69,7 @@ const createCustomIcon = (level: string) => {
                 align-items: center;
                 justify-content: center;
             ">
-                <div style="transform: rotate(45deg); color: white; font-size: 16px; font-weight: bold;">🔥</div>
+                <div style="transform: rotate(45deg); color: white; font-size: 16px; line-height: 1;">${icon}</div>
             </div>
         `,
         iconSize: [32, 32],
@@ -89,7 +103,7 @@ const updateMarkers = () => {
         props.incidents.forEach((incident) => {
             const color  = getPriorityColor(incident.priority_level)
             const marker = L.marker([incident.lat, incident.lng], {
-                icon: createCustomIcon(incident.priority_level),
+                icon: createCustomIcon(incident.priority_level, incident.emergency_type),
             })
 
             const popupContent = `

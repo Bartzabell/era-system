@@ -215,9 +215,9 @@ const exportCitizenReport = () => {
                 </div>
             </div>
 
-            <!-- Incident Feed -->
-            <div class="col-span-1 lg:col-span-1 h-full flex flex-col">
-                <div class="relative h-[calc(75%-5rem)] bg-white px-4 py-3 overflow-hidden rounded-xl border border-gray-200 flex flex-col">
+            <!-- Incident Feed outer div -->
+            <div class="col-span-1 flex flex-col" style="height: calc(580px + 4rem + 4rem + 1rem);">
+                <div class="bg-white px-4 pt-3 rounded-xl border border-gray-200 flex flex-col h-full pb-4">
                     <div class="flex justify-between items-center">
                         <h1 class="text-2xl font-black my-3 text-gray-800">Incident Feed</h1>
                         <div class="flex gap-1">
@@ -226,7 +226,7 @@ const exportCitizenReport = () => {
                         </div>
                     </div>
 
-                    <div class="grid gap-2 grid-cols-1 h-[calc(75%-5rem)] overflow-y-auto pr-2 bg-gray-50 p-2 rounded-lg">
+                    <div class="bg-white px-4 pt-3 rounded-xl border border-gray-200 flex flex-col flex-1 pb-4 overflow-y-auto">
                         <div
                             v-for="incident in incidentFeed"
                             :key="incident.id"
@@ -277,7 +277,7 @@ const exportCitizenReport = () => {
                     </div>
 
                     <!-- Report Buttons -->
-                    <div class="grid grid-cols-2 gap-3 mt-5">
+                    <div class="grid grid-cols-2 gap-3 mt-3 mb-1">
                         <button
                             class="flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-sm"
                             @click="exportMonthlyReport"
