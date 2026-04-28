@@ -24,7 +24,6 @@ class MonthlyBarangayReportExport implements FromCollection, WithHeadings, WithS
             $row['no'],
             $row['barangay_name'],
             $row['landmark'],
-            $row['medical_condition_raw'],  // "??"
             $row['minor'],
             $row['serious'],
             $row['dead'],
