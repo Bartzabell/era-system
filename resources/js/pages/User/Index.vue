@@ -53,7 +53,7 @@ const tabs = [
 const switchTab = (tabKey: string) => {
     activeTab.value = tabKey
     router.get(
-        route('users.index'),
+        '/users',
         { ...props.filters, tab: tabKey, page: 1 },
         { preserveState: true, replace: true }
     )
@@ -63,7 +63,7 @@ const switchTab = (tabKey: string) => {
 const localFilters = ref(props.filters)
 const updateFilters = (newFilters: object) => {
     localFilters.value = { ...newFilters, tab: activeTab.value }
-    router.get(route('users.index'), localFilters.value, { preserveState: true, replace: true })
+    router.get('/users', localFilters.value, { preserveState: true, replace: true })
 }
 
 // ─── CRUD Modals ──────────────────────────────────────────────────────────────
@@ -118,7 +118,6 @@ const closeVerifyModal = () => {
 
 const validIdUrl = computed(() => {
     if (!verifyRecord.value?.valid_id) return null
-    // valid_id is stored as e.g. "valid_ids/tKy9Ct7N2PJEqm3vK5zB4xoOdtXH9fdRmGqseKvq.png"
     return `/storage/${verifyRecord.value.valid_id}`
 })
 
@@ -218,7 +217,6 @@ const columns = [
         id: 'actions',
         header: 'Actions',
         cell: ({ row }: any) => h('div', { class: 'flex space-x-2' }, [
-            // Verify button — only show when not yet verified
             row.original.admin_verified !== 'yes'
                 ? h(Button, {
                     variant: 'outline', size: 'icon',
@@ -284,7 +282,6 @@ const columns = [
                         ]"
                     >
                         {{ tab.label }}
-                        <!-- Badge for pending tab -->
                         <span
                             v-if="tab.key === 'pending'"
                             class="ml-1.5 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full"
