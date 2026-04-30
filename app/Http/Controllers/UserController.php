@@ -66,6 +66,7 @@ class UserController extends Controller
             'permissions'    => 'nullable|array',
             'permissions.*'  => 'exists:permissions,id',
             'is_responder'   => 'boolean',
+            'admin_verified' => 'nullable|in:yes',
         ]);
 
         $user = User::create([
@@ -118,6 +119,7 @@ class UserController extends Controller
             'permissions'    => 'nullable|array',
             'permissions.*'  => 'exists:permissions,id',
             'is_responder'   => 'boolean',
+            'admin_verified' => $validated['admin_verified'] ?? null,
         ]);
 
         $user->update([

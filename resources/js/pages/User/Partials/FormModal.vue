@@ -29,6 +29,7 @@ const form = useForm({
     role:             props.record?.role          ?? '',
     permissions:      props.record?.permissions?.map((p: any) => p.id) ?? [] as number[],
     is_responder:     props.record?.responder != null,
+    admin_verified: props.record?.admin_verified ?? null as string | null,
 })
 
 const roleOptions = props.roles.map(r => ({ id: r.role_name, name: r.role_name }))
@@ -176,6 +177,32 @@ const closeModal = () => {
                     <div>
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Mark as Responder</span>
                         <p class="text-xs text-gray-400">Creates a responder record for this user</p>
+                    </div>
+                </label>
+            </div>
+            <!-- Admin Verified Toggle -->
+            <div class="p-3 mb-4 border border-dashed border-gray-400">
+                <label class="flex items-center gap-3 cursor-pointer select-none">
+                    <button
+                        type="button"
+                        @click="form.admin_verified = form.admin_verified === 'yes' ? null : 'yes'"
+                        :class="[
+                            'relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
+                            form.admin_verified === 'yes' ? 'bg-orange-500' : 'bg-gray-300 dark:bg-gray-600'
+                        ]"
+                    >
+                        <span
+                            :class="[
+                                'inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out',
+                                form.admin_verified === 'yes' ? 'translate-x-5' : 'translate-x-0'
+                            ]"
+                        />
+                    </button>
+                    <div>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Admin Verified</span>
+                        <p class="text-xs text-gray-400">
+                            {{ form.admin_verified === 'yes' ? 'Account is verified' : 'Pending verification' }}
+                        </p>
                     </div>
                 </label>
             </div>
