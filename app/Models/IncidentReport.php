@@ -29,7 +29,7 @@ class IncidentReport extends Model
         'priority_score',
         'priority_level',
         'priority_label',
-        'attachment',
+
         'responder_name',
         'responder_contact_no',
         'estimated_arrival',
@@ -39,7 +39,10 @@ class IncidentReport extends Model
         'remarks',
         'responder_remarks',
         'treatment_provided',
+
+        'attachment',
         'responder_attachment',
+
         'cancel_remarks',
         'reported_at',
 

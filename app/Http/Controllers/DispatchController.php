@@ -50,12 +50,12 @@ class DispatchController extends Controller
 
         if (!$this->hasFullAccess()) $query->where('user_id', Auth::id());
 
-        // ✅ Execute the query ONCE and reuse the result
+
         $reports = $query->get();
 
         return Inertia::render('Dispatch/Index', [
             ...$this->sharedData(),
-            'incidentReports' => $reports,   // ✅ pass $reports, NOT $query->get() again
+            'incidentReports' => $reports,
             'hasFullAccess'   => $this->hasFullAccess(),
             'currentUserId'   => Auth::id(),
         ]);
@@ -128,14 +128,19 @@ class DispatchController extends Controller
             };
             $data['created_by'] = $data['updated_by'] = Auth::id();
 
-            if ($request->hasFile('attachment'))
-                $data['attachment'] = $request->file('attachment')->store('incident-reports', 'public');
-            if ($request->hasFile('responder_attachment'))
-                $data['responder_attachment'] = $request->file('responder_attachment')->store('incident-reports/responder', 'public');
-
             $report = IncidentReport::create($data);
-            $report->incident_code = 'IND#-' . now()->year . '-' . str_pad($report->id, 4, '0', STR_PAD_LEFT);
+            $incidentCode = 'IND-' . now()->year . '-' . str_pad($report->id, 4, '0', STR_PAD_LEFT);
+            $report->incident_code = $incidentCode;
+
+            $folder = 'incident-attachments/' . $incidentCode;
+
+            if ($request->hasFile('attachment'))
+                $report->attachment = $request->file('attachment')->store($folder, 'public');
+            if ($request->hasFile('responder_attachment'))
+                $report->responder_attachment = $request->file('responder_attachment')->store($folder, 'public');
+
             $report->save();
+
         });
 
         return redirect()->route('dispatch.index')->with('success', 'Incident report created successfully.');
@@ -196,12 +201,13 @@ class DispatchController extends Controller
             $data['casualty_count'] = ($data['minor_casualty_count'] ?? 0) + ($data['serious_casualty_count'] ?? 0) + ($data['deceased_casualty_count'] ?? 0);
             $data['updated_by']     = Auth::id();
 
-            foreach (['attachment' => 'incident-reports', 'responder_attachment' => 'incident-reports/responder'] as $field => $path) {
-                if ($request->hasFile($field)) {
-                    if ($incidentReport->$field) Storage::disk('public')->delete($incidentReport->$field);
-                    $data[$field] = $request->file($field)->store($path, 'public');
+            $folder = 'incident-attachments/' . $incidentReport->incident_code;
+                foreach (['attachment', 'responder_attachment'] as $field) {
+                    if ($request->hasFile($field)) {
+                        if ($incidentReport->$field) Storage::disk('public')->delete($incidentReport->$field);
+                        $data[$field] = $request->file($field)->store($folder, 'public');
+                    }
                 }
-            }
 
             $incidentReport->update($data);
         });
