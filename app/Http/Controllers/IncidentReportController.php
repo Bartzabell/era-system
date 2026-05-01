@@ -162,7 +162,7 @@ class IncidentReportController extends Controller
             }
 
             $report = IncidentReport::create($data);
-            $report->incident_code = 'IND#-' . now()->year . '-' . str_pad($report->id, 4, '0', STR_PAD_LEFT);
+            $report->incident_code = 'IND-' . now()->year . '-' . str_pad($report->id, 4, '0', STR_PAD_LEFT);
             $report->save();
         });
 

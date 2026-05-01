@@ -316,7 +316,7 @@ const minutesAgo = (val: string | null) => {
 
                         <!-- Image -->
                         <div class="relative w-full bg-gray-900" style="height:186px;">
-                            <img v-if="selectedReport.attachment" :src="`/storage/${selectedReport.attachment}`" alt="Incident photo" class="w-full h-full object-cover" />
+                            <img v-if="selectedReport.attachment" :src="`/storage/${selectedReport.incident_code}/${selectedReport.attachment}`" alt="Incident photo" class="w-full h-full object-cover" />
                             <div v-else class="w-full h-full bg-gray-900 flex flex-col items-center justify-center gap-2">
                                 <PhImage :size="40" class="text-gray-700" />
                                 <p class="text-xs text-gray-600">Photo submitted by citizen</p>
