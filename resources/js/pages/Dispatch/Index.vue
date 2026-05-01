@@ -29,6 +29,7 @@ interface IncidentReport {
     emergency?: { id: number; emergency_name: string }
     siteLocation?: { id: number; site_name: string }
     ir_responders?: IrResponder[]
+    attachments?: string[]
 }
 
 const props = defineProps<{
@@ -135,6 +136,18 @@ const reportPayload = (r: IncidentReport, overrides = {}) => ({
     priority_label:          r.priority_label,
     ...overrides,
 })
+
+const slideIndex = ref(0)
+watch(selectedId, () => { slideIndex.value = 0 }) // reset when switching reports
+
+const prevSlide = () => {
+    const len = selectedReport.value?.attachments?.length ?? 0
+    if (len) slideIndex.value = (slideIndex.value - 1 + len) % len
+}
+const nextSlide = () => {
+    const len = selectedReport.value?.attachments?.length ?? 0
+    if (len) slideIndex.value = (slideIndex.value + 1) % len
+}
 
 // ── Submit / status update ─────────────────────────────────────────────────
 const submitReport = () => {
@@ -314,14 +327,48 @@ const minutesAgo = (val: string | null) => {
                             </div>
                         </div>
 
-                        <!-- Image -->
-                        <div class="relative w-full bg-gray-900" style="height:186px;">
-                            <img v-if="selectedReport.attachment" :src="`/storage/${selectedReport.attachment}`" alt="Incident photo" class="w-full h-full object-cover" />
-                            <div v-else class="w-full h-full bg-gray-900 flex flex-col items-center justify-center gap-2">
+                        <!-- Image Slideshow -->
+                        <div class="relative w-full bg-gray-900 overflow-hidden" style="height:186px;">
+
+                            <template v-if="selectedReport.attachments?.length">
+                                <img
+                                    :src="`/storage/${selectedReport.attachments[slideIndex]}`"
+                                    :alt="`Attachment ${slideIndex + 1}`"
+                                    class="w-full h-full object-cover"
+                                />
+
+                                <template v-if="selectedReport.attachments.length > 1">
+                                    <!-- Prev -->
+                                    <button @click.stop="prevSlide"
+                                        class="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 text-white text-lg leading-none flex items-center justify-center z-10 transition-colors">
+                                        ‹
+                                    </button>
+                                    <!-- Next -->
+                                    <button @click.stop="nextSlide"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 text-white text-lg leading-none flex items-center justify-center z-10 transition-colors">
+                                        ›
+                                    </button>
+                                    <!-- Dots -->
+                                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                                        <button v-for="(_, i) in selectedReport.attachments" :key="i"
+                                            @click.stop="slideIndex = i"
+                                            :class="['w-1.5 h-1.5 rounded-full transition-colors', i === slideIndex ? 'bg-white' : 'bg-white/40']" />
+                                    </div>
+                                    <!-- Counter -->
+                                    <div class="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-black/50 text-white text-[10px] font-semibold z-10">
+                                        {{ slideIndex + 1 }} / {{ selectedReport.attachments.length }}
+                                    </div>
+                                </template>
+                            </template>
+
+                            <!-- No attachments -->
+                            <div v-else class="w-full h-full flex flex-col items-center justify-center gap-2">
                                 <PhImage :size="40" class="text-gray-700" />
                                 <p class="text-xs text-gray-600">Photo submitted by citizen</p>
                             </div>
-                            <div v-if="computedPriority || selectedReport.priority_level" class="absolute bottom-2 right-2">
+
+                            <!-- Priority badge (unchanged) -->
+                            <div v-if="computedPriority || selectedReport.priority_level" class="absolute bottom-2 right-2 z-10">
                                 <span :class="['px-2 py-0.5 rounded-full text-xs font-bold border shadow', priorityBadgeClass(computedPriority?.level ?? selectedReport.priority_level)]">
                                     {{ computedPriority?.level ?? selectedReport.priority_level }} · {{ computedPriority?.label ?? selectedReport.priority_label }}
                                 </span>

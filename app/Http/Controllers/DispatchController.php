@@ -45,13 +45,17 @@ class DispatchController extends Controller
             'incident:id,incident_name',
             'emergency:id,emergency_name',
             'siteLocation:id,site_name',
-            'irResponders',   // Laravel will serialize this as "ir_responders" in JSON
+            'irResponders',
         ])->orderBy('reported_at', 'desc')->orderBy('created_at', 'desc');
 
         if (!$this->hasFullAccess()) $query->where('user_id', Auth::id());
 
-
-        $reports = $query->get();
+        $reports = $query->get()->map(function ($r) {
+            $r->attachments = $r->incident_code
+                ? Storage::disk('public')->files('incident-attachments/' . $r->incident_code)
+                : [];
+            return $r;
+        });
 
         return Inertia::render('Dispatch/Index', [
             ...$this->sharedData(),
