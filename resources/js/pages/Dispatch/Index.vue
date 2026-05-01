@@ -149,6 +149,20 @@ const nextSlide = () => {
     if (len) slideIndex.value = (slideIndex.value + 1) % len
 }
 
+const showImageModal = ref(false)
+const modalIndex = ref(0)
+
+const openImageModal = (i: number) => { modalIndex.value = i; showImageModal.value = true }
+const closeImageModal = () => { showImageModal.value = false }
+const prevModal = () => {
+    const len = selectedReport.value?.attachments?.length ?? 0
+    if (len) modalIndex.value = (modalIndex.value - 1 + len) % len
+}
+const nextModal = () => {
+    const len = selectedReport.value?.attachments?.length ?? 0
+    if (len) modalIndex.value = (modalIndex.value + 1) % len
+}
+
 // ── Submit / status update ─────────────────────────────────────────────────
 const submitReport = () => {
     if (!selectedReport.value) return
@@ -334,7 +348,8 @@ const minutesAgo = (val: string | null) => {
                                 <img
                                     :src="`/storage/${selectedReport.attachments[slideIndex]}`"
                                     :alt="`Attachment ${slideIndex + 1}`"
-                                    class="w-full h-full object-cover"
+                                    class="w-full h-full object-cover cursor-zoom-in"
+                                    @click.stop="openImageModal(slideIndex)"
                                 />
 
                                 <template v-if="selectedReport.attachments.length > 1">
@@ -495,5 +510,52 @@ const minutesAgo = (val: string | null) => {
                 </div>
             </div>
         </div>
+        <!-- ── Image Lightbox Modal ── -->
+        <Teleport to="body">
+            <Transition name="fade">
+                <div v-if="showImageModal && selectedReport?.attachments?.length"
+                    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+                    @click.self="closeImageModal"
+                    @keydown.esc.window="closeImageModal">
+
+                    <!-- Close -->
+                    <button @click="closeImageModal"
+                        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white text-xl flex items-center justify-center transition-colors z-10">
+                        ×
+                    </button>
+
+                    <!-- Counter -->
+                    <div class="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-black/50 text-white text-xs font-semibold z-10">
+                        {{ modalIndex + 1 }} / {{ selectedReport.attachments.length }}
+                    </div>
+
+                    <!-- Image -->
+                    <img
+                        :src="`/storage/${selectedReport.attachments[modalIndex]}`"
+                        :alt="`Attachment ${modalIndex + 1}`"
+                        class="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl select-none"
+                    />
+
+                    <!-- Prev / Next -->
+                    <template v-if="selectedReport.attachments.length > 1">
+                        <button @click="prevModal"
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white text-2xl flex items-center justify-center transition-colors">
+                            ‹
+                        </button>
+                        <button @click="nextModal"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white text-2xl flex items-center justify-center transition-colors">
+                            ›
+                        </button>
+
+                        <!-- Dot strip -->
+                        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                            <button v-for="(_, i) in selectedReport.attachments" :key="i"
+                                @click="modalIndex = i"
+                                :class="['w-2 h-2 rounded-full transition-colors', i === modalIndex ? 'bg-white' : 'bg-white/30 hover:bg-white/60']" />
+                        </div>
+                    </template>
+                </div>
+            </Transition>
+        </Teleport>
     </AppLayout>
 </template>
