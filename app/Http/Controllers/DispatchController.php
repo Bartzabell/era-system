@@ -32,8 +32,13 @@ class DispatchController extends Controller
             'incidents'     => Incident::select('id', 'incident_name', 'emergency_id', 'base_severity', 'base_time', 'base_resources', 'base_secondary')->orderBy('incident_name')->get(),
             'emergencies'   => Emergency::select('id', 'emergency_name')->orderBy('emergency_name')->get(),
             'siteLocations' => SiteLocation::select('id', 'site_name', 'site_type', 'coordinates')->orderBy('site_name')->get(),
-            'users'         => Responder::with('user')->where('is_active', true)->get()
-                                ->map(fn($r) => ['id' => $r->user->id, 'full_name' => $r->user->first_name . ' ' . $r->user->last_name]),
+            'users' => Responder::with('user')->where('is_active', true)->get()
+                ->filter(fn($r) => $r->user !== null)
+                ->map(fn($r) => [
+                    'id'        => $r->user?->id,
+                    'full_name' => trim(($r->user?->first_name ?? '') . ' ' . ($r->user?->last_name ?? '')),
+                ])
+                ->values(),
         ];
     }
 
