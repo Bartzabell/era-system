@@ -43,7 +43,7 @@ const props = defineProps<{
     currentUserId: number
 }>()
 
-const breadcrumbs = [{ title: 'Homepage', href: '/landing' }, { title: 'Dispatch', href: '/dispatch' }]
+const breadcrumbs = [{ title: 'Dashboard', href: '/dashboard' }, { title: 'Dispatch', href: '/dispatch' }]
 
 // ── Status ─────────────────────────────────────────────────────────────────
 type StatusKey = 'waiting' | 'assigned' | 'arriving' | 'resolved' | 'cancelled'

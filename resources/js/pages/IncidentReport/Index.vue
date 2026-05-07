@@ -49,7 +49,7 @@ const canDelete = computed(() => isAdmin.value);
 const canView = computed(() => isAdmin.value || isAssistantAdmin.value || isResponder.value);
 
 const breadcrumbs = [
-    { title: 'Homepage', href: '/landing' },
+    { title: 'Dashboard', href: '/dashboard' },
     { title: 'Incident Reports', href: '/incident-report' },
 ]
 
