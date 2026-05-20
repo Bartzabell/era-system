@@ -72,6 +72,20 @@ const showDeleteModal = ref(false)
 const formMode        = ref<'create' | 'edit'>('create')
 const currentRecord   = ref<User | null>(null)
 
+const formatDate = (dateStr: string | null): string => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return dateStr
+    return date.toLocaleString('en-PH', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+    })
+}
+
 const openCreateModal = () => {
     formMode.value      = 'create'
     currentRecord.value = null
@@ -212,7 +226,7 @@ const columns = [
             row.original.responder ? 'Yes' : 'No'
         ),
     },
-    { accessorKey: 'created_at', header: 'Created At' },
+    { accessorKey: 'created_at', header: 'Created At', cell: ({ row }: any) => formatDate(row.original.created_at), },
     {
         id: 'actions',
         header: 'Actions',

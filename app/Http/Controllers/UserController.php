@@ -107,7 +107,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'username'       => 'required|string|max:255|unique:users,username,' . $user->id,
-            'password'       => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'password'       => 'nullable', 'confirmed', Rules\Password::defaults(),
             'first_name'     => 'nullable|string|max:255',
             'middle_name'    => 'nullable|string|max:255',
             'last_name'      => 'nullable|string|max:255',
@@ -119,7 +119,7 @@ class UserController extends Controller
             'permissions'    => 'nullable|array',
             'permissions.*'  => 'exists:permissions,id',
             'is_responder'   => 'boolean',
-            'admin_verified' => $validated['admin_verified'] ?? null,
+            'admin_verified' => 'nullable|in:yes',
         ]);
 
         $user->update([
