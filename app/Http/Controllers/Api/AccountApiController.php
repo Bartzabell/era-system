@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -327,5 +328,127 @@ class AccountApiController extends Controller
         ]);
 
         return response()->json(['success' => true, 'message' => 'ID submitted for review']);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        
+        // Generate 6-digit code
+        $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        
+        // Store in password_reset_tokens table
+        \DB::table('password_reset_tokens')->updateOrCreate(
+            ['email' => $user->email],
+            [
+                'token' => $code,
+                'created_at' => now()
+            ]
+        );
+
+        // Send email
+        Mail::raw(
+            "Your password reset code is: $code\n\nThis code will expire in 15 minutes.",
+            function ($message) use ($user) {
+                $message->to($user->email)
+                    ->subject('Password Reset Code - GEARS');
+            }
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reset code sent to your email'
+        ]);
+    }
+
+    public function verifyResetToken(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'code' => 'required|string|size:6'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $reset = \DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->where('token', $request->code)
+            ->first();
+
+        if (!$reset) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired code'
+            ], 400);
+        }
+
+        // Check if expired (15 minutes)
+        if (now()->diffInMinutes($reset->created_at) > 15) {
+            \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return response()->json([
+                'success' => false,
+                'message' => 'Code expired'
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Code verified'
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'code' => 'required|string|size:6',
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $reset = \DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->where('token', $request->code)
+            ->first();
+
+        if (!$reset || now()->diffInMinutes($reset->created_at) > 15) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired code'
+            ], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->update(['password' => Hash::make($request->password)]);
+
+        // Delete used token
+        \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password reset successfully'
+        ]);
     }
 }

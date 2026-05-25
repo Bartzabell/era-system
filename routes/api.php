@@ -10,6 +10,9 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
     // Public routes
     Route::post('/auth/register', [AccountApiController::class, 'register']);
     Route::post('/auth/login', [AccountApiController::class, 'login']);
+    Route::post('/auth/forgot-password', [AccountApiController::class, 'forgotPassword']);
+    Route::post('/auth/verify-reset-token', [AccountApiController::class, 'verifyResetToken']);
+    Route::post('/auth/reset-password', [AccountApiController::class, 'resetPassword']);
     Route::get('/dropdowns', [IncidentReportApiController::class, 'getDropdowns']);
 
     Route::post('/email/resend', [AccountApiController::class, 'resendVerification']);
