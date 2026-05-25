@@ -88,7 +88,7 @@ const navGroups: NavGroup[] = [
         admin: true,
         items: [
             {
-                title: 'Alerts Config',
+                title: 'Announcement',
                 href: '/announcement-alert',
                 icon: Megaphone,
                 admin: true,
@@ -146,12 +146,7 @@ const footerNavItems: NavItem[] = [];
             </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-            <NavMain
-                v-for="group in visibleNavGroups"
-                :key="group.label"
-                :label="group.label"
-                :items="group.items"
-            />
+            <NavMain v-for="group in visibleNavGroups" :key="group.label" :label="group.label" :items="group.items" />
         </SidebarContent>
         <SidebarFooter>
             <NavFooter :items="footerNavItems" />
