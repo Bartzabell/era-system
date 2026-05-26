@@ -15,12 +15,10 @@ class AnnouncementAlertController extends Controller
     {
         $perPage = $request->input('per_page', 10);
 
-        // All announcements for the datatable
         $announcements = AnnouncementAlert::with('creator')
             ->latest()
             ->paginate($perPage);
 
-        // Today's broadcasts
         $broadcastAlerts = AnnouncementAlert::with('creator')
             ->whereDate('created_at', Carbon::today())
             ->whereNull('deleted_at')
@@ -28,7 +26,6 @@ class AnnouncementAlertController extends Controller
             ->get()
             ->map(fn($a) => $this->formatAnnouncement($a));
 
-        // This week's broadcasts (excluding today)
         $broadcastHistory = AnnouncementAlert::with('creator')
             ->whereBetween('created_at', [
                 Carbon::now()->startOfWeek(),
@@ -54,6 +51,7 @@ class AnnouncementAlertController extends Controller
             'announcement_message' => 'required|string',
             'for_citizens'         => 'boolean',
             'for_responders'       => 'boolean',
+            'for_administrators'   => 'boolean',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -62,6 +60,7 @@ class AnnouncementAlertController extends Controller
                 'announcement_message' => $request->announcement_message,
                 'for_citizens'         => $request->boolean('for_citizens'),
                 'for_responders'       => $request->boolean('for_responders'),
+                'for_administrators'   => $request->boolean('for_administrators'),
                 'created_by'           => Auth::id(),
                 'updated_by'           => Auth::id(),
             ]);
@@ -85,22 +84,36 @@ class AnnouncementAlertController extends Controller
     private function formatAnnouncement(AnnouncementAlert $a): array
     {
         $audience = [];
-        if ($a->for_citizens)   $audience[] = 'Citizens';
-        if ($a->for_responders) $audience[] = 'Responders';
+        if ($a->for_citizens)       $audience[] = 'Citizens';
+        if ($a->for_responders)     $audience[] = 'Responders';
+        if ($a->for_administrators) $audience[] = 'Administrators';
 
         return [
             'id'                   => $a->id,
+            'incident_report_id'   => $a->incident_report_id,
             'announcement_title'   => $a->announcement_title,
             'announcement_message' => $a->announcement_message,
             'for_citizens'         => $a->for_citizens,
             'for_responders'       => $a->for_responders,
+            'for_administrators'   => $a->for_administrators,
             'audience'             => implode(' & ', $audience) ?: 'None',
             'created_by_name'      => $a->creator?->full_name ?? '',
             'time_ago'             => Carbon::parse($a->created_at)->diffForHumans(),
             'created_at'           => $a->created_at->format('M d, Y h:i A'),
+            'is_incident_alert'    => !is_null($a->incident_report_id),
         ];
     }
 
+    /**
+     * Returns notifications for the authenticated user based on their role.
+     *
+     * Role visibility matrix:
+     *  - citizen       → for_citizens = true
+     *  - responder     → for_responders = true  (includes incident alerts)
+     *  - administrator → for_administrators = true OR for_responders = true
+     *                    (admins see everything targeted at responders too)
+     *  - (other/admin) → all alerts (legacy fallback)
+     */
     public function notifications(Request $request)
     {
         $user = Auth::user();
@@ -112,10 +125,19 @@ class AnnouncementAlertController extends Controller
 
         if ($role === 'citizen') {
             $query->where('for_citizens', true);
+
         } elseif ($role === 'responder') {
+            // Responders see: manual alerts addressed to them + auto incident alerts
             $query->where('for_responders', true);
+
+        } elseif ($role === 'administrator') {
+            // Administrators see: alerts addressed to them + alerts addressed to responders
+            $query->where(function ($q) {
+                $q->where('for_administrators', true)
+                  ->orWhere('for_responders', true);
+            });
         }
-        // admin sees all
+        // Any other role (super-admin, etc.) sees everything — no additional filter
 
         $readIds = DB::table('announcement_alert_reads')
             ->where('user_id', Auth::id())
@@ -125,12 +147,15 @@ class AnnouncementAlertController extends Controller
         $notifications = $query->get()->map(function ($a) use ($readIds) {
             return [
                 'id'                   => $a->id,
+                'incident_report_id'   => $a->incident_report_id,
                 'announcement_title'   => $a->announcement_title,
                 'announcement_message' => $a->announcement_message,
                 'for_citizens'         => $a->for_citizens,
                 'for_responders'       => $a->for_responders,
+                'for_administrators'   => $a->for_administrators,
                 'time_ago'             => Carbon::parse($a->created_at)->diffForHumans(),
                 'is_read'              => in_array($a->id, $readIds),
+                'is_incident_alert'    => !is_null($a->incident_report_id),
             ];
         });
 

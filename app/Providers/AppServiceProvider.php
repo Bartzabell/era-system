@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\IncidentReport;
+use App\Observers\IncidentReportObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         Schema::defaultStringLength(191);
+        IncidentReport::observe(IncidentReportObserver::class);
     }
 
     protected function configureDefaults(): void
