@@ -18,6 +18,7 @@ use App\Models\Responder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LoginSettingController;
+use App\Http\Controllers\SettingsController;
 
 Route::get('/', [LoginController::class, 'create'])->name('home');
 
@@ -133,6 +134,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/login-settings',         [LoginSettingController::class, 'index'])       ->name('login-settings.index');
         Route::put('/login-settings/login',   [LoginSettingController::class, 'updateLogin']) ->name('login-settings.updateLogin');
         Route::put('/login-settings/terms',   [LoginSettingController::class, 'updateTerms']) ->name('login-settings.updateTerms');
+
+        Route::get('/system-settings', [SettingsController::class, 'index'])->name('system-settings.index');
+
+        // Hotline
+        Route::post  ('/system-settings/hotline',          [SettingsController::class, 'storeHotline'])   ->name('system-settings.hotline.store');
+        Route::put   ('/system-settings/hotline/{hotline}', [SettingsController::class, 'updateHotline']) ->name('system-settings.hotline.update');
+        Route::delete('/system-settings/hotline/{hotline}', [SettingsController::class, 'destroyHotline'])->name('system-settings.hotline.destroy');
+
+        // Emergency
+        Route::post  ('/system-settings/emergency',              [SettingsController::class, 'storeEmergency'])   ->name('system-settings.emergency.store');
+        Route::put   ('/system-settings/emergency/{emergency}',  [SettingsController::class, 'updateEmergency']) ->name('system-settings.emergency.update');
+        Route::delete('/system-settings/emergency/{emergency}',  [SettingsController::class, 'destroyEmergency'])->name('system-settings.emergency.destroy');
+
+        // Incident
+        Route::post  ('/system-settings/incident',            [SettingsController::class, 'storeIncident'])   ->name('system-settings.incident.store');
+        Route::put   ('/system-settings/incident/{incident}', [SettingsController::class, 'updateIncident']) ->name('system-settings.incident.update');
+        Route::delete('/system-settings/incident/{incident}', [SettingsController::class, 'destroyIncident'])->name('system-settings.incident.destroy');
     });
 });
 
