@@ -224,7 +224,7 @@ class ResponderSeeder extends Seeder
         $responderPermissionId = Permission::where('slug', 'responder_access')->pluck('id')->first();
 
         foreach ($responders as $responderData) {
-            $user = User::firstOrCreate(
+            $user = User::updateOrCreate(
                 ['email' => $responderData['email']],
                 [
                     'username'           => $responderData['username'],
