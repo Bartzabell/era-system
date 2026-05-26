@@ -241,7 +241,7 @@ class ResponderSeeder extends Seeder
                     'middle_name'       => null,
                     'site_location_id'  => null,
                     'valid_id'          => null,
-                    'admin_verified'    => 'verified',
+                    'admin_verified'    => 'yes',
                 ]
             );
 
