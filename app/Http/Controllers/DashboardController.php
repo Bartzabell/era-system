@@ -38,7 +38,7 @@ class DashboardController extends Controller
             : '0 min';
 
         $resolvedToday = IncidentReport::where('status', 'resolved')
-            ->whereDate('updated_at', Carbon::today())
+            ->whereDate('datetime_arrived', Carbon::today())
             ->whereNull('deleted_at')
             ->count();
 

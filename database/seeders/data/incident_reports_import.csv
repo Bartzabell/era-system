@@ -1,51 +1,51 @@
-incident_code,user_id,barangay_id,emergency_id,incident_id,casualty_count,distance,map_coordinates,remarks,priority_score,priority_level,priority_label,reported_at
-IND-2026-0001,3,1,1,2,1,2.1,"14.196100, 121.008200",Cardiac arrest reported at residence near Aldiano Olaes,8.68,P1,Critical,2026-01-05 08:14:22
-IND-2026-0002,3,2,3,21,0,1.5,"14.298500, 121.014800",House fire reported near GMA Public Market,8.92,P1,Critical,2026-01-08 14:32:10
-IND-2026-0003,3,3,4,8,2,3.2,"14.300200, 121.016400",Motorcycle accident along road near Municipal Hall,7.34,P2,High,2026-01-10 03:38:32
-IND-2026-0004,3,4,2,14,1,2.8,"14.302400, 121.018100",Severe bleeding after fall from ladder,8.90,P1,Critical,2026-01-12 16:03:14
-IND-2026-0005,3,5,1,5,1,3.4,"14.299700, 121.015300",Unconscious patient found near GMA Public Market,7.57,P2,High,2026-01-14 04:37:43
-IND-2026-0006,3,6,3,19,0,1.9,"14.297300, 121.013600",Residential fire destroying family home,8.92,P1,Critical,2026-01-16 09:44:14
-IND-2026-0007,3,7,4,10,1,3.8,"14.294100, 121.011200",Pedestrian hit by motorcycle near school zone,7.16,P2,High,2026-01-18 23:15:07
-IND-2026-0008,3,8,1,3,1,2.4,"14.291800, 121.009500",Stroke victim unresponsive at residence,8.68,P1,Critical,2026-01-20 14:55:36
-IND-2026-0009,3,9,5,27,0,4.1,"14.289400, 121.007800",Person trapped under collapsed wall after storm,8.46,P1,Critical,2026-01-22 11:39:53
-IND-2026-0010,3,10,6,32,0,1.9,"14.292700, 121.010400",Physical assault reported near basketball court,6.93,P2,High,2026-01-24 08:30:26
-IND-2026-0011,3,11,7,36,0,5.3,"14.295600, 121.012700",Flooding in low-lying barangay area near creek,6.51,P2,High,2026-01-26 20:19:18
-IND-2026-0012,3,12,2,16,1,1.8,"14.287500, 121.005900",Patient fell from second floor of house,7.16,P2,High,2026-01-28 13:59:48
-IND-2026-0013,3,13,6,34,0,2.9,"14.290300, 121.008100",Stabbing incident near sari-sari store,8.46,P1,Critical,2026-01-30 13:26:48
-IND-2026-0014,3,14,4,9,2,3.1,"14.293500, 121.010700",Car collision with multiple injuries on national road,7.16,P2,High,2026-02-02 07:50:29
-IND-2026-0015,3,15,1,4,0,1.6,"14.296800, 121.013200",Seizure episode at residence,6.05,P3,Moderate,2026-02-04 09:53:01
-IND-2026-0016,3,16,7,38,0,5.7,"14.285200, 121.004300",Landslide blocking barangay road,8.46,P1,Critical,2026-02-06 01:35:51
-IND-2026-0017,3,17,2,15,1,2.3,"14.288900, 121.007000",Head injury from motorcycle accident,8.90,P1,Critical,2026-02-08 15:40:31
-IND-2026-0018,3,18,6,31,0,2.7,"14.291600, 121.009200",Robbery reported at convenience store,6.93,P2,High,2026-02-10 03:51:52
-IND-2026-0019,3,19,4,12,1,3.6,"14.294400, 121.011800",Hit and run victim requiring medical attention,5.43,P3,Moderate,2026-02-12 04:57:28
-IND-2026-0020,3,20,1,7,1,2.5,"14.297200, 121.014100",Diabetic emergency at residence,6.05,P3,Moderate,2026-02-14 22:38:46
-IND-2026-0021,3,21,5,28,0,4.4,"14.284000, 121.003600",Entrapment in damaged vehicle after accident,8.46,P1,Critical,2026-02-16 07:21:46
-IND-2026-0022,3,22,7,40,0,6.1,"14.286800, 121.006000",Evacuation assistance needed due to rising floodwaters,5.43,P3,Moderate,2026-02-18 13:05:49
-IND-2026-0023,3,23,2,17,0,2.1,"14.289600, 121.008300",Fracture from fall down staircase,6.93,P2,High,2026-02-20 08:06:14
-IND-2026-0024,3,24,6,33,0,3.3,"14.292400, 121.010600",Domestic violence incident reported by neighbor,6.93,P2,High,2026-02-22 17:25:14
-IND-2026-0025,3,25,3,24,0,1.7,"14.295200, 121.012900",Vehicle fire in parking area near market,5.20,P3,Moderate,2026-02-24 13:49:04
-IND-2026-0026,3,26,1,1,1,2.0,"14.298000, 121.015200",Asthma attack at residence requiring urgent response,7.16,P2,High,2026-02-26 16:30:52
-IND-2026-0027,3,27,7,37,2,5.5,"14.283000, 121.002800",Typhoon response needed in heavily affected barangay,6.97,P2,High,2026-02-28 00:56:47
-IND-2026-0028,1,1,2,18,1,2.6,"14.285800, 121.005100",Stab wound victim found at basketball court,8.90,P1,Critical,2026-03-02 13:32:51
-IND-2026-0029,1,2,5,26,0,4.2,"14.288600, 121.007400",Drowning incident at barangay riverside,8.46,P1,Critical,2026-03-04 01:33:09
-IND-2026-0030,1,3,6,35,0,3.0,"14.291400, 121.009700",Shooting incident near vacant lot,8.46,P1,Critical,2026-03-06 16:28:04
-IND-2026-0031,1,4,3,20,0,2.3,"14.294200, 121.012000",Electrical fire at residential unit,6.93,P2,High,2026-03-08 22:38:36
-IND-2026-0032,1,5,1,6,1,1.9,"14.297000, 121.014300",Fever and infection case needing medical transport,3.57,P4,Low,2026-03-10 07:21:26
-IND-2026-0033,1,6,4,13,1,3.5,"14.282000, 121.002100",Truck accident blocking highway with injuries,8.68,P1,Critical,2026-03-12 01:01:12
-IND-2026-0034,1,7,5,29,0,4.6,"14.284800, 121.004400",Collapsed wall trapping residents inside structure,8.46,P1,Critical,2026-03-14 14:53:07
-IND-2026-0035,1,8,7,39,0,5.2,"14.287600, 121.006700",Earthquake response — structural damage check needed,8.92,P1,Critical,2026-03-16 13:30:25
-IND-2026-0036,1,9,2,14,1,2.4,"14.290400, 121.009000",Severe bleeding from workplace injury,8.90,P1,Critical,2026-03-18 07:19:51
-IND-2026-0037,1,10,3,22,0,2.2,"14.293200, 121.011300",Grass fire spreading near open lot,5.20,P3,Moderate,2026-03-20 13:38:43
-IND-2026-0038,1,11,4,11,3,3.7,"14.296000, 121.013600",Car-to-car collision at busy intersection,7.16,P2,High,2026-03-22 07:25:29
-IND-2026-0039,1,12,4,13,1,3.5,"14.281000, 121.001400",Truck overturned on highway blocking lanes,8.68,P1,Critical,2026-03-24 01:01:12
-IND-2026-0040,2,13,1,2,1,2.7,"14.283800, 121.003700",Cardiac arrest — patient unresponsive at home,8.68,P1,Critical,2026-03-26 02:05:31
-IND-2026-0041,2,14,5,30,0,2.8,"14.286600, 121.006000",Missing person — elderly resident wandered away,5.20,P3,Moderate,2026-03-28 15:55:26
-IND-2026-0042,2,15,3,25,0,2.0,"14.289400, 121.008300",LPG gas leak at residential compound,9.22,P1,Critical,2026-03-30 14:31:25
-IND-2026-0043,2,16,2,16,1,2.2,"14.292200, 121.010600",Fall from roof during repair work,7.16,P2,High,2026-04-01 06:19:40
-IND-2026-0044,2,17,7,36,0,5.0,"14.295000, 121.012900",Flood situation worsening in low-lying areas,6.51,P2,High,2026-04-03 18:54:30
-IND-2026-0045,2,18,1,3,1,1.8,"14.280200, 121.000700",Hypertension emergency at elderly residents home,8.68,P1,Critical,2026-04-05 06:05:37
-IND-2026-0046,2,19,4,11,2,3.4,"14.283000, 121.003000",Multi-vehicle collision at busy intersection,7.16,P2,High,2026-04-07 18:10:44
-IND-2026-0047,2,20,5,27,0,4.0,"14.285800, 121.005300",Person trapped under collapsed fence post,8.46,P1,Critical,2026-04-09 07:07:41
-IND-2026-0048,2,21,6,32,0,2.6,"14.288600, 121.007600",Physical altercation with injuries near park,6.93,P2,High,2026-04-11 11:28:33
-IND-2026-0049,2,22,3,21,0,1.6,"14.291400, 121.009900",House fire reported near residential compound,8.92,P1,Critical,2026-04-13 14:05:07
-IND-2026-0050,2,23,2,19,1,2.6,"14.294200, 121.012200",Gunshot wound victim requiring urgent care,9.10,P1,Critical,2026-04-15 20:45:33
+incident_code,user_id,barangay_id,emergency_id,incident_id,casualty_count,minor_casualty_count,serious_casualty_count,deceased_casualty_count,distance,distance_km,site_location_id,map_coordinates,remarks,priority_score,priority_level,priority_label,severity_level,responder_count,estimated_arrival,datetime_arrived,status,reported_at
+IND-2026-0001,3,1,1,2,1,1,0,0,2.1,9.67,25,"14.196100, 121.008200",Cardiac arrest reported at residence near Aldiano Olaes,8.68,P1,Critical,high,2,2026-05-01 00:11:00,2026-05-01 00:11:00,resolved,2026-05-01 00:01:00
+IND-2026-0002,3,2,3,21,0,0,0,0,1.5,0.78,7,"14.298500, 121.014800",House fire reported near GMA Public Market,8.92,P1,Critical,high,4,2026-05-01 13:22:00,2026-05-01 13:22:00,resolved,2026-05-01 13:12:00
+IND-2026-0003,3,3,4,8,2,2,0,0,3.2,1.1,2,"14.300200, 121.016400",Motorcycle accident along road near Municipal Hall,7.34,P2,High,high,3,2026-05-02 02:12:00,2026-05-02 02:12:00,resolved,2026-05-02 02:02:00
+IND-2026-0004,3,4,2,14,1,1,0,0,2.8,0.9,2,"14.302400, 121.018100",Severe bleeding after fall from ladder,8.9,P1,Critical,high,2,2026-05-02 15:44:00,2026-05-02 15:44:00,resolved,2026-05-02 15:34:00
+IND-2026-0005,3,5,1,5,1,1,0,0,3.4,0.19,18,"14.299700, 121.015300",Unconscious patient found near GMA Public Market,7.57,P2,High,high,2,2026-05-03 04:35:00,2026-05-03 04:35:00,resolved,2026-05-03 04:25:00
+IND-2026-0006,3,6,3,19,0,0,0,0,1.9,0.65,7,"14.297300, 121.013600",Residential fire destroying family home,8.92,P1,Critical,high,5,2026-05-03 16:57:00,2026-05-03 16:57:00,resolved,2026-05-03 16:47:00
+IND-2026-0007,3,7,4,10,1,1,0,0,3.8,0.74,1,"14.294100, 121.011200",Pedestrian hit by motorcycle near school zone,7.16,P2,High,high,2,2026-05-04 05:57:00,2026-05-04 05:57:00,resolved,2026-05-04 05:47:00
+IND-2026-0008,3,8,1,3,1,1,0,0,2.4,0.27,12,"14.291800, 121.009500",Stroke victim unresponsive at residence,8.68,P1,Critical,high,3,2026-05-04 19:03:00,2026-05-04 19:03:00,resolved,2026-05-04 18:53:00
+IND-2026-0009,3,9,5,27,0,0,0,0,4.1,0.75,5,"14.289400, 121.007800",Person trapped under collapsed wall after storm,8.46,P1,Critical,high,2,2026-05-05 08:21:00,2026-05-05 08:21:00,resolved,2026-05-05 08:11:00
+IND-2026-0010,3,10,6,32,0,0,0,0,1.9,0.52,5,"14.292700, 121.010400",Physical assault reported near basketball court,6.93,P2,High,high,3,2026-05-05 21:28:00,2026-05-05 21:28:00,resolved,2026-05-05 21:18:00
+IND-2026-0011,3,11,7,36,0,0,0,0,5.3,0.6,5,"14.295600, 121.012700",Flooding in low-lying barangay area near creek,6.51,P2,High,high,5,2026-05-06 09:54:00,2026-05-06 09:54:00,resolved,2026-05-06 09:44:00
+IND-2026-0012,3,12,2,16,1,1,0,0,1.8,1.24,1,"14.287500, 121.005900",Patient fell from second floor of house,7.16,P2,High,high,5,2026-05-06 23:14:00,2026-05-06 23:14:00,resolved,2026-05-06 23:04:00
+IND-2026-0013,3,13,6,34,0,0,0,0,2.9,0.65,5,"14.290300, 121.008100",Stabbing incident near sari-sari store,8.46,P1,Critical,high,4,2026-05-07 12:25:00,2026-05-07 12:25:00,resolved,2026-05-07 12:15:00
+IND-2026-0014,3,14,4,9,2,2,0,0,3.1,0.75,1,"14.293500, 121.010700",Car collision with multiple injuries on national road,7.16,P2,High,high,2,2026-05-08 01:19:00,2026-05-08 01:19:00,resolved,2026-05-08 01:09:00
+IND-2026-0015,3,15,1,4,0,0,0,0,1.6,0.24,18,"14.296800, 121.013200",Seizure episode at residence,6.05,P3,Moderate,medium,3,2026-05-08 14:12:00,2026-05-08 14:12:00,resolved,2026-05-08 14:02:00
+IND-2026-0016,3,16,7,38,0,0,0,0,5.7,1.47,7,"14.285200, 121.004300",Landslide blocking barangay road,8.46,P1,Critical,high,5,2026-05-09 02:46:00,2026-05-09 02:46:00,resolved,2026-05-09 02:36:00
+IND-2026-0017,3,17,2,15,1,1,0,0,2.3,1.09,1,"14.288900, 121.007000",Head injury from motorcycle accident,8.9,P1,Critical,high,4,2026-05-09 15:31:00,2026-05-09 15:31:00,resolved,2026-05-09 15:21:00
+IND-2026-0018,3,18,6,31,0,0,0,0,2.7,0.55,5,"14.291600, 121.009200",Robbery reported at convenience store,6.93,P2,High,high,3,2026-05-10 05:07:00,2026-05-10 05:07:00,resolved,2026-05-10 04:57:00
+IND-2026-0019,3,19,4,12,1,1,0,0,3.6,0.76,1,"14.294400, 121.011800",Hit and run victim requiring medical attention,5.43,P3,Moderate,medium,4,2026-05-10 17:22:00,2026-05-10 17:22:00,resolved,2026-05-10 17:12:00
+IND-2026-0020,3,20,1,7,1,1,0,0,2.5,0.2,14,"14.297200, 121.014100",Diabetic emergency at residence,6.05,P3,Moderate,medium,2,2026-05-11 06:37:00,2026-05-11 06:37:00,resolved,2026-05-11 06:27:00
+IND-2026-0021,3,21,5,28,0,0,0,0,4.4,1.4,5,"14.284000, 121.003600",Entrapment in damaged vehicle after accident,8.46,P1,Critical,high,2,2026-05-11 19:32:00,2026-05-11 19:32:00,resolved,2026-05-11 19:22:00
+IND-2026-0022,3,22,7,40,0,0,0,0,6.1,1.04,5,"14.286800, 121.006000",Evacuation assistance needed due to rising floodwaters,5.43,P3,Moderate,medium,4,2026-05-12 08:45:00,2026-05-12 08:45:00,resolved,2026-05-12 08:35:00
+IND-2026-0023,3,23,2,17,0,0,0,0,2.1,1.03,1,"14.289600, 121.008300",Fracture from fall down staircase,6.93,P2,High,high,4,2026-05-12 21:55:00,2026-05-12 21:55:00,resolved,2026-05-12 21:45:00
+IND-2026-0024,3,24,6,33,0,0,0,0,3.3,0.56,5,"14.292400, 121.010600",Domestic violence incident reported by neighbor,6.93,P2,High,high,2,2026-05-13 10:47:00,2026-05-13 10:47:00,resolved,2026-05-13 10:37:00
+IND-2026-0025,3,25,3,24,0,0,0,0,1.7,0.65,7,"14.295200, 121.012900",Vehicle fire in parking area near market,5.2,P3,Moderate,medium,5,2026-05-13 23:32:00,2026-05-13 23:32:00,resolved,2026-05-13 23:22:00
+IND-2026-0026,3,26,1,1,1,1,0,0,2,0.19,18,"14.298000, 121.015200",Asthma attack at residence requiring urgent response,7.16,P2,High,high,2,2026-05-14 12:19:00,2026-05-14 12:19:00,resolved,2026-05-14 12:09:00
+IND-2026-0027,3,27,7,37,2,2,0,0,5.5,1.53,5,"14.283000, 121.002800",Typhoon response needed in heavily affected barangay,6.97,P2,High,high,2,2026-05-15 01:27:00,2026-05-15 01:27:00,resolved,2026-05-15 01:17:00
+IND-2026-0028,1,1,2,18,1,1,0,0,2.6,1.44,1,"14.285800, 121.005100",Stab wound victim found at basketball court,8.9,P1,Critical,high,4,2026-05-15 14:42:00,2026-05-15 14:42:00,resolved,2026-05-15 14:32:00
+IND-2026-0029,1,2,5,26,0,0,0,0,4.2,0.83,5,"14.288600, 121.007400",Drowning incident at barangay riverside,8.46,P1,Critical,high,4,2026-05-16 03:22:00,2026-05-16 03:22:00,resolved,2026-05-16 03:12:00
+IND-2026-0030,1,3,6,35,0,0,0,0,3,0.59,5,"14.291400, 121.009700",Shooting incident near vacant lot,8.46,P1,Critical,high,3,2026-05-16 16:28:00,2026-05-16 16:28:00,resolved,2026-05-16 16:18:00
+IND-2026-0031,1,4,3,20,0,0,0,0,2.3,0.64,7,"14.294200, 121.012000",Electrical fire at residential unit,6.93,P2,High,high,2,2026-05-17 04:42:00,2026-05-17 04:42:00,resolved,2026-05-17 04:32:00
+IND-2026-0032,1,5,1,6,1,1,0,0,1.9,0.17,14,"14.297000, 121.014300",Fever and infection case needing medical transport,3.57,P4,Low,low,3,2026-05-17 18:26:00,2026-05-17 18:26:00,resolved,2026-05-17 18:16:00
+IND-2026-0033,1,6,4,13,1,1,0,0,3.5,1.91,1,"14.282000, 121.002100",Truck accident blocking highway with injuries,8.68,P1,Critical,high,4,2026-05-18 06:39:00,2026-05-18 06:39:00,resolved,2026-05-18 06:29:00
+IND-2026-0034,1,7,5,29,0,0,0,0,4.6,1.29,5,"14.284800, 121.004400",Collapsed wall trapping residents inside structure,8.46,P1,Critical,high,3,2026-05-18 20:26:00,2026-05-18 20:26:00,resolved,2026-05-18 20:16:00
+IND-2026-0035,1,8,7,39,0,0,0,0,5.2,1.16,7,"14.287600, 121.006700",Earthquake response — structural damage check needed,8.92,P1,Critical,high,2,2026-05-19 08:52:00,2026-05-19 08:52:00,resolved,2026-05-19 08:42:00
+IND-2026-0036,1,9,2,14,1,1,0,0,2.4,0.97,1,"14.290400, 121.009000",Severe bleeding from workplace injury,8.9,P1,Critical,high,4,2026-05-19 21:54:00,2026-05-19 21:54:00,resolved,2026-05-19 21:44:00
+IND-2026-0037,1,10,3,22,0,0,0,0,2.2,0.67,7,"14.293200, 121.011300",Grass fire spreading near open lot,5.2,P3,Moderate,medium,4,2026-05-20 10:32:00,2026-05-20 10:32:00,resolved,2026-05-20 10:22:00
+IND-2026-0038,1,11,4,11,3,3,0,0,3.7,0.85,1,"14.296000, 121.013600",Car-to-car collision at busy intersection,7.16,P2,High,high,4,2026-05-20 23:41:00,2026-05-20 23:41:00,resolved,2026-05-20 23:31:00
+IND-2026-0039,1,12,4,13,1,1,0,0,3.5,2.03,1,"14.281000, 121.001400",Truck overturned on highway blocking lanes,8.68,P1,Critical,high,3,2026-05-21 12:58:00,2026-05-21 12:58:00,resolved,2026-05-21 12:48:00
+IND-2026-0040,2,13,1,2,1,1,0,0,2.7,0.29,25,"14.283800, 121.003700",Cardiac arrest — patient unresponsive at home,8.68,P1,Critical,high,4,2026-05-22 01:57:00,2026-05-22 01:57:00,resolved,2026-05-22 01:47:00
+IND-2026-0041,2,14,5,30,0,0,0,0,2.8,1.06,5,"14.286600, 121.006000",Missing person — elderly resident wandered away,5.2,P3,Moderate,medium,2,2026-05-22 14:48:00,2026-05-22 14:48:00,resolved,2026-05-22 14:38:00
+IND-2026-0042,2,15,3,25,0,0,0,0,2,0.96,7,"14.289400, 121.008300",LPG gas leak at residential compound,9.22,P1,Critical,high,3,2026-05-23 03:41:00,2026-05-23 03:41:00,resolved,2026-05-23 03:31:00
+IND-2026-0043,2,16,2,16,1,1,0,0,2.2,0.86,1,"14.292200, 121.010600",Fall from roof during repair work,7.16,P2,High,high,3,2026-05-23 16:14:00,2026-05-23 16:14:00,resolved,2026-05-23 16:04:00
+IND-2026-0044,2,17,7,36,0,0,0,0,5,0.63,5,"14.295000, 121.012900",Flood situation worsening in low-lying areas,6.51,P2,High,high,5,2026-05-24 05:25:00,2026-05-24 05:25:00,resolved,2026-05-24 05:15:00
+IND-2026-0045,2,18,1,3,1,1,0,0,1.8,0.3,25,"14.280200, 121.000700",Hypertension emergency at elderly residents home,8.68,P1,Critical,high,4,2026-05-24 18:38:00,2026-05-24 18:38:00,resolved,2026-05-24 18:28:00
+IND-2026-0046,2,19,4,11,2,2,0,0,3.4,1.78,1,"14.283000, 121.003000",Multi-vehicle collision at busy intersection,7.16,P2,High,high,3,2026-05-25 07:38:00,2026-05-25 07:38:00,resolved,2026-05-25 07:28:00
+IND-2026-0047,2,20,5,27,0,0,0,0,4,1.16,5,"14.285800, 121.005300",Person trapped under collapsed fence post,8.46,P1,Critical,high,4,2026-05-25 20:45:00,2026-05-25 20:45:00,resolved,2026-05-25 20:35:00
+IND-2026-0048,2,21,6,32,0,0,0,0,2.6,0.84,5,"14.288600, 121.007600",Physical altercation with injuries near park,6.93,P2,High,high,2,2026-05-26 09:03:00,2026-05-26 09:03:00,resolved,2026-05-26 08:53:00
+IND-2026-0049,2,22,3,21,0,0,0,0,1.6,0.78,7,"14.291400, 121.009900",House fire reported near residential compound,8.92,P1,Critical,high,2,2026-05-26 22:37:00,2026-05-26 22:37:00,resolved,2026-05-26 22:27:00
+IND-2026-0050,2,23,2,19,1,1,0,0,2.6,0.59,5,"14.294200, 121.012200",Gunshot wound victim requiring urgent care,9.1,P1,Critical,high,4,2026-05-27 11:08:00,2026-05-27 11:08:00,resolved,2026-05-27 10:58:00
