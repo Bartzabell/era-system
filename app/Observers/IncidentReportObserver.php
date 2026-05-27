@@ -43,7 +43,7 @@ class IncidentReportObserver
             'announcement_title'   => $title,
             'announcement_message' => $message,
             'for_citizens'         => false,
-            'for_responders'       => true,
+            'for_responders'       => false,
             'for_administrators'   => true,
             'created_by'           => $incidentReport->user_id ?? null,
             'updated_by'           => $incidentReport->user_id ?? null,
