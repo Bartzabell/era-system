@@ -152,6 +152,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post  ('/system-settings/incident',            [SettingsController::class, 'storeIncident'])   ->name('system-settings.incident.store');
         Route::put   ('/system-settings/incident/{incident}', [SettingsController::class, 'updateIncident']) ->name('system-settings.incident.update');
         Route::delete('/system-settings/incident/{incident}', [SettingsController::class, 'destroyIncident'])->name('system-settings.incident.destroy');
+
+        Route::post  ('/system-settings/barangay',            [SettingsController::class, 'storeBarangay'])   ->name('system-settings.barangay.store');
+        Route::put   ('/system-settings/barangay/{barangay}', [SettingsController::class, 'updateBarangay']) ->name('system-settings.barangay.update');
+        Route::delete('/system-settings/barangay/{barangay}', [SettingsController::class, 'destroyBarangay'])->name('system-settings.barangay.destroy');
     });
 });
 

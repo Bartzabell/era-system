@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barangay;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Hotline;
@@ -18,6 +19,7 @@ class SettingsController extends Controller
             'hotlines'   => Hotline::orderBy('hotline_name')->get(),
             'emergencies' => Emergency::with('incidents')->orderBy('emergency_name')->get(),
             'incidents'  => Incident::with('emergency')->orderBy('incident_name')->get(),
+            'barangays'   => Barangay::orderBy('barangay_name')->get(),
         ];
     }
 
@@ -180,4 +182,50 @@ class SettingsController extends Controller
 
         return redirect()->route('system-settings.index')->with('success', 'Incident deleted successfully.');
     }
+
+    public function storeBarangay(Request $request)
+    {
+        $request->validate([
+            'barangay_name' => 'required|string|max:255',
+            'landmark'      => 'nullable|string|max:255',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            Barangay::create([
+                ...$request->only('barangay_name', 'landmark'),
+                'created_by' => Auth::id(),
+                'updated_by' => Auth::id(),
+            ]);
+        });
+
+        return redirect()->route('system-settings.index')->with('success', 'Barangay created successfully.');
+    }
+
+    public function updateBarangay(Request $request, Barangay $barangay)
+    {
+        $request->validate([
+            'barangay_name' => 'required|string|max:255',
+            'landmark'      => 'nullable|string|max:255',
+        ]);
+
+        DB::transaction(function () use ($request, $barangay) {
+            $barangay->update([
+                ...$request->only('barangay_name', 'landmark'),
+                'updated_by' => Auth::id(),
+            ]);
+        });
+
+        return redirect()->route('system-settings.index')->with('success', 'Barangay updated successfully.');
+    }
+
+    public function destroyBarangay(Barangay $barangay)
+    {
+        DB::transaction(function () use ($barangay) {
+            $barangay->update(['deleted_by' => Auth::id()]);
+            $barangay->delete();
+        });
+
+        return redirect()->route('system-settings.index')->with('success', 'Barangay deleted successfully.');
+    }
+
 }

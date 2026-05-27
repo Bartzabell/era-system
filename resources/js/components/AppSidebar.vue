@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { Megaphone, FileCheckCorner, ChartColumnStacked, Users, CalendarRange, Squircle } from 'lucide-vue-next';
-import { PhAmbulance } from '@phosphor-icons/vue'
+import { PhAmbulance, PhGear } from '@phosphor-icons/vue'
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -97,6 +97,12 @@ const navGroups: NavGroup[] = [
                 title: 'Users',
                 href: '/users',
                 icon: Users,
+                admin: true,
+            },
+            {
+                title: 'Other Settings',
+                href: '/system-settings',
+                icon: PhGear,
                 admin: true,
             },
             {

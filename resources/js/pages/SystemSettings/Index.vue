@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import DataTable from '@/components/Datatable.vue'
 import Modal from '@/components/Modal.vue'
 import { Button } from '@/components/ui/button'
-import { PhPencil, PhTrash, PhPlus, PhPhone, PhWarning, PhFirstAid } from '@phosphor-icons/vue'
+import { PhPencil, PhTrash, PhPlus, PhPhone, PhWarning, PhFirstAid, PhMapPin } from '@phosphor-icons/vue'  // Add PhMapPin
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Hotline {
@@ -34,11 +34,19 @@ interface Incident {
     emergency: { emergency_name: string } | null
 }
 
+// Add Barangay interface
+interface Barangay {
+    id: number
+    barangay_name: string
+    landmark: string | null
+}
+
 // ── Props ──────────────────────────────────────────────────────────────────
 const props = defineProps<{
     hotlines: Hotline[]
     emergencies: Emergency[]
     incidents: Incident[]
+    barangays: Barangay[]  // Add this
 }>()
 
 // DataTable expects a Laravel paginator shape: { data, links, from, to, total, per_page, current_page }
@@ -59,6 +67,7 @@ const wrapArray = (arr: any[]) => {
 const hotlines    = computed(() => wrapArray(props.hotlines))
 const emergencies = computed(() => wrapArray(props.emergencies))
 const incidents   = computed(() => wrapArray(props.incidents))
+const barangays   = computed(() => wrapArray(props.barangays))  // Add this
 
 // ── Breadcrumbs ────────────────────────────────────────────────────────────
 const breadcrumbs = [
@@ -67,19 +76,21 @@ const breadcrumbs = [
 ]
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
-type TabKey = 'hotline' | 'emergency' | 'incident'
+type TabKey = 'hotline' | 'emergency' | 'incident' | 'barangay'  // Add 'barangay'
 const activeTab = ref<TabKey>('hotline')
 
 const tabs: { key: TabKey; label: string; icon: any }[] = [
     { key: 'hotline',   label: 'Hotline',   icon: PhPhone    },
     { key: 'emergency', label: 'Emergency', icon: PhWarning  },
     { key: 'incident',  label: 'Incident',  icon: PhFirstAid },
+    { key: 'barangay',  label: 'Barangay',  icon: PhMapPin   },  // Add this
 ]
 
 const tabColors: Record<TabKey, { dot: string; border: string; bg: string }> = {
     hotline:   { dot: '#3b82f6', border: '#3b82f6', bg: '#dbeafe' },
     emergency: { dot: '#f97316', border: '#f97316', bg: '#ffedd5' },
     incident:  { dot: '#10b981', border: '#10b981', bg: '#d1fae5' },
+    barangay:  { dot: '#8b5cf6', border: '#8b5cf6', bg: '#ede9fe' },  // Add this (purple)
 }
 
 const activeColor = computed(() => tabColors[activeTab.value].border)
@@ -91,7 +102,7 @@ type FormMode = 'create' | 'edit'
 const isFormVisible   = ref(false)
 const showDeleteModal = ref(false)
 const formMode        = ref<FormMode>('create')
-const currentRecord   = ref<Hotline | Emergency | Incident | null>(null)
+const currentRecord   = ref<Hotline | Emergency | Incident | Barangay | null>(null)  // Add Barangay type
 
 const closeFormModal  = () => { isFormVisible.value = false; currentRecord.value = null }
 const openDeleteModal = (r: any) => { currentRecord.value = r; showDeleteModal.value = true }
@@ -102,7 +113,9 @@ const deleteRecord = () => {
         ? `/system-settings/hotline/${id}`
         : activeTab.value === 'emergency'
             ? `/system-settings/emergency/${id}`
-            : `/system-settings/incident/${id}`
+            : activeTab.value === 'incident'
+                ? `/system-settings/incident/${id}`
+                : `/system-settings/barangay/${id}`  // Add this
 
     router.delete(url, { onSuccess: () => { showDeleteModal.value = false } })
 }
@@ -119,10 +132,14 @@ const initForm = (record: any = null) => {
         form.value = record
             ? { emergency_name: record.emergency_name, definition: record.definition ?? '', severity_level: record.severity_level ?? '' }
             : { emergency_name: '', definition: '', severity_level: '' }
-    } else {
+    } else if (activeTab.value === 'incident') {
         form.value = record
             ? { incident_name: record.incident_name, definition: record.definition ?? '', base_severity: record.base_severity ?? '', base_time: record.base_time ?? '', base_resources: record.base_resources ?? '', base_secondary: record.base_secondary ?? '', emergency_id: record.emergency_id }
             : { incident_name: '', definition: '', base_severity: '', base_time: '', base_resources: '', base_secondary: '', emergency_id: '' }
+    } else {  // Add barangay form
+        form.value = record
+            ? { barangay_name: record.barangay_name, landmark: record.landmark ?? '' }
+            : { barangay_name: '', landmark: '' }
     }
 }
 
@@ -144,13 +161,15 @@ const submitForm = () => {
     if (formMode.value === 'create') {
         const url = activeTab.value === 'hotline'   ? '/system-settings/hotline'
                   : activeTab.value === 'emergency' ? '/system-settings/emergency'
-                  :                                   '/system-settings/incident'
+                  : activeTab.value === 'incident'  ? '/system-settings/incident'
+                  :                                   '/system-settings/barangay'  // Add this
         router.post(url, form.value, { onSuccess: closeFormModal })
     } else {
         const id  = currentRecord.value!.id
         const url = activeTab.value === 'hotline'   ? `/system-settings/hotline/${id}`
                   : activeTab.value === 'emergency' ? `/system-settings/emergency/${id}`
-                  :                                   `/system-settings/incident/${id}`
+                  : activeTab.value === 'incident'  ? `/system-settings/incident/${id}`
+                  :                                   `/system-settings/barangay/${id}`  // Add this
         router.put(url, form.value, { onSuccess: closeFormModal })
     }
 }
@@ -194,16 +213,25 @@ const incidentColumns = [
     { id: 'actions', header: '', cell: ({ row }: any) => makeActionCol(row) },
 ]
 
+// Add barangay columns
+const barangayColumns = [
+    { accessorKey: 'barangay_name', header: 'Barangay Name' },
+    { accessorKey: 'landmark',      header: 'Landmark', cell: ({ row }: any) => row.original.landmark ?? '—' },
+    { id: 'actions', header: '', cell: ({ row }: any) => makeActionCol(row) },
+]
+
 const activeColumns = computed(() =>
     activeTab.value === 'hotline'   ? hotlineColumns
   : activeTab.value === 'emergency' ? emergencyColumns
-  : incidentColumns
+  : activeTab.value === 'incident'  ? incidentColumns
+  : barangayColumns  // Add this
 )
 
 const activeData = computed<any[]>(() =>
     activeTab.value === 'hotline'   ? hotlines.value
   : activeTab.value === 'emergency' ? emergencies.value
-  : incidents.value
+  : activeTab.value === 'incident'  ? incidents.value
+  : barangays.value  // Add this
 )
 
 const modalTitle = computed(() => {
@@ -259,7 +287,7 @@ const modalTitle = computed(() => {
                 </template>
 
                 <!-- Incident Form -->
-                <template v-else>
+                <template v-else-if="activeTab === 'incident'">
                     <div class="space-y-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Incident Name <span class="text-red-500">*</span></label>
@@ -293,6 +321,20 @@ const modalTitle = computed(() => {
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Definition</label>
                             <textarea v-model="form.definition" rows="3" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Barangay Form -->  <!-- Add this -->
+                <template v-else>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Barangay Name <span class="text-red-500">*</span></label>
+                            <input v-model="form.barangay_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Landmark</label>
+                            <input v-model="form.landmark" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                         </div>
                     </div>
                 </template>
@@ -351,7 +393,7 @@ const modalTitle = computed(() => {
                         <component :is="tab.icon" :size="14" />
                         {{ tab.label }}
                         <span class="text-[11px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-400 rounded-full px-1.5 py-px min-w-[18px] text-center leading-4">
-                            {{ tab.key === 'hotline' ? hotlines.total : tab.key === 'emergency' ? emergencies.total : incidents.total }}
+                            {{ tab.key === 'hotline' ? hotlines.total : tab.key === 'emergency' ? emergencies.total : tab.key === 'incident' ? incidents.total : barangays.total }}
                         </span>
                     </button>
                 </div>
