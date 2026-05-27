@@ -130,7 +130,7 @@ class AnnouncementAlertController extends Controller
             // Responders see: manual alerts addressed to them + auto incident alerts
             $query->where('for_responders', true);
 
-        } elseif ($role === 'administrator') {
+        } elseif ($role === 'administrator' || $role === 'assistant admin') {
             // Administrators see: alerts addressed to them + alerts addressed to responders
             $query->where(function ($q) {
                 $q->where('for_administrators', true)
