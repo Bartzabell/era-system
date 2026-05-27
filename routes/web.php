@@ -21,7 +21,7 @@ use App\Http\Controllers\LoginSettingController;
 use App\Http\Controllers\SettingsController;
 
 Route::get('/', [LoginController::class, 'create'])->name('home');
-Route::get('/login', [LoginController::class, 'create'])->name('login');
+//Route::get('/login', [LoginController::class, 'create'])->name('login');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
