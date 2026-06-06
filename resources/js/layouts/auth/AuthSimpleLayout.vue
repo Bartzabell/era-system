@@ -18,8 +18,8 @@ defineProps<{
             <div class="flex flex-col gap-8">
                 <div class="flex flex-col items-center gap-4">
                     <div class="flex items-center gap-2 font-medium">
-                        <div class="rounded-md bg-red-500">
-                            <PhFirstAid :size="30" weight="fill" class="text-red-500 bg-white rounded-full m-1"/>
+                        <div >
+                            <img src="/storage/img/logo.png" class=" rounded-full w-[50px] h-[50px] object-contain" />
                         </div>
                         <span class="text-xl font-bold leading-none">
                             GEARS<br/>

@@ -208,8 +208,8 @@ const heroTitleLines = props.heroTitle.split('\n');
 
         <!-- Hero Panel -->
         <div class="flex flex-1 flex-col items-center justify-center text-center gap-4">
-            <div class="rounded-md bg-red-500">
-                <PhFirstAid :size="52" weight="fill" class="text-red-500 bg-white rounded-full m-3" />
+            <div >
+                <img src="/storage/img/logo.png" class=" rounded-full w-[100px] h-[100px] object-contain" />
             </div>
 
             <h1 class="text-5xl text-white font-black">
