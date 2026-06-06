@@ -27,6 +27,9 @@
     </style>
 </head>
 <body>
+    <div style="text-align:center;">
+        <img src="{{ public_path('storage/img/gma-logo.png') }}" style="width:90px; height:70px;" />
+    </div>
     <h1>MUNICIPALITY OF GEN. MARIANO ALVAREZ</h1>
     <h3>TANGGAPAN NG PAMBAYANG PAMAMAHALA SA PAGTUGON SA SAKUNA AT BANTA NG PANGANIB</h3>
     <h4>OFFICE OF THE MUNICIPAL DISASTER RISK REDUCTION AND MANAGEMENT</h4>
