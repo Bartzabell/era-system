@@ -37,7 +37,7 @@ const allChecked = computed(() => privacyChecked.value && termsChecked.value);
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Terms and Conditions</h2>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Terms and Conditions</h2>
             </div>
             <button
                 @click="emit('close')"
@@ -50,10 +50,10 @@ const allChecked = computed(() => privacyChecked.value && termsChecked.value);
         </div>
 
         <!-- Scrollable Body -->
-        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5 text-base text-gray-700 dark:text-gray-300 leading-relaxed">
 
             <!-- Privacy Policy -->
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Privacy Policy</h2>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Privacy Policy</h2>
 
             <!-- eslint-disable-next-line vue/no-v-html -->
             <p v-html="privacyIntro"></p>
@@ -72,12 +72,12 @@ const allChecked = computed(() => privacyChecked.value && termsChecked.value);
                         class="mt-0.5 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 dark:focus:ring-orange-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                     />
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    <span class="text-sm text-gray-700 dark:text-gray-300" v-html="privacyCheckboxLabel"></span>
+                    <span class="text-base text-gray-700 dark:text-gray-300" v-html="privacyCheckboxLabel"></span>
                 </label>
             </div>
 
             <!-- Terms of Use -->
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white pt-2">Terms of Use</h2>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white pt-2">Terms of Use</h2>
 
             <!-- eslint-disable-next-line vue/no-v-html -->
             <p v-html="termsIntro"></p>
@@ -96,7 +96,7 @@ const allChecked = computed(() => privacyChecked.value && termsChecked.value);
                         class="mt-0.5 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 dark:focus:ring-orange-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                     />
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    <span class="text-sm text-gray-700 dark:text-gray-300" v-html="termsCheckboxLabel"></span>
+                    <span class="text-base text-gray-700 dark:text-gray-300" v-html="termsCheckboxLabel"></span>
                 </label>
             </div>
 
@@ -108,7 +108,7 @@ const allChecked = computed(() => privacyChecked.value && termsChecked.value);
                 @click="emit('accept')"
                 :disabled="!allChecked"
                 :class="[
-                    'px-5 py-2 rounded-full text-sm font-medium transition-colors',
+                    'px-5 py-2 rounded-full text-base font-medium transition-colors',
                     allChecked
                         ? 'bg-orange-600 hover:bg-orange-700 text-white cursor-pointer'
                         : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'

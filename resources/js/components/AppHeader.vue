@@ -108,7 +108,7 @@ const rightNavItems: NavItem[] = [
                                         v-for="item in mainNavItems"
                                         :key="item.title"
                                         :href="item.href"
-                                        class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
+                                        class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-base font-medium hover:bg-accent"
                                         :class="
                                             whenCurrentUrl(
                                                 item.href,
@@ -131,7 +131,7 @@ const rightNavItems: NavItem[] = [
                                         :href="toUrl(item.href)"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="flex items-center space-x-2 text-sm font-medium"
+                                        class="flex items-center space-x-2 text-base font-medium"
                                     >
                                         <component
                                             v-if="item.icon"

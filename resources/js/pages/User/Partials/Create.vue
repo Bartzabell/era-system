@@ -62,7 +62,7 @@ const closeModal = () => {
     <Modal :show="show" max-width="2xl" @close="closeModal">
         <div class="p-6">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Create New User</h2>
+                <h2 class="text-2xl font-bold text-gray-900">Create New User</h2>
                 <button @click="closeModal" class="text-gray-400 hover:text-gray-500">
                     <PhXCircle :size="32" color="#f08000" weight="fill" />
                 </button>
@@ -82,29 +82,29 @@ const closeModal = () => {
                     <TextInput v-model="form.birth_date" type="date" label="Birth Date" :error="form.errors.birth_date" />
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Barangay</label>
+                        <label class="block text-base font-medium text-gray-700 mb-1">Barangay</label>
                         <Boombox
                             :items="barangays"
                             label-field="barangay_name"
                             placeholder="Select Barangay"
                             @change="handleBarangayChange"
                         />
-                        <p v-if="form.errors.barangay_id" class="mt-1 text-sm text-red-600">{{ form.errors.barangay_id }}</p>
+                        <p v-if="form.errors.barangay_id" class="mt-1 text-base text-red-600">{{ form.errors.barangay_id }}</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Role <span class="text-red-500">*</span></label>
+                        <label class="block text-base font-medium text-gray-700 mb-1">Role <span class="text-red-500">*</span></label>
                         <Boombox
                             :items="roles"
                             label-field="role_name"
                             placeholder="Select Role"
                             @change="handleRoleChange"
                         />
-                        <p v-if="form.errors.role" class="mt-1 text-sm text-red-600">{{ form.errors.role }}</p>
+                        <p v-if="form.errors.role" class="mt-1 text-base text-red-600">{{ form.errors.role }}</p>
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Permissions</label>
+                        <label class="block text-base font-medium text-gray-700 mb-3">Permissions</label>
                         <div class="bg-gray-50 rounded-lg p-4 space-y-3 max-h-64 overflow-y-auto">
                             <Toggle
                                 v-for="permission in permissions"
@@ -115,7 +115,7 @@ const closeModal = () => {
                                 :description="permission.description"
                             />
                         </div>
-                        <p v-if="form.errors.permissions" class="mt-1 text-sm text-red-600">{{ form.errors.permissions }}</p>
+                        <p v-if="form.errors.permissions" class="mt-1 text-base text-red-600">{{ form.errors.permissions }}</p>
                     </div>
 
                     <div class="md:col-span-2">
@@ -131,14 +131,14 @@ const closeModal = () => {
                     <button
                         type="button"
                         @click="closeModal"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                        class="px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                         :disabled="form.processing"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 disabled:opacity-50"
+                        class="px-4 py-2 text-base font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 disabled:opacity-50"
                         :disabled="form.processing"
                     >
                         {{ form.processing ? 'Creating...' : 'Create User' }}

@@ -65,7 +65,7 @@ const closeModal = () => {
     <div class="w-full lg:w-[80vw] xl:w-[60vw]">
         <!-- Header -->
         <div class="flex items-center justify-between w-full px-8 py-1 bg-form-header border-b border-black dark:border-gray-500 dark:bg-gray-800">
-            <h1 class="text-base lg:text-2xl font-extrabold dark:text-gray-200">
+            <h1 class="text-lg lg:text-3xl font-extrabold dark:text-gray-200">
                 {{ mode === 'create' ? 'Add New User' : 'Edit User' }}
             </h1>
             <button @click="closeModal" class="p-3 text-white rounded-full bg-red-500 hover:bg-red-600">
@@ -80,10 +80,10 @@ const closeModal = () => {
             <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
                 <div>
                     <CustomInput name="Username" v-model="form.username" />
-                    <p v-if="form.errors.username" class="text-xs text-red-500 mt-1">{{ form.errors.username }}</p>
+                    <p v-if="form.errors.username" class="text-sm text-red-500 mt-1">{{ form.errors.username }}</p>
                 </div>
                 <div>
-                    <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">
+                    <label class="block m-1 text-base text-gray-600 dark:text-gray-200">
                         Role <span class="text-red-500">*</span>
                     </label>
                     <Boombox
@@ -93,7 +93,7 @@ const closeModal = () => {
                         placeholder="Select role"
                         @change="(v: any) => form.role = v?.id ?? ''"
                     />
-                    <p v-if="form.errors.role" class="text-xs text-red-500 mt-1">{{ form.errors.role }}</p>
+                    <p v-if="form.errors.role" class="text-sm text-red-500 mt-1">{{ form.errors.role }}</p>
                 </div>
                 <div>
                     <CustomInput
@@ -102,7 +102,7 @@ const closeModal = () => {
                         v-model="form.password"
                         :placeholder="mode === 'edit' ? 'Leave blank to keep current' : ''"
                     />
-                    <p v-if="form.errors.password" class="text-xs text-red-500 mt-1">{{ form.errors.password }}</p>
+                    <p v-if="form.errors.password" class="text-sm text-red-500 mt-1">{{ form.errors.password }}</p>
                 </div>
                 <div>
                     <CustomInput name="Confirm Password" type="password" v-model="form.password_confirmation" />
@@ -114,18 +114,18 @@ const closeModal = () => {
             <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
                 <div>
                     <CustomInput name="First Name" v-model="form.first_name" />
-                    <p v-if="form.errors.first_name" class="text-xs text-red-500 mt-1">{{ form.errors.first_name }}</p>
+                    <p v-if="form.errors.first_name" class="text-sm text-red-500 mt-1">{{ form.errors.first_name }}</p>
                 </div>
                 <div>
                     <CustomInput name="Middle Name" v-model="form.middle_name" />
                 </div>
                 <div>
                     <CustomInput name="Last Name" v-model="form.last_name" />
-                    <p v-if="form.errors.last_name" class="text-xs text-red-500 mt-1">{{ form.errors.last_name }}</p>
+                    <p v-if="form.errors.last_name" class="text-sm text-red-500 mt-1">{{ form.errors.last_name }}</p>
                 </div>
                 <div>
                     <CustomInput name="Email" type="email" v-model="form.email" />
-                    <p v-if="form.errors.email" class="text-xs text-red-500 mt-1">{{ form.errors.email }}</p>
+                    <p v-if="form.errors.email" class="text-sm text-red-500 mt-1">{{ form.errors.email }}</p>
                 </div>
                 <div>
                     <CustomInput name="Mobile No." v-model="form.mobile_no" />
@@ -134,7 +134,7 @@ const closeModal = () => {
                     <CustomInput name="Birth Date" type="date" v-model="form.birth_date" />
                 </div>
                 <div class="lg:col-span-2">
-                    <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Barangay</label>
+                    <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Barangay</label>
                     <Boombox
                         :items="barangays"
                         :existing-value="form.barangay_id"
@@ -160,10 +160,10 @@ const closeModal = () => {
                             @change="togglePermission(perm.id)"
                             class="w-4 h-4 accent-orange-500"
                         />
-                        <span class="text-sm text-gray-700 dark:text-gray-200">{{ perm.name }}</span>
+                        <span class="text-base text-gray-700 dark:text-gray-200">{{ perm.name }}</span>
                     </label>
                 </div>
-                <p v-if="form.errors.permissions" class="text-xs text-red-500 mt-1">{{ form.errors.permissions }}</p>
+                <p v-if="form.errors.permissions" class="text-sm text-red-500 mt-1">{{ form.errors.permissions }}</p>
             </div>
 
             <!-- Responder Toggle -->
@@ -175,8 +175,8 @@ const closeModal = () => {
                         class="w-4 h-4 accent-orange-500"
                     />
                     <div>
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Mark as Responder</span>
-                        <p class="text-xs text-gray-400">Creates a responder record for this user</p>
+                        <span class="text-base font-medium text-gray-700 dark:text-gray-200">Mark as Responder</span>
+                        <p class="text-sm text-gray-400">Creates a responder record for this user</p>
                     </div>
                 </label>
             </div>
@@ -199,8 +199,8 @@ const closeModal = () => {
                         />
                     </button>
                     <div>
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Admin Verified</span>
-                        <p class="text-xs text-gray-400">
+                        <span class="text-base font-medium text-gray-700 dark:text-gray-200">Admin Verified</span>
+                        <p class="text-sm text-gray-400">
                             {{ form.admin_verified === 'yes' ? 'Account is verified' : 'Pending verification' }}
                         </p>
                     </div>

@@ -35,7 +35,7 @@ defineProps<{
             <div class="flex flex-col gap-6">
                 <Card class="rounded-xl">
                     <CardHeader class="px-10 pt-8 pb-0 text-center">
-                        <CardTitle class="text-xl">{{ title }}</CardTitle>
+                        <CardTitle class="text-2xl">{{ title }}</CardTitle>
                         <CardDescription>
                             {{ description }}
                         </CardDescription>

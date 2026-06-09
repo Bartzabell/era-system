@@ -374,7 +374,7 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
     <div class="w-full lg:w-[80vw] xl:w-[90vw]">
         <!-- Header -->
         <div class="flex items-center justify-between w-full px-8 py-1 bg-form-header border-b border-black dark:border-gray-500 dark:bg-gray-800">
-            <h1 class="text-base lg:text-2xl font-extrabold dark:text-gray-200">
+            <h1 class="text-lg lg:text-3xl font-extrabold dark:text-gray-200">
                 {{ isEdit ? `Edit Incident Report : ${record?.incident_code ?? ''}` : 'Create Incident Report' }}
             </h1>
             <button @click="closeModal" class="p-3 text-white rounded-full bg-red-500 hover:bg-red-600">
@@ -390,58 +390,58 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                 <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
 
                     <div v-if="hasFullAccess" class="lg:col-span-2">
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Reporter <span class="text-red-500">*</span></label>
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Reporter <span class="text-red-500">*</span></label>
                         <Boombox :items="users" :existing-value="form.user_id" label-field="full_name"
                             placeholder="Select reporter" @change="(v: any) => form.user_id = v?.id ?? null" />
-                        <p v-if="form.errors.user_id" class="text-xs text-red-500 mt-1">{{ form.errors.user_id }}</p>
+                        <p v-if="form.errors.user_id" class="text-sm text-red-500 mt-1">{{ form.errors.user_id }}</p>
                     </div>
 
                     <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Barangay <span class="text-red-500">*</span></label>
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Barangay <span class="text-red-500">*</span></label>
                         <Boombox :items="barangays" :existing-value="form.barangay_id" label-field="barangay_name"
                             placeholder="Select barangay" @change="(v: any) => form.barangay_id = v?.id ?? null" />
-                        <p v-if="form.errors.barangay_id" class="text-xs text-red-500 mt-1">{{ form.errors.barangay_id }}</p>
+                        <p v-if="form.errors.barangay_id" class="text-sm text-red-500 mt-1">{{ form.errors.barangay_id }}</p>
                     </div>
 
                     <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Emergency Type <span class="text-red-500">*</span></label>
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Emergency Type <span class="text-red-500">*</span></label>
                         <Boombox :items="emergencies" :existing-value="form.emergency_id" label-field="emergency_name"
                             placeholder="Select emergency type" @change="(v: any) => form.emergency_id = v?.id ?? null" />
-                        <p v-if="form.errors.emergency_id" class="text-xs text-red-500 mt-1">{{ form.errors.emergency_id }}</p>
+                        <p v-if="form.errors.emergency_id" class="text-sm text-red-500 mt-1">{{ form.errors.emergency_id }}</p>
                     </div>
 
                     <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">
                             Incident Type <span class="text-red-500">*</span>
-                            <span v-if="!form.emergency_id" class="text-gray-400 font-normal text-xs"> — select emergency first</span>
+                            <span v-if="!form.emergency_id" class="text-gray-400 font-normal text-sm"> — select emergency first</span>
                         </label>
                         <Boombox :items="filteredIncidents" :existing-value="form.incident_id" label-field="incident_name"
                             placeholder="Select incident type" @change="(v: any) => form.incident_id = v?.id ?? null" />
-                        <p v-if="form.errors.incident_id" class="text-xs text-red-500 mt-1">{{ form.errors.incident_id }}</p>
+                        <p v-if="form.errors.incident_id" class="text-sm text-red-500 mt-1">{{ form.errors.incident_id }}</p>
                     </div>
 
                     <div class="lg:col-span-2">
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Map Coordinates <span class="text-red-500">*</span></label>
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Map Coordinates <span class="text-red-500">*</span></label>
                         <div class="flex gap-2">
                             <CustomInput name="" v-model="form.map_coordinates" class="flex-1" readonly />
                             <button type="button" @click="openMapPicker"
-                                class="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-900 flex items-center gap-2 whitespace-nowrap">
+                                class="px-4 py-2 text-base font-medium text-white bg-gray-700 rounded-md hover:bg-gray-900 flex items-center gap-2 whitespace-nowrap">
                                 <PhMapPin :size="18" /> Pick on Map
                             </button>
                         </div>
-                        <p v-if="form.errors.map_coordinates" class="text-xs text-red-500 mt-1">{{ form.errors.map_coordinates }}</p>
-                        <p v-else-if="form.map_coordinates" class="mt-1 text-xs text-orange-600 flex items-center gap-1">
+                        <p v-if="form.errors.map_coordinates" class="text-sm text-red-500 mt-1">{{ form.errors.map_coordinates }}</p>
+                        <p v-else-if="form.map_coordinates" class="mt-1 text-sm text-orange-600 flex items-center gap-1">
                             <PhCheckCircle :size="14" /> Location selected
                         </p>
                     </div>
 
                     <div v-if="priorityDisplay" class="lg:col-span-2">
-                        <p class="block m-1 text-sm text-gray-600 dark:text-gray-200">Computed Priority</p>
+                        <p class="block m-1 text-base text-gray-600 dark:text-gray-200">Computed Priority</p>
                         <div class="flex items-center gap-3 p-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 dark:bg-gray-700/40">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border" :class="priorityBadgeClass">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-base font-semibold border" :class="priorityBadgeClass">
                                 {{ priorityDisplay.level }} — {{ priorityDisplay.label }}
                             </span>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                            <span class="text-base text-gray-500 dark:text-gray-400">
                                 Score: <strong class="text-gray-700 dark:text-gray-200">{{ priorityDisplay.score }}</strong> / 10
                             </span>
                         </div>
@@ -462,36 +462,36 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                             ? `${miniMapRoadDistance} km`
                             : record?.distance != null ? `${record.distance} km` : null,
                     }" :key="key">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">{{ key }}</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ val ?? '' }}</p>
+                        <p class="text-sm font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">{{ key }}</p>
+                        <p class="text-base font-medium text-gray-800 dark:text-gray-100">{{ val ?? '' }}</p>
                     </div>
 
                     <div class="lg:col-span-2">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Priority</p>
+                        <p class="text-sm font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Priority</p>
                         <div v-if="record?.priority_level" class="flex items-center gap-3">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border" :class="{
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-base font-semibold border" :class="{
                                 'bg-red-100 text-red-700 border-red-300':          record.priority_level === 'P1',
                                 'bg-orange-100 text-orange-700 border-orange-300': record.priority_level === 'P2',
                                 'bg-yellow-100 text-yellow-700 border-yellow-300': record.priority_level === 'P3',
                                 'bg-blue-100 text-blue-700 border-blue-300':       record.priority_level === 'P4',
                                 'bg-gray-100 text-gray-600 border-gray-300':       record.priority_level === 'P5',
                             }">{{ record.priority_level }} — {{ record.priority_label }}</span>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                            <span class="text-base text-gray-500 dark:text-gray-400">
                                 Score: <strong class="text-gray-700 dark:text-gray-200">{{ record.priority_score }}</strong> / 10
                             </span>
                         </div>
-                        <p v-else class="text-sm text-gray-400">—</p>
+                        <p v-else class="text-base text-gray-400">—</p>
                     </div>
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Date Reported</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-100">
+                        <p class="text-sm font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Date Reported</p>
+                        <p class="text-base font-medium text-gray-800 dark:text-gray-100">
                             {{ record?.created_at ? new Date(record.created_at).toLocaleString() : '' }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Current Status</p>
-                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold capitalize" :class="{
+                        <p class="text-sm font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Current Status</p>
+                        <span class="inline-block px-2 py-0.5 rounded-full text-sm font-semibold capitalize" :class="{
                             'bg-yellow-100 text-yellow-700': record?.status === 'waiting',
                             'bg-orange-100 text-orange-700': record?.status === 'assigned',
                             'bg-purple-100 text-purple-700': record?.status === 'arriving',
@@ -501,10 +501,10 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                     </div>
 
                     <div class="lg:col-span-3">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-1">Location</p>
+                        <p class="text-sm font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-1">Location</p>
                         <div class="flex items-start gap-2 mb-2">
                             <PhMapPin :size="16" class="text-orange-500 mt-0.5 shrink-0" />
-                            <p class="text-sm font-medium text-gray-800 dark:text-gray-100">
+                            <p class="text-base font-medium text-gray-800 dark:text-gray-100">
                                 <span v-if="isMiniGeocoding" class="text-gray-400 italic">Resolving location...</span>
                                 <span v-else>{{ miniMapAddress || '' }}</span>
                             </p>
@@ -513,18 +513,18 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                             <div ref="miniMapContainer" class="w-full rounded-lg border border-orange-200 overflow-hidden" style="height: 200px;" />
                             <div v-if="isMiniRouting"
                                 class="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-gray-800/60 rounded-lg z-[999]">
-                                <span class="text-xs text-gray-500 italic">Loading road route...</span>
+                                <span class="text-sm text-gray-500 italic">Loading road route...</span>
                             </div>
                         </div>
                     </div>
 
                     <div v-if="record?.remarks" class="lg:col-span-2">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Remarks</p>
-                        <p class="text-sm text-gray-800 dark:text-gray-100">{{ record.remarks }}</p>
+                        <p class="text-sm font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Remarks</p>
+                        <p class="text-base text-gray-800 dark:text-gray-100">{{ record.remarks }}</p>
                     </div>
                     <div v-if="record?.attachment">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Attachment</p>
-                        <a :href="`/storage/${record.attachment}`" target="_blank" class="text-sm text-orange-600 hover:underline">View Attachment</a>
+                        <p class="text-sm font-semibold uppercase tracking-wider text-orange-500 dark:text-orange-400 mb-0.5">Attachment</p>
+                        <a :href="`/storage/${record.attachment}`" target="_blank" class="text-base text-orange-600 hover:underline">View Attachment</a>
                     </div>
                 </div>
             </template>
@@ -540,22 +540,22 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                     <div><CustomInput name="Plate No"             v-model="form.plate_no" /></div>
 
                     <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Site Location</label>
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Site Location</label>
                         <Boombox :items="siteLocations" :existing-value="form.site_location_id" label-field="site_name"
                             placeholder="Select site location" @change="(v: any) => form.site_location_id = v?.id ?? null" />
-                        <p v-if="form.distance_km != null" class="text-xs text-orange-600 mt-1">
+                        <p v-if="form.distance_km != null" class="text-sm text-orange-600 mt-1">
                             Computed distance: <strong>{{ form.distance_km }} km</strong>
                         </p>
-                        <p v-if="form.errors.site_location_id" class="text-xs text-red-500 mt-1">{{ form.errors.site_location_id }}</p>
+                        <p v-if="form.errors.site_location_id" class="text-sm text-red-500 mt-1">{{ form.errors.site_location_id }}</p>
                     </div>
 
                     <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Status</label>
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Status</label>
                         <select v-model="form.status"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:text-white">
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-base dark:bg-gray-700 dark:text-white">
                             <option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                         </select>
-                        <p v-if="form.errors.status" class="text-xs text-red-500 mt-1">{{ form.errors.status }}</p>
+                        <p v-if="form.errors.status" class="text-sm text-red-500 mt-1">{{ form.errors.status }}</p>
                     </div>
 
                     <div><CustomInput name="Reported At"       type="datetime-local" v-model="form.reported_at" /></div>
@@ -563,19 +563,19 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                     <div><CustomInput name="Datetime Arrived"  type="datetime-local" v-model="form.datetime_arrived" /></div>
 
                     <div class="lg:col-span-2">
-                        <label class="block m-1 text-sm font-semibold text-gray-600 dark:text-gray-200">Casualty Count</label>
+                        <label class="block m-1 text-base font-semibold text-gray-600 dark:text-gray-200">Casualty Count</label>
                         <div class="grid grid-cols-3 gap-3">
                             <div>
                                 <CustomInput name="Minor"    type="number" v-model="form.minor_casualty_count" />
-                                <p v-if="form.errors.minor_casualty_count" class="text-xs text-red-500 mt-1">{{ form.errors.minor_casualty_count }}</p>
+                                <p v-if="form.errors.minor_casualty_count" class="text-sm text-red-500 mt-1">{{ form.errors.minor_casualty_count }}</p>
                             </div>
                             <div>
                                 <CustomInput name="Serious"  type="number" v-model="form.serious_casualty_count" />
-                                <p v-if="form.errors.serious_casualty_count" class="text-xs text-red-500 mt-1">{{ form.errors.serious_casualty_count }}</p>
+                                <p v-if="form.errors.serious_casualty_count" class="text-sm text-red-500 mt-1">{{ form.errors.serious_casualty_count }}</p>
                             </div>
                             <div>
                                 <CustomInput name="Deceased" type="number" v-model="form.deceased_casualty_count" />
-                                <p v-if="form.errors.deceased_casualty_count" class="text-xs text-red-500 mt-1">{{ form.errors.deceased_casualty_count }}</p>
+                                <p v-if="form.errors.deceased_casualty_count" class="text-sm text-red-500 mt-1">{{ form.errors.deceased_casualty_count }}</p>
                             </div>
                         </div>
                     </div>
@@ -585,16 +585,16 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                     <div class="lg:col-span-2"><CustomInput name="Cancel Remarks"     v-model="form.cancel_remarks" /></div>
 
                     <div>
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Responder Attachment</label>
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Responder Attachment</label>
                         <input type="file" @change="(e) => handleFileChange(e, 'responder_attachment')"
                             accept="image/*,application/pdf"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
-                        <p v-if="form.errors.responder_attachment" class="text-xs text-red-500 mt-1">{{ form.errors.responder_attachment }}</p>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-base" />
+                        <p v-if="form.errors.responder_attachment" class="text-sm text-red-500 mt-1">{{ form.errors.responder_attachment }}</p>
                     </div>
                     <div v-if="isEdit && record?.responder_attachment">
-                        <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Current Responder Attachment</label>
+                        <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Current Responder Attachment</label>
                         <a :href="`/storage/${record.responder_attachment}`" target="_blank"
-                            class="text-sm text-orange-600 hover:underline">View File</a>
+                            class="text-base text-orange-600 hover:underline">View File</a>
                     </div>
                 </div>
             </template>
@@ -604,11 +604,11 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
             <div class="grid grid-cols-1 gap-3 p-3 mb-4 border border-dashed border-gray-400 lg:grid-cols-2">
                 <div><CustomInput name="Remarks" v-model="form.remarks" /></div>
                 <div>
-                    <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Attachment</label>
+                    <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Attachment</label>
                     <input type="file" @change="(e) => handleFileChange(e, 'attachment')"
                         accept="image/*,application/pdf"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
-                    <p v-if="form.errors.attachment" class="text-xs text-red-500 mt-1">{{ form.errors.attachment }}</p>
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md text-base" />
+                    <p v-if="form.errors.attachment" class="text-sm text-red-500 mt-1">{{ form.errors.attachment }}</p>
                 </div>
             </div>
 
@@ -634,17 +634,17 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
     <Modal :show="showMap" max-width="4xl" @close="closeMapModal">
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Select Location on Map</h3>
+                <h3 class="text-xl font-medium text-gray-900">Select Location on Map</h3>
                 <button @click="closeMapModal"><PhXCircle :size="32" color="#f08000" weight="fill" /></button>
             </div>
 
             <div class="mb-3 relative">
                 <div class="flex gap-2">
                     <input v-model="searchQuery" type="text" placeholder="Search address or place name..."
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-orange-400"
                         @keyup.enter="searchAddress" />
                     <button type="button" @click="searchAddress" :disabled="isSearching"
-                        class="px-3 py-2 text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-900 disabled:opacity-50 flex items-center gap-2">
+                        class="px-3 py-2 text-base font-medium text-white bg-gray-700 rounded-md hover:bg-gray-900 disabled:opacity-50 flex items-center gap-2">
                         <PhMagnifyingGlass :size="15" /> {{ isSearching ? 'Searching...' : 'Search' }}
                     </button>
                 </div>
@@ -652,16 +652,16 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
                     class="absolute z-[9999] w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
                     <li v-for="result in searchResults" :key="result.place_id"
                         @click="selectSearchResult(result)"
-                        class="px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 cursor-pointer border-b last:border-0">
+                        class="px-3 py-2 text-base text-gray-700 hover:bg-orange-50 cursor-pointer border-b last:border-0">
                         {{ result.display_name }}
                     </li>
                 </ul>
             </div>
 
             <div class="mb-3 flex items-center justify-between gap-2">
-                <p class="text-sm text-gray-600">Click the map, drag the marker, or search an address above.</p>
+                <p class="text-base text-gray-600">Click the map, drag the marker, or search an address above.</p>
                 <button type="button" @click="getCurrentLocation" :disabled="isLocating"
-                    class="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap">
+                    class="px-3 py-2 text-base font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap">
                     <PhMapPin :size="15" /> {{ isLocating ? 'Locating...' : 'Use My Location' }}
                 </button>
             </div>
@@ -669,8 +669,8 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
             <div ref="mapContainer" class="border border-gray-300 rounded-lg" style="height: 450px; width: 100%;" />
 
             <div class="mt-3 p-3 bg-gray-50 rounded-md space-y-1">
-                <p class="text-sm text-gray-700"><strong>Coordinates:</strong> {{ markerPos[0].toFixed(6) }}, {{ markerPos[1].toFixed(6) }}</p>
-                <p class="text-sm text-gray-700">
+                <p class="text-base text-gray-700"><strong>Coordinates:</strong> {{ markerPos[0].toFixed(6) }}, {{ markerPos[1].toFixed(6) }}</p>
+                <p class="text-base text-gray-700">
                     <strong>Address:</strong>
                     <span v-if="isGeocoding" class="text-gray-400 italic"> Resolving address...</span>
                     <span v-else class="text-gray-600"> {{ resolvedAddress || '' }}</span>
@@ -679,9 +679,9 @@ const closeModal = () => { form.reset(); form.clearErrors(); emit('close') }
 
             <div class="mt-4 flex justify-end gap-3">
                 <button type="button" @click="closeMapModal"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
+                    class="px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
                 <button type="button" @click="confirmLocation"
-                    class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700">Confirm Location</button>
+                    class="px-4 py-2 text-base font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700">Confirm Location</button>
             </div>
         </div>
     </Modal>

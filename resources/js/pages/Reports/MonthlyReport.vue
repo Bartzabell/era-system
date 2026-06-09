@@ -69,55 +69,55 @@ const printPdf = () => {
             <div class="w-[100%]">
 
                 <div class="flex flex-col p-4 sm:flex-row sm:items-center sm:justify-between gap-4 bg-orange-400">
-                    <h1 class="flex justify-center items-center font-black text-xl text-gray-800"><span><PhFirstAid :size="25" weight="fill" class="text-red-500 bg-white rounded-full m-3"/></span>GEARS</h1>
-                    <h1 class="text-2xl font-black text-gray-800">MONTHLY REPORT</h1>
+                    <h1 class="flex justify-center items-center font-black text-2xl text-gray-800"><span><PhFirstAid :size="25" weight="fill" class="text-red-500 bg-white rounded-full m-3"/></span>GEARS</h1>
+                    <h1 class="text-3xl font-black text-gray-800">MONTHLY REPORT</h1>
                     <div></div>
                 </div>
 
                 <div class="flex flex-wrap items-end justify-between gap-4 mb-6 p-4 rounded-lg">
                     <div class="flex flex-wrap items-end gap-4 ">
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-semibold text-gray-700">Date From:</label>
+                            <label class="text-sm font-semibold text-gray-700">Date From:</label>
                             <input
                                 v-model="dateFrom"
                                 type="date"
-                                class="border border-gray-400 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                class="border border-gray-400 bg-white rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
                         </div>
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-semibold text-gray-700">Date To</label>
+                            <label class="text-sm font-semibold text-gray-700">Date To</label>
                             <input
                                 v-model="dateTo"
                                 type="date"
-                                class="border border-gray-400 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                class="border border-gray-400 bg-white rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
                         </div>
                         <button
                             @click="applyFilter"
-                            class="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition"
+                            class="px-4 py-2 text-base font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition"
                         >
                             Apply Filter
                         </button>
                     </div>
                     <div class="flex flex-wrap items-end gap-4 ">
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-semibold text-gray-700">Search</label>
+                            <label class="text-sm font-semibold text-gray-700">Search</label>
                             <input
                                 v-model="searchQuery"
                                 type="text"
                                 placeholder="Barangay, landmark, incident..."
-                                class="border border-gray-400 bg-white rounded-lg px-3 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                class="border border-gray-400 bg-white rounded-lg px-3 py-2 text-base w-64 focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
                         </div>
                         <button
                             @click="exportCsv"
-                            class="px-4 py-2 text-sm font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition"
+                            class="px-4 py-2 text-base font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition"
                         >
                              Export CSV
                         </button>
                         <button
                             @click="printPdf"
-                            class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition"
+                            class="px-4 py-2 text-base font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition"
                         >
                              Print PDF
                         </button>
@@ -125,7 +125,7 @@ const printPdf = () => {
                 </div>
 
                 <div class="overflow-x-auto shadow-sm px-4">
-                    <table class="min-w-full text-sm text-gray-700 border-2 border-gray-800 bg-white">
+                    <table class="min-w-full text-base text-gray-700 border-2 border-gray-800 bg-white">
                         <thead>
                             <tr class="bg-orange-300 text-gray-800 text-center font-semibold uppercase tracking-wide">
                                 <th rowspan="2" class="px-3 py-3 border border-gray-800">No.</th>
@@ -137,7 +137,7 @@ const printPdf = () => {
                                 <th rowspan="2" class="px-3 py-3 border border-gray-800">Total No. of<br>Incidents</th>
                                 <th rowspan="2" class="px-3 py-3 border border-gray-800">Incidents</th>
                             </tr>
-                            <tr class="bg-orange-400 text-gray-800 text-center text-xs font-semibold uppercase">
+                            <tr class="bg-orange-400 text-gray-800 text-center text-sm font-semibold uppercase">
                                 <th class="px-3 py-2 border border-gray-800">Minor</th>
                                 <th class="px-3 py-2 border border-gray-800">Serious</th>
                                 <th class="px-3 py-2 border border-gray-800">DECEASED</th>
@@ -154,13 +154,13 @@ const printPdf = () => {
                                     <td class="px-3 py-2 border-r border-gray-800 font-medium">{{ row.barangay_name }}</td>
                                     <td class="px-3 py-2 border-r border-gray-800">{{ row.landmark }}</td>
                                     <td class="px-3 py-2 text-center border-r border-gray-800">
-                                        <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">{{ row.minor }}</span>
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-sm font-semibold">{{ row.minor }}</span>
                                     </td>
                                     <td class="px-3 py-2 text-center border-r border-gray-800">
-                                        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">{{ row.serious }}</span>
+                                        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">{{ row.serious }}</span>
                                     </td>
                                     <td class="px-3 py-2 text-center border-r border-gray-800">
-                                        <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-semibold">{{ row.dead }}</span>
+                                        <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-sm font-semibold">{{ row.dead }}</span>
                                     </td>
                                     <td class="px-3 py-2 text-center border-r border-gray-800 font-bold">{{ row.total_incidents }}</td>
                                     <td class="px-3 py-2">{{ row.top_incidents }}</td>
@@ -175,7 +175,7 @@ const printPdf = () => {
                     </table>
                 </div>
 
-                <p class="mt-3 text-xs text-gray-500">
+                <p class="mt-3 text-sm text-gray-500">
                     * Minor, Serious, and Deceased counts are summed from
                     <code>minor_casualty_count</code>, <code>serious_casualty_count</code>,
                     and <code>deceased_casualty_count</code> per barangay.

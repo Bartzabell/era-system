@@ -21,9 +21,9 @@ defineProps<{
                         <div >
                             <img src="/storage/img/logo.png" class=" rounded-full w-[50px] h-[50px] object-contain" />
                         </div>
-                        <span class="text-xl font-bold leading-none">
+                        <span class="text-2xl font-bold leading-none">
                             GEARS<br/>
-                            <span class="text-sm leading-none font-medium">Emergency Response System</span>
+                            <span class="text-base leading-none font-medium">Emergency Response System</span>
                         </span>
                     </div>
 
@@ -31,11 +31,11 @@ defineProps<{
                         :href="home()"
                         class="flex items-center gap-2 font-medium"
                     >
-                        <span class="text-xl font-medium">{{ title }}</span>
+                        <span class="text-2xl font-medium">{{ title }}</span>
                     </Link>
 
                     <div class="space-y-2 text-center">
-                        <p class="text-center text-sm text-muted-foreground">
+                        <p class="text-center text-base text-muted-foreground">
                             {{ description }}
                         </p>
                     </div>

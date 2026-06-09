@@ -154,7 +154,7 @@ const roleBadgeClass = (role: string) => {
         responder:     'bg-blue-100 text-blue-700',
         citizen:       'bg-green-100 text-green-700',
     }
-    return `px-2 py-1 text-xs font-semibold rounded-full capitalize ${map[role?.toLowerCase()] ?? 'bg-gray-100 text-gray-700'}`
+    return `px-2 py-1 text-sm font-semibold rounded-full capitalize ${map[role?.toLowerCase()] ?? 'bg-gray-100 text-gray-700'}`
 }
 
 // ─── Columns ──────────────────────────────────────────────────────────────────
@@ -191,8 +191,8 @@ const columns = [
                 'span',
                 {
                     class: v === 'yes'
-                        ? 'px-2 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-700'
-                        : 'px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700'
+                        ? 'px-2 py-1 text-sm font-semibold rounded-full bg-emerald-100 text-emerald-700'
+                        : 'px-2 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-700'
                 },
                 v === 'yes' ? 'Verified' : 'Pending'
             )
@@ -203,11 +203,11 @@ const columns = [
         header: 'Permissions',
         cell: ({ row }: any) => {
             const perms = row.original.permissions ?? []
-            if (!perms.length) return h('span', { class: 'text-gray-400 text-xs' }, 'None')
+            if (!perms.length) return h('span', { class: 'text-gray-400 text-sm' }, 'None')
             return h('div', { class: 'flex flex-wrap gap-1' },
                 perms.map((p: any) => h(
                     'span',
-                    { class: 'px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded' },
+                    { class: 'px-1.5 py-0.5 text-sm bg-orange-100 text-orange-700 rounded' },
                     p.name
                 ))
             )
@@ -220,8 +220,8 @@ const columns = [
             'span',
             {
                 class: row.original.responder
-                    ? 'px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700'
-                    : 'px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500'
+                    ? 'px-2 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-700'
+                    : 'px-2 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-500'
             },
             row.original.responder ? 'Yes' : 'No'
         ),
@@ -289,7 +289,7 @@ const columns = [
                         :key="tab.key"
                         @click="switchTab(tab.key)"
                         :class="[
-                            'px-4 py-2 text-sm font-medium transition-colors rounded-t-md',
+                            'px-4 py-2 text-base font-medium transition-colors rounded-t-md',
                             activeTab === tab.key
                                 ? 'border-b-2 border-orange-500 text-orange-600 bg-orange-50'
                                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -298,7 +298,7 @@ const columns = [
                         {{ tab.label }}
                         <span
                             v-if="tab.key === 'pending'"
-                            class="ml-1.5 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full"
+                            class="ml-1.5 px-1.5 py-0.5 text-sm bg-yellow-100 text-yellow-700 rounded-full"
                         >
                             !
                         </span>
@@ -318,8 +318,8 @@ const columns = [
         <!-- Delete Modal -->
         <Modal :show="showDeleteModal" @close="showDeleteModal = false">
             <div class="p-6">
-                <h2 class="mb-4 text-lg font-medium text-gray-900">Delete User</h2>
-                <p class="text-sm text-gray-600">
+                <h2 class="mb-4 text-xl font-medium text-gray-900">Delete User</h2>
+                <p class="text-base text-gray-600">
                     Are you sure you want to delete
                     <strong>{{ currentRecord?.full_name || currentRecord?.username }}</strong>?
                     This action cannot be undone.
@@ -337,49 +337,49 @@ const columns = [
 
                 <div class="flex items-center gap-2 mb-5">
                     <PhShieldCheck class="text-emerald-500" :size="22" />
-                    <h2 class="text-lg font-semibold text-gray-900">Account Verification</h2>
+                    <h2 class="text-xl font-semibold text-gray-900">Account Verification</h2>
                 </div>
 
                 <!-- User Info -->
                 <div v-if="verifyRecord" class="space-y-3 mb-5">
-                    <div class="bg-gray-50 rounded-lg p-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <div class="bg-gray-50 rounded-lg p-4 grid grid-cols-2 gap-x-4 gap-y-2 text-base">
                         <div>
-                            <span class="text-gray-500 block text-xs">Full Name</span>
+                            <span class="text-gray-500 block text-sm">Full Name</span>
                             <span class="font-medium text-gray-800">{{ verifyRecord.full_name || '—' }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 block text-xs">Username</span>
+                            <span class="text-gray-500 block text-sm">Username</span>
                             <span class="font-medium text-gray-800">{{ verifyRecord.username }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 block text-xs">Email</span>
+                            <span class="text-gray-500 block text-sm">Email</span>
                             <span class="font-medium text-gray-800">{{ verifyRecord.email || '—' }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 block text-xs">Mobile No.</span>
+                            <span class="text-gray-500 block text-sm">Mobile No.</span>
                             <span class="font-medium text-gray-800">{{ verifyRecord.mobile_no || '—' }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 block text-xs">Role</span>
+                            <span class="text-gray-500 block text-sm">Role</span>
                             <span class="font-medium capitalize text-gray-800">{{ verifyRecord.role }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 block text-xs">Barangay</span>
+                            <span class="text-gray-500 block text-sm">Barangay</span>
                             <span class="font-medium text-gray-800">{{ verifyRecord.barangay?.barangay_name || '—' }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 block text-xs">Birth Date</span>
+                            <span class="text-gray-500 block text-sm">Birth Date</span>
                             <span class="font-medium text-gray-800">{{ verifyRecord.birth_date || '—' }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 block text-xs">Registered</span>
+                            <span class="text-gray-500 block text-sm">Registered</span>
                             <span class="font-medium text-gray-800">{{ verifyRecord.created_at }}</span>
                         </div>
                     </div>
 
                     <!-- Valid ID -->
                     <div>
-                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Valid ID</p>
+                        <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Valid ID</p>
                         <div
                             v-if="validIdUrl && !verifyImageError"
                             class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50"
@@ -393,7 +393,7 @@ const columns = [
                         </div>
                         <div
                             v-else
-                            class="border border-dashed border-gray-300 rounded-lg p-6 text-center text-sm text-gray-400"
+                            class="border border-dashed border-gray-300 rounded-lg p-6 text-center text-base text-gray-400"
                         >
                             {{ verifyImageError ? 'Unable to load valid ID image.' : 'No valid ID uploaded.' }}
                         </div>

@@ -156,8 +156,8 @@ const priorityCol = {
     header: 'Severity',
     cell: ({ row }: any) => {
         const { priority_level: lvl, priority_label: lbl } = row.original
-        if (!lvl) return h('span', { class: 'text-gray-300 text-xs' }, '—')
-        return h('span', { class: `px-2 py-0.5 text-xs font-medium rounded ${priorityColors[lvl] ?? 'bg-gray-100 text-gray-500'}` }, `${lvl} · ${lbl}`)
+        if (!lvl) return h('span', { class: 'text-gray-300 text-sm' }, '—')
+        return h('span', { class: `px-2 py-0.5 text-sm font-medium rounded ${priorityColors[lvl] ?? 'bg-gray-100 text-gray-500'}` }, `${lvl} · ${lbl}`)
     },
 }
 
@@ -166,7 +166,7 @@ const statusCol = {
     header: 'Status',
     cell: ({ row }: any) => {
         const s = row.original.status
-        return h('span', { class: `inline-flex items-center gap-1.5 text-xs font-medium ${statusClass(s)}` }, [
+        return h('span', { class: `inline-flex items-center gap-1.5 text-sm font-medium ${statusClass(s)}` }, [
             h('span', { class: 'w-1.5 h-1.5 rounded-full', style: `background: currentColor; opacity: 0.7` }),
             s,
         ])
@@ -234,14 +234,14 @@ const activeBg = computed(() => tabColors[activeTab.value].bg)
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-7">
                     <div>
-                        <h1 class="text-lg font-medium text-gray-900 dark:text-gray-100">Incident Reports</h1>
-                        <p class="text-xs text-gray-400 mt-0.5">Homepage / Incident Reports</p>
+                        <h1 class="text-xl font-medium text-gray-900 dark:text-gray-100">Incident Reports</h1>
+                        <p class="text-sm text-gray-400 mt-0.5">Homepage / Incident Reports</p>
                     </div>
                     <button
                         @click="openCreateModal"
                         class="inline-flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700
                                dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white
-                               text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                               text-white text-base font-medium px-4 py-2 rounded-lg transition-colors"
                     >
                         <PhPlus :size="14" />
                         Create incident report
@@ -258,7 +258,7 @@ const activeBg = computed(() => tabColors[activeTab.value].bg)
                             ? { borderColor: tabColors[tab.key].border, borderBottomColor: 'white' }
                             : {}"
                         :class="[
-                            'flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-medium',
+                            'flex items-center gap-1.5 px-3.5 py-1.5 text-base font-medium',
                             'rounded-t-md border-2 border-b-0 transition-all select-none',
                             activeTab === tab.key
                                 ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 z-10'
@@ -300,16 +300,16 @@ const activeBg = computed(() => tabColors[activeTab.value].bg)
         <!-- Delete confirmation -->
         <Modal :show="showDeleteModal" @close="showDeleteModal = false">
             <div class="p-6 max-w-sm">
-                <h2 class="text-base font-medium text-gray-900 dark:text-gray-100 mb-1">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
                     Delete incident report
                 </h2>
-                <p class="text-sm text-gray-400 dark:text-gray-500">
+                <p class="text-base text-gray-400 dark:text-gray-500">
                     This action cannot be undone.
                 </p>
                 <div class="flex justify-end gap-2 mt-6">
                     <button
                         @click="showDeleteModal = false"
-                        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200
+                        class="px-4 py-2 text-base font-medium rounded-lg border border-gray-200
                                dark:border-gray-700 text-gray-600 dark:text-gray-300
                                hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
@@ -317,7 +317,7 @@ const activeBg = computed(() => tabColors[activeTab.value].bg)
                     </button>
                     <button
                         @click="deleteRecord"
-                        class="px-4 py-2 text-sm font-medium rounded-lg bg-red-600
+                        class="px-4 py-2 text-base font-medium rounded-lg bg-red-600
                                hover:bg-red-700 text-white transition-colors"
                     >
                         Delete

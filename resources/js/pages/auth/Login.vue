@@ -81,7 +81,7 @@ const heroTitleLines = props.heroTitle.split('\n');
 
             <div
                 v-if="status"
-                class="mb-1 text-center text-sm font-medium text-green-600"
+                class="mb-1 text-center text-base font-medium text-green-600"
             >
                 {{ status }}
             </div>
@@ -115,7 +115,7 @@ const heroTitleLines = props.heroTitle.split('\n');
                             <TextLink
                                 v-if="canResetPassword"
                                 :href="request()"
-                                class="text-sm"
+                                class="text-base"
                                 :tabindex="5"
                             >
                                 Forgot password?
@@ -149,7 +149,7 @@ const heroTitleLines = props.heroTitle.split('\n');
                             v-model="termsAccepted"
                             class="mt-0.5"
                         />
-                        <Label for="terms" class="text-sm text-gray-600 leading-snug cursor-pointer select-none">
+                        <Label for="terms" class="text-base text-gray-600 leading-snug cursor-pointer select-none">
                             I have read and agree to the
                             <button
                                 type="button"
@@ -173,7 +173,7 @@ const heroTitleLines = props.heroTitle.split('\n');
                     </Button>
                 </div>
 
-                <div class="text-center text-sm text-muted-foreground">
+                <div class="text-center text-base text-muted-foreground">
                     Don't have an account?
                     <TextLink
                         :href="register()"
@@ -188,20 +188,20 @@ const heroTitleLines = props.heroTitle.split('\n');
             <!-- Stats Grid -->
             <div class="grid grid-cols-2 gap-2 mt-1">
                 <div class="bg-gray-300/60 rounded-lg p-3 text-center">
-                    <div class="text-xl font-bold text-gray-900">{{ stat1Value }}</div>
-                    <div class="text-xs text-gray-600">{{ stat1Label }}</div>
+                    <div class="text-2xl font-bold text-gray-900">{{ stat1Value }}</div>
+                    <div class="text-sm text-gray-600">{{ stat1Label }}</div>
                 </div>
                 <div class="bg-gray-300/60 rounded-lg p-3 text-center">
-                    <div class="text-xl font-bold text-gray-900">{{ stat2Value }}</div>
-                    <div class="text-xs text-gray-600">{{ stat2Label }}</div>
+                    <div class="text-2xl font-bold text-gray-900">{{ stat2Value }}</div>
+                    <div class="text-sm text-gray-600">{{ stat2Label }}</div>
                 </div>
                 <div class="bg-gray-300/60 rounded-lg p-3 text-center">
-                    <div class="text-sm font-bold text-gray-900">{{ stat3Value }}</div>
-                    <div class="text-xs text-gray-600">{{ stat3Label }}</div>
+                    <div class="text-base font-bold text-gray-900">{{ stat3Value }}</div>
+                    <div class="text-sm text-gray-600">{{ stat3Label }}</div>
                 </div>
                 <div class="bg-gray-300/60 rounded-lg p-3 text-center">
-                    <div class="text-sm font-bold text-gray-900">{{ stat4Value }}</div>
-                    <div class="text-xs text-gray-600">{{ stat4Label }}</div>
+                    <div class="text-base font-bold text-gray-900">{{ stat4Value }}</div>
+                    <div class="text-sm text-gray-600">{{ stat4Label }}</div>
                 </div>
             </div>
         </AuthBase>
@@ -233,12 +233,12 @@ const heroTitleLines = props.heroTitle.split('\n');
                         weight="fill"
                         class="text-white mx-auto mb-2"
                     />
-                    <div class="text-sm font-bold text-white mb-1">{{ card.title }}</div>
-                    <div class="text-xs text-white/85 leading-relaxed">{{ card.description }}</div>
+                    <div class="text-base font-bold text-white mb-1">{{ card.title }}</div>
+                    <div class="text-sm text-white/85 leading-relaxed">{{ card.description }}</div>
                 </div>
             </div>
 
-            <div class="text-white font-black text-sm mt-10">{{ heroFooter }}</div>
+            <div class="text-white font-black text-base mt-10">{{ heroFooter }}</div>
         </div>
 
         <!-- Terms and Conditions Modal -->

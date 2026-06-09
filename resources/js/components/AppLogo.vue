@@ -8,10 +8,10 @@ import AppLogoIcon from '@/components/AppLogoIcon.vue';
     >
         <img src="/storage/img/logo.png" class=" rounded-full w-[100px] h-[100px] object-contain" />
     </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
+    <div class="ml-1 grid flex-1 text-left text-base">
         <span class="mb-0.5 truncate leading-tight font-semibold"
             >GEARS</span
         >
-        <span class="text-wrap text-xs font-black">Operation Center MDRRMO</span>
+        <span class="text-wrap text-sm font-black">Operation Center MDRRMO</span>
     </div>
 </template>

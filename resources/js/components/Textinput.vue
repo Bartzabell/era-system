@@ -78,7 +78,7 @@ defineExpose({ focus });
 
 <template>
     <div class="w-full">
-        <label v-if="label" class="block text-sm font-medium text-gray-700 mb-1">
+        <label v-if="label" class="block text-base font-medium text-gray-700 mb-1">
             {{ label }}
             <span v-if="required" class="text-red-500">*</span>
         </label>
@@ -86,7 +86,7 @@ defineExpose({ focus });
         <div class="relative">
             <span
                 v-if="type === 'currency'"
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-base"
             >
                 ₱
             </span>
@@ -119,7 +119,7 @@ defineExpose({ focus });
             />
         </div>
 
-        <p v-if="error" class="mt-1 text-sm text-red-600">
+        <p v-if="error" class="mt-1 text-base text-red-600">
             {{ error }}
         </p>
     </div>

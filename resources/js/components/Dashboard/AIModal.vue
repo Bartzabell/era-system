@@ -76,8 +76,8 @@ const prioritySummary = computed(() => {
                                     <Flame :size="24" color="white" />
                                 </div>
                                 <div>
-                                    <h2 class="text-xl font-black text-white tracking-tight">Active Incidents</h2>
-                                    <p class="text-red-100 text-sm">Live incident overview</p>
+                                    <h2 class="text-2xl font-black text-white tracking-tight">Active Incidents</h2>
+                                    <p class="text-red-100 text-base">Live incident overview</p>
                                 </div>
                             </div>
                             <button
@@ -93,14 +93,14 @@ const prioritySummary = computed(() => {
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span class="text-4xl font-black text-red-700">{{ activeIncidents }}</span>
-                                    <span class="text-sm text-red-500 font-medium">total active</span>
+                                    <span class="text-base text-red-500 font-medium">total active</span>
                                 </div>
                                 <!-- Priority breakdown pills -->
                                 <div class="flex gap-2">
                                     <template v-for="(count, level) in prioritySummary" :key="level">
                                         <div
                                             v-if="count > 0"
-                                            class="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border"
+                                            class="flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold border"
                                             :class="[getPriority(level).bg, getPriority(level).text, getPriority(level).border]"
                                         >
                                             <span class="w-2 h-2 rounded-full" :class="getPriority(level).dot" />
@@ -115,8 +115,8 @@ const prioritySummary = computed(() => {
                         <div class="max-h-[420px] overflow-y-auto px-6 py-4 space-y-3">
                             <div v-if="sortedIncidents.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
                                 <Flame :size="48" color="#e5e7eb" />
-                                <p class="mt-3 text-sm font-medium">No active incidents</p>
-                                <p class="text-xs text-gray-300 mt-1">All clear — no incidents to display</p>
+                                <p class="mt-3 text-base font-medium">No active incidents</p>
+                                <p class="text-sm text-gray-300 mt-1">All clear — no incidents to display</p>
                             </div>
 
                             <div
@@ -128,7 +128,7 @@ const prioritySummary = computed(() => {
                                 <!-- Priority indicator -->
                                 <div class="flex flex-col items-center gap-1 shrink-0 mt-0.5">
                                     <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-black border"
+                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-black border"
                                         :class="[getPriority(incident.priority_level).text, getPriority(incident.priority_level).border, getPriority(incident.priority_level).bg]"
                                     >
                                         {{ incident.priority_level }}
@@ -139,32 +139,32 @@ const prioritySummary = computed(() => {
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-start justify-between gap-2">
                                         <div>
-                                            <p class="font-bold text-sm text-gray-800 leading-tight">{{ incident.incident_type }}</p>
-                                            <p class="text-xs text-gray-500 mt-0.5">{{ incident.emergency_type }}</p>
+                                            <p class="font-bold text-base text-gray-800 leading-tight">{{ incident.incident_type }}</p>
+                                            <p class="text-sm text-gray-500 mt-0.5">{{ incident.emergency_type }}</p>
                                         </div>
                                         <div class="flex flex-col items-end gap-1 shrink-0">
                                             <span
                                                 v-if="incident.priority_score"
-                                                class="text-xs font-semibold"
+                                                class="text-sm font-semibold"
                                                 :class="getPriority(incident.priority_level).text"
                                             >
                                                 {{ incident.priority_score }}/10
                                             </span>
-                                            <span class="text-xs px-2 py-0.5 rounded-full bg-white/70 text-gray-600 border border-gray-200 capitalize">
+                                            <span class="text-sm px-2 py-0.5 rounded-full bg-white/70 text-gray-600 border border-gray-200 capitalize">
                                                 {{ incident.status }}
                                             </span>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-3 mt-2">
-                                        <div class="flex items-center gap-1 text-xs text-gray-500">
+                                        <div class="flex items-center gap-1 text-sm text-gray-500">
                                             <PhMapPin :size="12" weight="fill" class="text-gray-400" />
                                             <span>{{ incident.barangay }}</span>
                                         </div>
-                                        <div class="flex items-center gap-1 text-xs text-gray-500">
+                                        <div class="flex items-center gap-1 text-sm text-gray-500">
                                             <PhClock :size="12" class="text-gray-400" />
                                             <span>{{ incident.created_at }}</span>
                                         </div>
-                                        <div v-if="incident.casualty_count > 0" class="flex items-center gap-1 text-xs text-red-600 font-medium">
+                                        <div v-if="incident.casualty_count > 0" class="flex items-center gap-1 text-sm text-red-600 font-medium">
                                             <PhWarning :size="12" weight="fill" />
                                             <span>{{ incident.casualty_count }} {{ incident.casualty_count === 1 ? 'casualty' : 'casualties' }}</span>
                                         </div>
@@ -177,7 +177,7 @@ const prioritySummary = computed(() => {
                         <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
                             <button
                                 @click="emit('close')"
-                                class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                                class="px-4 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
                             >
                                 Close
                             </button>

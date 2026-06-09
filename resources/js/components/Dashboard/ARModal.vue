@@ -83,8 +83,8 @@ watch(() => props.show, (val) => { if (val) fetchResponders() })
                                     <PhFireTruck :size="24" color="white" weight="fill" />
                                 </div>
                                 <div>
-                                    <h2 class="text-xl font-black text-white tracking-tight">Active Responders</h2>
-                                    <p class="text-blue-100 text-sm">Currently on duty</p>
+                                    <h2 class="text-2xl font-black text-white tracking-tight">Active Responders</h2>
+                                    <p class="text-blue-100 text-base">Currently on duty</p>
                                 </div>
                             </div>
                             <button
@@ -99,8 +99,8 @@ watch(() => props.show, (val) => { if (val) fetchResponders() })
                         <div class="px-6 py-4 bg-blue-50 border-b border-blue-100 flex items-center gap-3">
                             <span class="text-4xl font-black text-blue-700">{{ activeResponders }}</span>
                             <div>
-                                <p class="text-sm font-semibold text-blue-600">responders on duty</p>
-                                <p class="text-xs text-blue-400">Available and ready to deploy</p>
+                                <p class="text-base font-semibold text-blue-600">responders on duty</p>
+                                <p class="text-sm text-blue-400">Available and ready to deploy</p>
                             </div>
                         </div>
 
@@ -114,8 +114,8 @@ watch(() => props.show, (val) => { if (val) fetchResponders() })
                             <!-- Empty state -->
                             <div v-else-if="responders.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
                                 <PhFireTruck :size="48" color="#e5e7eb" />
-                                <p class="mt-3 text-sm font-medium">No active responders found</p>
-                                <p class="text-xs text-gray-300 mt-1">Responder data may not be available via API</p>
+                                <p class="mt-3 text-base font-medium">No active responders found</p>
+                                <p class="text-sm text-gray-300 mt-1">Responder data may not be available via API</p>
                             </div>
 
                             <!-- Responder cards -->
@@ -126,7 +126,7 @@ watch(() => props.show, (val) => { if (val) fetchResponders() })
                                     class="flex items-center gap-4 p-4 rounded-xl border border-blue-100 bg-blue-50/40 hover:bg-blue-50 transition-colors"
                                 >
                                     <!-- Avatar -->
-                                    <div class="w-11 h-11 rounded-full shrink-0 overflow-hidden flex items-center justify-center text-white text-sm font-black"
+                                    <div class="w-11 h-11 rounded-full shrink-0 overflow-hidden flex items-center justify-center text-white text-base font-black"
                                         :class="!responder.profile_picture ? getAvatarColor(responder.id) : ''">
                                         <img
                                             v-if="responder.profile_picture"
@@ -140,22 +140,22 @@ watch(() => props.show, (val) => { if (val) fetchResponders() })
                                     <!-- Info -->
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2">
-                                            <p class="font-bold text-sm text-gray-800 truncate">{{ fullName(responder) }}</p>
-                                            <span class="inline-flex items-center gap-1 text-xs text-green-600 font-medium">
+                                            <p class="font-bold text-base text-gray-800 truncate">{{ fullName(responder) }}</p>
+                                            <span class="inline-flex items-center gap-1 text-sm text-green-600 font-medium">
                                                 <PhCheckCircle :size="12" weight="fill" />
                                                 Active
                                             </span>
                                         </div>
                                         <div class="flex items-center gap-3 mt-1">
-                                            <span v-if="responder.responder_type" class="flex items-center gap-1 text-xs text-gray-500">
+                                            <span v-if="responder.responder_type" class="flex items-center gap-1 text-sm text-gray-500">
                                                 <PhIdentificationCard :size="12" class="text-gray-400" />
                                                 {{ responder.responder_type }}
                                             </span>
-                                            <span v-if="responder.contact_no" class="flex items-center gap-1 text-xs text-gray-500">
+                                            <span v-if="responder.contact_no" class="flex items-center gap-1 text-sm text-gray-500">
                                                 <PhPhone :size="12" class="text-gray-400" />
                                                 {{ responder.contact_no }}
                                             </span>
-                                            <span v-if="responder.station" class="text-xs text-blue-600 font-medium">
+                                            <span v-if="responder.station" class="text-sm text-blue-600 font-medium">
                                                 {{ responder.station }}
                                             </span>
                                         </div>
@@ -168,7 +168,7 @@ watch(() => props.show, (val) => { if (val) fetchResponders() })
                         <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
                             <button
                                 @click="emit('close')"
-                                class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                                class="px-4 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
                             >
                                 Close
                             </button>

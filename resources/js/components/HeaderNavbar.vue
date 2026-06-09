@@ -32,7 +32,7 @@ const goToMainPage = () => {
     <header class="bg-white border-b border-gray-200 shadow-sm m-2 rounded-lg">
         <div class="flex items-center justify-between px-6 py-4">
             <div class="flex items-center">
-                <h1 class="text-xl font-semibold text-gray-900">Operation Center</h1>
+                <h1 class="text-2xl font-semibold text-gray-900">Operation Center</h1>
             </div>
             <div class="flex items-center gap-3">
                 <Button
@@ -49,7 +49,7 @@ const goToMainPage = () => {
                 >
                     Incident Report
                 </Button>
-                <span class="text-sm font-medium text-gray-700">{{ user?.username }}</span>
+                <span class="text-base font-medium text-gray-700">{{ user?.username }}</span>
                 <Button
                     variant="ghost"
                     size="icon"

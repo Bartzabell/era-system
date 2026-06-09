@@ -94,7 +94,7 @@ const submit = () => {
                 <!-- Brand header -->
                 <div class="mb-8 text-center lg:text-left">
                     <h2 class="text-3xl font-extrabold text-gray-800 dark:text-white">Create an account</h2>
-                    <p class="text-sm text-gray-500 mt-1">Fill in your details to get started</p>
+                    <p class="text-base text-gray-500 mt-1">Fill in your details to get started</p>
                 </div>
 
                 <form @submit.prevent="submit" class="space-y-6">
@@ -106,24 +106,24 @@ const submit = () => {
 
                             <div class="lg:col-span-2">
                                 <CustomInput name="Email" type="email" v-model="form.email" placeholder="email@example.com" />
-                                <p v-if="form.errors.email" class="text-xs text-red-500 mt-1">{{ form.errors.email }}</p>
+                                <p v-if="form.errors.email" class="text-sm text-red-500 mt-1">{{ form.errors.email }}</p>
                             </div>
 
                             <div>
                                 <CustomInput name="Username" v-model="form.username" placeholder="username" />
-                                <p v-if="form.errors.username" class="text-xs text-red-500 mt-1">{{ form.errors.username }}</p>
+                                <p v-if="form.errors.username" class="text-sm text-red-500 mt-1">{{ form.errors.username }}</p>
                             </div>
 
                             <div><!-- spacer on desktop --></div>
 
                             <div>
                                 <CustomInput name="Password" type="password" v-model="form.password" />
-                                <p v-if="form.errors.password" class="text-xs text-red-500 mt-1">{{ form.errors.password }}</p>
+                                <p v-if="form.errors.password" class="text-sm text-red-500 mt-1">{{ form.errors.password }}</p>
                             </div>
 
                             <div>
                                 <CustomInput name="Confirm Password" type="password" v-model="form.password_confirmation" />
-                                <p v-if="form.errors.password_confirmation" class="text-xs text-red-500 mt-1">{{ form.errors.password_confirmation }}</p>
+                                <p v-if="form.errors.password_confirmation" class="text-sm text-red-500 mt-1">{{ form.errors.password_confirmation }}</p>
                             </div>
 
                         </div>
@@ -136,7 +136,7 @@ const submit = () => {
 
                             <div>
                                 <CustomInput name="First Name" v-model="form.first_name" placeholder="Juan" />
-                                <p v-if="form.errors.first_name" class="text-xs text-red-500 mt-1">{{ form.errors.first_name }}</p>
+                                <p v-if="form.errors.first_name" class="text-sm text-red-500 mt-1">{{ form.errors.first_name }}</p>
                             </div>
 
                             <div>
@@ -145,17 +145,17 @@ const submit = () => {
 
                             <div>
                                 <CustomInput name="Last Name" v-model="form.last_name" placeholder="Dela Cruz" />
-                                <p v-if="form.errors.last_name" class="text-xs text-red-500 mt-1">{{ form.errors.last_name }}</p>
+                                <p v-if="form.errors.last_name" class="text-sm text-red-500 mt-1">{{ form.errors.last_name }}</p>
                             </div>
 
                             <div>
                                 <CustomInput name="Mobile No." v-model="form.mobile_no" placeholder="09XX XXX XXXX" />
-                                <p v-if="form.errors.mobile_no" class="text-xs text-red-500 mt-1">{{ form.errors.mobile_no }}</p>
+                                <p v-if="form.errors.mobile_no" class="text-sm text-red-500 mt-1">{{ form.errors.mobile_no }}</p>
                             </div>
 
                             <div>
                                 <CustomInput name="Birth Date" type="date" v-model="form.birth_date" />
-                                <p v-if="form.errors.birth_date" class="text-xs text-red-500 mt-1">{{ form.errors.birth_date }}</p>
+                                <p v-if="form.errors.birth_date" class="text-sm text-red-500 mt-1">{{ form.errors.birth_date }}</p>
                             </div>
 
                             <div>
@@ -163,7 +163,7 @@ const submit = () => {
                             </div>
 
                             <div class="lg:col-span-2">
-                                <label class="block m-1 text-sm text-gray-600 dark:text-gray-200">Barangay</label>
+                                <label class="block m-1 text-base text-gray-600 dark:text-gray-200">Barangay</label>
                                 <Boombox
                                     :items="props.barangays ?? []"
                                     label-field="barangay_name"
@@ -180,7 +180,7 @@ const submit = () => {
                         <h3 class="mb-2 font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2">
                             <PhIdentificationCard :size="18" />
                             Valid ID
-                            <span class="text-xs font-normal text-gray-400">(required for account verification)</span>
+                            <span class="text-sm font-normal text-gray-400">(required for account verification)</span>
                         </h3>
                         <div class="p-4 border border-dashed border-gray-300 rounded-lg">
 
@@ -192,13 +192,13 @@ const submit = () => {
                                 >
                                     <PhUploadSimple :size="36" class="text-orange-400" />
                                     <div>
-                                        <p class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                        <p class="text-base font-medium text-gray-700 dark:text-gray-200">
                                             Click to upload your valid ID
                                         </p>
-                                        <p class="text-xs text-gray-400 mt-1">
+                                        <p class="text-sm text-gray-400 mt-1">
                                             Accepted: JPG, PNG, PDF — max 5MB
                                         </p>
-                                        <p class="text-xs text-gray-400 mt-0.5">
+                                        <p class="text-sm text-gray-400 mt-0.5">
                                             e.g. PhilSys, Driver's License, Passport, SSS, UMID
                                         </p>
                                     </div>
@@ -222,13 +222,13 @@ const submit = () => {
                                     />
                                 </div>
                                 <div class="flex items-center justify-between mt-2">
-                                    <p class="text-xs text-gray-500 truncate flex-1 mr-2">
+                                    <p class="text-sm text-gray-500 truncate flex-1 mr-2">
                                         <span class="font-medium">Selected:</span> {{ validIdFileName }}
                                     </p>
                                     <button
                                         type="button"
                                         @click="clearValidId"
-                                        class="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 transition-colors"
+                                        class="flex items-center gap-1 text-sm text-red-500 hover:text-red-700 transition-colors"
                                     >
                                         <PhX :size="14" />
                                         Remove
@@ -236,7 +236,7 @@ const submit = () => {
                                 </div>
                             </div>
 
-                            <p v-if="form.errors.valid_id" class="text-xs text-red-500 mt-2">{{ form.errors.valid_id }}</p>
+                            <p v-if="form.errors.valid_id" class="text-sm text-red-500 mt-2">{{ form.errors.valid_id }}</p>
 
                         </div>
                     </section>
@@ -252,7 +252,7 @@ const submit = () => {
                             class="w-full"
                         />
 
-                        <p class="text-sm text-gray-500">
+                        <p class="text-base text-gray-500">
                             Already have an account?
                             <TextLink :href="login()" class="underline underline-offset-4 text-orange-600">
                                 Log in

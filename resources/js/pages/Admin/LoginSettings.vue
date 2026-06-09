@@ -96,8 +96,8 @@ const activeTab = ref<'login' | 'terms'>('login');
         <div class="max-w-4xl mx-auto px-4 py-8">
             <!-- Page header -->
             <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Login Page Settings</h1>
-                <p class="text-sm text-gray-500 mt-1">Customize what is displayed on the public login page and the Terms & Conditions modal.</p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Login Page Settings</h1>
+                <p class="text-base text-gray-500 mt-1">Customize what is displayed on the public login page and the Terms & Conditions modal.</p>
             </div>
 
             <!-- Tabs -->
@@ -105,7 +105,7 @@ const activeTab = ref<'login' | 'terms'>('login');
                 <button
                     @click="activeTab = 'login'"
                     :class="[
-                        'px-4 py-1.5 text-sm font-medium rounded-md transition-colors',
+                        'px-4 py-1.5 text-base font-medium rounded-md transition-colors',
                         activeTab === 'login'
                             ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                             : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -116,7 +116,7 @@ const activeTab = ref<'login' | 'terms'>('login');
                 <button
                     @click="activeTab = 'terms'"
                     :class="[
-                        'px-4 py-1.5 text-sm font-medium rounded-md transition-colors',
+                        'px-4 py-1.5 text-base font-medium rounded-md transition-colors',
                         activeTab === 'terms'
                             ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                             : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -130,35 +130,35 @@ const activeTab = ref<'login' | 'terms'>('login');
             <form v-if="activeTab === 'login'" @submit.prevent="submitLogin" class="space-y-8">
 
                 <!-- Success flash -->
-                <div v-if="loginForm.recentlySuccessful" class="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3">
+                <div v-if="loginForm.recentlySuccessful" class="bg-green-50 border border-green-200 text-green-700 text-base rounded-lg px-4 py-3">
                     Login page settings saved successfully.
                 </div>
 
                 <!-- Auth Box Section -->
                 <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-                    <h2 class="font-semibold text-gray-900 dark:text-white text-base">Auth Box (left panel)</h2>
+                    <h2 class="font-semibold text-gray-900 dark:text-white text-lg">Auth Box (left panel)</h2>
 
                     <div class="grid gap-2">
                         <Label>Title</Label>
                         <Input v-model="loginForm.auth_title" placeholder="Welcome Back!" />
-                        <p v-if="loginForm.errors.auth_title" class="text-xs text-red-500">{{ loginForm.errors.auth_title }}</p>
+                        <p v-if="loginForm.errors.auth_title" class="text-sm text-red-500">{{ loginForm.errors.auth_title }}</p>
                     </div>
                     <div class="grid gap-2">
                         <Label>Description</Label>
                         <Input v-model="loginForm.auth_description" placeholder="Sign in to your account to continue" />
-                        <p v-if="loginForm.errors.auth_description" class="text-xs text-red-500">{{ loginForm.errors.auth_description }}</p>
+                        <p v-if="loginForm.errors.auth_description" class="text-sm text-red-500">{{ loginForm.errors.auth_description }}</p>
                     </div>
 
-                    <h3 class="font-medium text-gray-700 dark:text-gray-300 text-sm pt-2">Stats Grid (4 tiles)</h3>
+                    <h3 class="font-medium text-gray-700 dark:text-gray-300 text-base pt-2">Stats Grid (4 tiles)</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div v-for="n in 4" :key="n" class="space-y-2 bg-gray-50 dark:bg-gray-700/40 rounded-lg p-3">
-                            <p class="text-xs font-semibold text-gray-500 uppercase">Stat {{ n }}</p>
+                            <p class="text-sm font-semibold text-gray-500 uppercase">Stat {{ n }}</p>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Value</Label>
+                                <Label class="text-sm">Value</Label>
                                 <Input v-model="(loginForm as any)[`stat_${n}_value`]" placeholder="e.g. 24/7" />
                             </div>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Label</Label>
+                                <Label class="text-sm">Label</Label>
                                 <Input v-model="(loginForm as any)[`stat_${n}_label`]" placeholder="e.g. Always on" />
                             </div>
                         </div>
@@ -167,17 +167,17 @@ const activeTab = ref<'login' | 'terms'>('login');
 
                 <!-- Hero Section -->
                 <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-                    <h2 class="font-semibold text-gray-900 dark:text-white text-base">Hero Panel (right panel)</h2>
+                    <h2 class="font-semibold text-gray-900 dark:text-white text-lg">Hero Panel (right panel)</h2>
 
                     <div class="grid gap-2">
-                        <Label>Title <span class="text-gray-400 font-normal text-xs">(use \n for line break)</span></Label>
+                        <Label>Title <span class="text-gray-400 font-normal text-sm">(use \n for line break)</span></Label>
                         <textarea
                             v-model="loginForm.hero_title"
                             rows="2"
-                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                             placeholder="Reliable Response,&#10;Reliable Protection"
                         ></textarea>
-                        <p v-if="loginForm.errors.hero_title" class="text-xs text-red-500">{{ loginForm.errors.hero_title }}</p>
+                        <p v-if="loginForm.errors.hero_title" class="text-sm text-red-500">{{ loginForm.errors.hero_title }}</p>
                     </div>
 
                     <div class="grid gap-2">
@@ -185,7 +185,7 @@ const activeTab = ref<'login' | 'terms'>('login');
                         <textarea
                             v-model="loginForm.hero_subtitle"
                             rows="3"
-                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                         ></textarea>
                     </div>
 
@@ -198,11 +198,11 @@ const activeTab = ref<'login' | 'terms'>('login');
                 <!-- Feature Cards -->
                 <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
                     <div class="flex items-center justify-between">
-                        <h2 class="font-semibold text-gray-900 dark:text-white text-base">Feature Cards</h2>
+                        <h2 class="font-semibold text-gray-900 dark:text-white text-lg">Feature Cards</h2>
                         <Button type="button" variant="outline" size="sm" @click="addCard">+ Add Card</Button>
                     </div>
 
-                    <div v-if="loginForm.feature_cards.length === 0" class="text-sm text-gray-400 text-center py-4">
+                    <div v-if="loginForm.feature_cards.length === 0" class="text-base text-gray-400 text-center py-4">
                         No feature cards. Click "Add Card" to add one.
                     </div>
 
@@ -213,32 +213,32 @@ const activeTab = ref<'login' | 'terms'>('login');
                             class="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-4 space-y-3"
                         >
                             <div class="flex items-center justify-between">
-                                <p class="text-xs font-semibold text-gray-500 uppercase">Card {{ i + 1 }}</p>
+                                <p class="text-sm font-semibold text-gray-500 uppercase">Card {{ i + 1 }}</p>
                                 <button
                                     type="button"
                                     @click="removeCard(i)"
-                                    class="text-xs text-red-500 hover:text-red-700"
+                                    class="text-sm text-red-500 hover:text-red-700"
                                 >Remove</button>
                             </div>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Icon</Label>
+                                <Label class="text-sm">Icon</Label>
                                 <select
                                     v-model="card.icon"
-                                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 >
                                     <option v-for="icon in iconOptions" :key="icon" :value="icon">{{ icon }}</option>
                                 </select>
                             </div>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Title</Label>
+                                <Label class="text-sm">Title</Label>
                                 <Input v-model="card.title" placeholder="Card title" />
                             </div>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Description</Label>
+                                <Label class="text-sm">Description</Label>
                                 <textarea
                                     v-model="card.description"
                                     rows="2"
-                                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 ></textarea>
                             </div>
                         </div>
@@ -259,25 +259,25 @@ const activeTab = ref<'login' | 'terms'>('login');
             <!-- ════════════════ TERMS TAB ════════════════ -->
             <form v-if="activeTab === 'terms'" @submit.prevent="submitTerms" class="space-y-8">
 
-                <div v-if="termsForm.recentlySuccessful" class="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3">
+                <div v-if="termsForm.recentlySuccessful" class="bg-green-50 border border-green-200 text-green-700 text-base rounded-lg px-4 py-3">
                     Terms & Conditions saved successfully.
                 </div>
 
                 <!-- Privacy Policy -->
                 <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-                    <h2 class="font-semibold text-gray-900 dark:text-white text-base">Privacy Policy</h2>
+                    <h2 class="font-semibold text-gray-900 dark:text-white text-lg">Privacy Policy</h2>
 
                     <div class="grid gap-2">
-                        <Label>Intro paragraph <span class="text-gray-400 font-normal text-xs">(HTML allowed: &lt;strong&gt;, &lt;em&gt;, etc.)</span></Label>
+                        <Label>Intro paragraph <span class="text-gray-400 font-normal text-sm">(HTML allowed: &lt;strong&gt;, &lt;em&gt;, etc.)</span></Label>
                         <textarea
                             v-model="termsForm.privacy_intro"
                             rows="3"
-                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                         ></textarea>
                     </div>
 
                     <div class="flex items-center justify-between pt-2">
-                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Sections</h3>
+                        <h3 class="text-base font-medium text-gray-700 dark:text-gray-300">Sections</h3>
                         <Button type="button" variant="outline" size="sm" @click="addPrivacySection">+ Add Section</Button>
                     </div>
 
@@ -288,49 +288,49 @@ const activeTab = ref<'login' | 'terms'>('login');
                             class="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-4 space-y-2"
                         >
                             <div class="flex items-center justify-between">
-                                <p class="text-xs font-semibold text-gray-500 uppercase">Section {{ i + 1 }}</p>
-                                <button type="button" @click="removePrivacySection(i)" class="text-xs text-red-500 hover:text-red-700">Remove</button>
+                                <p class="text-sm font-semibold text-gray-500 uppercase">Section {{ i + 1 }}</p>
+                                <button type="button" @click="removePrivacySection(i)" class="text-sm text-red-500 hover:text-red-700">Remove</button>
                             </div>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Section heading</Label>
+                                <Label class="text-sm">Section heading</Label>
                                 <Input v-model="section.title" placeholder="1. Data we collect" />
                             </div>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Content</Label>
+                                <Label class="text-sm">Content</Label>
                                 <textarea
                                     v-model="section.content"
                                     rows="3"
-                                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 ></textarea>
                             </div>
                         </div>
                     </div>
 
                     <div class="grid gap-2 pt-2">
-                        <Label>Privacy checkbox label <span class="text-gray-400 font-normal text-xs">(HTML allowed)</span></Label>
+                        <Label>Privacy checkbox label <span class="text-gray-400 font-normal text-sm">(HTML allowed)</span></Label>
                         <textarea
                             v-model="termsForm.privacy_checkbox_label"
                             rows="2"
-                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                         ></textarea>
                     </div>
                 </section>
 
                 <!-- Terms of Use -->
                 <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-                    <h2 class="font-semibold text-gray-900 dark:text-white text-base">Terms of Use</h2>
+                    <h2 class="font-semibold text-gray-900 dark:text-white text-lg">Terms of Use</h2>
 
                     <div class="grid gap-2">
-                        <Label>Intro paragraph <span class="text-gray-400 font-normal text-xs">(HTML allowed)</span></Label>
+                        <Label>Intro paragraph <span class="text-gray-400 font-normal text-sm">(HTML allowed)</span></Label>
                         <textarea
                             v-model="termsForm.terms_intro"
                             rows="3"
-                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                         ></textarea>
                     </div>
 
                     <div class="flex items-center justify-between pt-2">
-                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Sections</h3>
+                        <h3 class="text-base font-medium text-gray-700 dark:text-gray-300">Sections</h3>
                         <Button type="button" variant="outline" size="sm" @click="addTermsSection">+ Add Section</Button>
                     </div>
 
@@ -341,30 +341,30 @@ const activeTab = ref<'login' | 'terms'>('login');
                             class="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-4 space-y-2"
                         >
                             <div class="flex items-center justify-between">
-                                <p class="text-xs font-semibold text-gray-500 uppercase">Section {{ i + 1 }}</p>
-                                <button type="button" @click="removeTermsSection(i)" class="text-xs text-red-500 hover:text-red-700">Remove</button>
+                                <p class="text-sm font-semibold text-gray-500 uppercase">Section {{ i + 1 }}</p>
+                                <button type="button" @click="removeTermsSection(i)" class="text-sm text-red-500 hover:text-red-700">Remove</button>
                             </div>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Section heading</Label>
+                                <Label class="text-sm">Section heading</Label>
                                 <Input v-model="section.title" placeholder="1. Eligibility" />
                             </div>
                             <div class="grid gap-1">
-                                <Label class="text-xs">Content</Label>
+                                <Label class="text-sm">Content</Label>
                                 <textarea
                                     v-model="section.content"
                                     rows="3"
-                                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 ></textarea>
                             </div>
                         </div>
                     </div>
 
                     <div class="grid gap-2 pt-2">
-                        <Label>Terms checkbox label <span class="text-gray-400 font-normal text-xs">(HTML allowed)</span></Label>
+                        <Label>Terms checkbox label <span class="text-gray-400 font-normal text-sm">(HTML allowed)</span></Label>
                         <textarea
                             v-model="termsForm.terms_checkbox_label"
                             rows="2"
-                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
                         ></textarea>
                     </div>
                 </section>

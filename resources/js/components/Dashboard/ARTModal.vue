@@ -80,8 +80,8 @@ const resolvedWithTimes = computed(() =>
                                     <PhClockCountdown :size="24" color="white" weight="fill" />
                                 </div>
                                 <div>
-                                    <h2 class="text-xl font-black text-white tracking-tight">Avg. Response Time</h2>
-                                    <p class="text-green-100 text-sm">Time from report to arrival</p>
+                                    <h2 class="text-2xl font-black text-white tracking-tight">Avg. Response Time</h2>
+                                    <p class="text-green-100 text-base">Time from report to arrival</p>
                                 </div>
                             </div>
                             <button
@@ -97,11 +97,11 @@ const resolvedWithTimes = computed(() =>
                             <div class="flex items-end gap-4">
                                 <div>
                                     <p class="text-6xl font-black text-green-700 leading-none">{{ avgResponseTime }}</p>
-                                    <p class="text-sm text-green-500 font-medium mt-1">average response time</p>
+                                    <p class="text-base text-green-500 font-medium mt-1">average response time</p>
                                 </div>
                                 <div class="mb-1">
                                     <span
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-base font-bold"
                                         :class="[performanceLabel.bg, performanceLabel.color]"
                                     >
                                         <component :is="performanceLabel.icon" :size="14" />
@@ -113,7 +113,7 @@ const resolvedWithTimes = computed(() =>
 
                         <!-- Benchmarks -->
                         <div class="px-6 py-4 border-b border-gray-100">
-                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Performance Benchmarks</p>
+                            <p class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">Performance Benchmarks</p>
                             <div class="space-y-2">
                                 <div v-for="b in benchmarks" :key="b.label" class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -122,12 +122,12 @@ const resolvedWithTimes = computed(() =>
                                             :class="b.met ? 'text-green-500' : 'text-gray-300'"
                                             weight="fill"
                                         />
-                                        <span class="text-sm text-gray-600">{{ b.label }}</span>
+                                        <span class="text-base text-gray-600">{{ b.label }}</span>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <span class="text-sm font-semibold text-gray-500">{{ b.value }}</span>
+                                        <span class="text-base font-semibold text-gray-500">{{ b.value }}</span>
                                         <span
-                                            class="text-xs font-bold px-2 py-0.5 rounded-full"
+                                            class="text-sm font-bold px-2 py-0.5 rounded-full"
                                             :class="b.met ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'"
                                         >
                                             {{ b.met ? 'Met' : 'Not Met' }}
@@ -139,7 +139,7 @@ const resolvedWithTimes = computed(() =>
 
                         <!-- Progress arc / bar -->
                         <div class="px-6 py-4 border-b border-gray-100">
-                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Performance Scale</p>
+                            <p class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">Performance Scale</p>
                             <div class="relative w-full h-3 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 rounded-full overflow-hidden">
                                 <!-- Marker -->
                                 <div
@@ -147,7 +147,7 @@ const resolvedWithTimes = computed(() =>
                                     :style="{ left: `${Math.min((avgMinutes / 30) * 100, 100)}%` }"
                                 />
                             </div>
-                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <div class="flex justify-between text-sm text-gray-400 mt-1">
                                 <span>0 min</span>
                                 <span>10 min</span>
                                 <span>20 min</span>
@@ -157,7 +157,7 @@ const resolvedWithTimes = computed(() =>
 
                         <!-- Note -->
                         <div class="px-6 py-4 bg-gray-50">
-                            <p class="text-xs text-gray-400 italic">
+                            <p class="text-sm text-gray-400 italic">
                                 Calculated from incident report creation time to responder arrival time across all resolved incidents.
                             </p>
                         </div>
@@ -166,7 +166,7 @@ const resolvedWithTimes = computed(() =>
                         <div class="px-6 py-4 border-t border-gray-100 flex justify-end">
                             <button
                                 @click="emit('close')"
-                                class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                                class="px-4 py-2 text-base font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
                             >
                                 Close
                             </button>

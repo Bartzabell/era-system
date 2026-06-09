@@ -81,7 +81,7 @@ const user = page.props.auth.user;
 
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">
-                        <p class="-mt-4 text-sm text-muted-foreground">
+                        <p class="-mt-4 text-base text-muted-foreground">
                             Your email address is unverified.
                             <Link
                                 :href="send()"
@@ -94,7 +94,7 @@ const user = page.props.auth.user;
 
                         <div
                             v-if="status === 'verification-link-sent'"
-                            class="mt-2 text-sm font-medium text-green-600"
+                            class="mt-2 text-base font-medium text-green-600"
                         >
                             A new verification link has been sent to your email
                             address.
@@ -116,7 +116,7 @@ const user = page.props.auth.user;
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-base text-neutral-600"
                             >
                                 Saved.
                             </p>

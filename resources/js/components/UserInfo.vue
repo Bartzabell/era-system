@@ -31,9 +31,9 @@ const showAvatar = computed(
         </AvatarFallback>
     </Avatar>
 
-    <div class="grid flex-1 text-left text-sm leading-tight">
+    <div class="grid flex-1 text-left text-base leading-tight">
         <span class="truncate font-medium">{{ user.full_name }}</span>
-        <span v-if="showUsername" class="truncate text-xs text-muted-foreground">{{
+        <span v-if="showUsername" class="truncate text-sm text-muted-foreground">{{
             user.username
         }}</span>
     </div>

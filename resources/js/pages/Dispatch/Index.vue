@@ -253,8 +253,8 @@ const minutesAgo = (val: string | null) => {
 
         <Modal :show="showDeleteModal" @close="showDeleteModal = false">
             <div class="p-6">
-                <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Delete Incident Report</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-300">
+                <h2 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Delete Incident Report</h2>
+                <p class="text-base text-gray-600 dark:text-gray-300">
                     Are you sure you want to delete <strong>{{ recordToDelete?.incident_code }}</strong>? This cannot be undone.
                 </p>
                 <div class="flex justify-end mt-6 gap-2">
@@ -269,8 +269,8 @@ const minutesAgo = (val: string | null) => {
             <!-- ── LEFT: Feed ── -->
             <div class="w-72 flex-shrink-0 flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
                 <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                    <span class="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300">Incident Feed</span>
-                    <button @click="openCreateModal" class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-colors">
+                    <span class="text-sm font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300">Incident Feed</span>
+                    <button @click="openCreateModal" class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold transition-colors">
                         <PhPlus :size="12" weight="bold" /> New
                     </button>
                 </div>
@@ -279,7 +279,7 @@ const minutesAgo = (val: string | null) => {
                     <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-2">Filter by status</p>
                     <div class="flex flex-wrap gap-1.5">
                         <button v-for="s in statusFlow" :key="s" @click="toggleFilter(s)"
-                            :class="['flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all duration-150', activeFilter === s ? statusMeta[s].activeBadge : statusMeta[s].idleBadge]">
+                            :class="['flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-semibold transition-all duration-150', activeFilter === s ? statusMeta[s].activeBadge : statusMeta[s].idleBadge]">
                             <span :class="['w-1.5 h-1.5 rounded-full shrink-0', activeFilter === s ? 'bg-white' : statusMeta[s].dot]" />
                             {{ statusCounts[s] ?? 0 }} {{ statusMeta[s].label }}
                         </button>
@@ -289,7 +289,7 @@ const minutesAgo = (val: string | null) => {
                 <div class="flex-1 overflow-y-auto">
                     <div v-if="filteredReports.length === 0" class="flex flex-col items-center justify-center h-full text-gray-400 gap-2 p-8">
                         <PhSiren :size="32" class="opacity-30" />
-                        <p class="text-xs text-center">No incidents{{ activeFilter ? ` with status "${activeFilter}"` : '' }}.</p>
+                        <p class="text-sm text-center">No incidents{{ activeFilter ? ` with status "${activeFilter}"` : '' }}.</p>
                     </div>
 
                     <button v-for="report in filteredReports" :key="report.id" @click="selectReport(report.id)"
@@ -300,8 +300,8 @@ const minutesAgo = (val: string | null) => {
                             <span v-else class="text-[10px] text-gray-300">—</span>
                             <span :class="['text-[10px] font-semibold px-1.5 py-0.5 rounded-full', getStatusMeta(report.status).idleBadge]">{{ getStatusMeta(report.status).label }}</span>
                         </div>
-                        <p class="text-sm font-semibold text-gray-800 dark:text-white truncate">{{ report.emergency?.emergency_name ?? '—' }}</p>
-                        <p class="text-xs text-gray-400 truncate">{{ report.incident?.incident_name ?? '' }}</p>
+                        <p class="text-base font-semibold text-gray-800 dark:text-white truncate">{{ report.emergency?.emergency_name ?? '—' }}</p>
+                        <p class="text-sm text-gray-400 truncate">{{ report.incident?.incident_name ?? '' }}</p>
                         <div class="flex items-center justify-between mt-1 gap-1">
                             <span class="flex items-center gap-1 text-[11px] text-gray-500 truncate">
                                 <PhMapPin :size="10" class="text-orange-400 shrink-0" />{{ report.barangay?.barangay_name ?? '—' }}
@@ -321,8 +321,8 @@ const minutesAgo = (val: string | null) => {
             <div class="flex overflow-y-auto w-full">
                 <div v-if="!selectedReport" class="flex flex-col items-center justify-center gap-3 text-gray-400 dark:text-gray-600 w-full">
                     <PhFire :size="48" class="opacity-15" />
-                    <p class="text-sm font-medium">Select an incident to view details</p>
-                    <p class="text-xs opacity-60">Click any report from the feed on the left</p>
+                    <p class="text-base font-medium">Select an incident to view details</p>
+                    <p class="text-sm opacity-60">Click any report from the feed on the left</p>
                 </div>
 
                 <div v-else class="w-full px-5">
@@ -330,7 +330,7 @@ const minutesAgo = (val: string | null) => {
 
                         <!-- Header -->
                         <div class="flex items-center justify-between px-5 py-3.5 bg-gray-800 dark:bg-gray-900">
-                            <h2 class="text-sm font-bold text-white tracking-wide">Emergency Details</h2>
+                            <h2 class="text-base font-bold text-white tracking-wide">Emergency Details</h2>
                             <div v-if="hasFullAccess" class="flex items-center gap-1.5">
                                 <button @click="openEditModal(selectedReport)" class="p-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition-colors" title="Edit">
                                     <PhPencil :size="13" />
@@ -355,12 +355,12 @@ const minutesAgo = (val: string | null) => {
                                 <template v-if="selectedReport.attachments.length > 1">
                                     <!-- Prev -->
                                     <button @click.stop="prevSlide"
-                                        class="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 text-white text-lg leading-none flex items-center justify-center z-10 transition-colors">
+                                        class="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 text-white text-xl leading-none flex items-center justify-center z-10 transition-colors">
                                         ‹
                                     </button>
                                     <!-- Next -->
                                     <button @click.stop="nextSlide"
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 text-white text-lg leading-none flex items-center justify-center z-10 transition-colors">
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 text-white text-xl leading-none flex items-center justify-center z-10 transition-colors">
                                         ›
                                     </button>
                                     <!-- Dots -->
@@ -379,19 +379,19 @@ const minutesAgo = (val: string | null) => {
                             <!-- No attachments -->
                             <div v-else class="w-full h-full flex flex-col items-center justify-center gap-2">
                                 <PhImage :size="40" class="text-gray-700" />
-                                <p class="text-xs text-gray-600">Photo submitted by citizen</p>
+                                <p class="text-sm text-gray-600">Photo submitted by citizen</p>
                             </div>
 
                             <!-- Priority badge (unchanged) -->
                             <div v-if="computedPriority || selectedReport.priority_level" class="absolute bottom-2 right-2 z-10">
-                                <span :class="['px-2 py-0.5 rounded-full text-xs font-bold border shadow', priorityBadgeClass(computedPriority?.level ?? selectedReport.priority_level)]">
+                                <span :class="['px-2 py-0.5 rounded-full text-sm font-bold border shadow', priorityBadgeClass(computedPriority?.level ?? selectedReport.priority_level)]">
                                     {{ computedPriority?.level ?? selectedReport.priority_level }} · {{ computedPriority?.label ?? selectedReport.priority_label }}
                                 </span>
                             </div>
                         </div>
 
                         <!-- Info strip -->
-                        <div class="flex divide-x divide-gray-100 border-b border-gray-100 text-xs">
+                        <div class="flex divide-x divide-gray-100 border-b border-gray-100 text-sm">
                             <div class="flex items-center gap-1 px-3 py-2 min-w-0">
                                 <PhMapPin :size="11" class="text-orange-400 shrink-0" />
                                 <span class="text-gray-700 dark:text-gray-200 font-medium truncate">{{ selectedReport.siteLocation?.site_name ?? selectedReport.barangay?.barangay_name ?? selectedReport.map_coordinates ?? '-' }}</span>
@@ -407,11 +407,11 @@ const minutesAgo = (val: string | null) => {
                                     <PhUser :size="15" class="text-orange-600 dark:text-orange-300" />
                                 </div>
                                 <div>
-                                    <p class="text-sm font-bold text-gray-800 dark:text-white leading-tight">{{ selectedReport.user ? `${selectedReport.user.first_name} ${selectedReport.user.last_name}` : '—' }}</p>
+                                    <p class="text-base font-bold text-gray-800 dark:text-white leading-tight">{{ selectedReport.user ? `${selectedReport.user.first_name} ${selectedReport.user.last_name}` : '—' }}</p>
                                     <p class="text-[11px] text-orange-500 font-medium">Reported By</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 shrink-0">
+                            <div class="flex items-center gap-1 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 shrink-0">
                                 <PhPhone :size="12" class="text-orange-400" />{{ selectedReport.user?.mobile_no ?? '—' }}
                             </div>
                         </div>
@@ -420,13 +420,13 @@ const minutesAgo = (val: string | null) => {
                         <div class="px-5 py-4 space-y-4">
 
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Emergency Type</label>
+                                <label class="block text-sm font-bold uppercase tracking-wider text-gray-500 mb-1.5">Emergency Type</label>
                                 <Boombox :items="emergencies" :existing-value="inlineEmergencyId" label-field="emergency_name" placeholder="Select emergency type"
                                     @change="(v: any) => { inlineEmergencyId = v?.id ?? null; if (!props.incidents.find(i => i.id === inlineIncidentId && i.emergency_id === inlineEmergencyId)) inlineIncidentId = null }" />
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                                <label class="block text-sm font-bold uppercase tracking-wider text-gray-500 mb-1.5">
                                     Incident Type
                                     <span v-if="!inlineEmergencyId" class="normal-case font-normal text-gray-400 text-[10px]">— select emergency first</span>
                                 </label>
@@ -435,12 +435,12 @@ const minutesAgo = (val: string | null) => {
                             </div>
 
                             <div v-if="computedPriority" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-dashed border-gray-200 dark:border-gray-600">
-                                <span :class="['px-2 py-0.5 rounded-full text-xs font-bold border', priorityBadgeClass(computedPriority.level)]">{{ computedPriority.level }} · {{ computedPriority.label }}</span>
-                                <span class="text-xs text-gray-500">Score: <strong class="text-gray-700 dark:text-gray-200">{{ computedPriority.score }}</strong>/10</span>
+                                <span :class="['px-2 py-0.5 rounded-full text-sm font-bold border', priorityBadgeClass(computedPriority.level)]">{{ computedPriority.level }} · {{ computedPriority.label }}</span>
+                                <span class="text-sm text-gray-500">Score: <strong class="text-gray-700 dark:text-gray-200">{{ computedPriority.score }}</strong>/10</span>
                             </div>
 
                             <button @click="submitReport" :disabled="isSubmitting || !inlineIncidentId || !inlineEmergencyId"
-                                class="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-2 shadow-sm">
+                                class="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-base font-bold tracking-wide transition-colors flex items-center justify-center gap-2 shadow-sm">
                                 <PhFloppyDisk :size="16" />{{ isSubmitting ? 'Saving…' : 'Submit Report' }}
                             </button>
 
@@ -455,26 +455,26 @@ const minutesAgo = (val: string | null) => {
                                             <span :class="['text-[10px] font-bold px-1.5 py-0.5 rounded-full', r.responder_type === 'leader' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700']">
                                                 {{ r.responder_type === 'leader' ? 'Leader' : 'Member' }}
                                             </span>
-                                            <span class="text-xs text-gray-700 dark:text-gray-200">{{ r.responder_name }}</span>
+                                            <span class="text-sm text-gray-700 dark:text-gray-200">{{ r.responder_name }}</span>
                                         </div>
                                     </div>
-                                    <p v-else class="text-xs text-gray-400 italic">No responders assigned yet.</p>
+                                    <p v-else class="text-sm text-gray-400 italic">No responders assigned yet.</p>
 
                                     <template v-if="selectedReport.status === 'waiting'">
                                         <div class="border-t border-gray-100 dark:border-gray-700 pt-3 space-y-2">
                                             <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Assign Team</p>
 
                                             <div>
-                                                <label class="block text-xs font-semibold text-gray-500 mb-1">Team Leader</label>
+                                                <label class="block text-sm font-semibold text-gray-500 mb-1">Team Leader</label>
                                                 <Boombox :items="users" :existing-value="teamLeaderId" label-field="full_name" placeholder="Select leader"
                                                     @change="(v: any) => teamLeaderId = v?.id ?? null" />
                                             </div>
 
                                             <div>
-                                                <label class="block text-xs font-semibold text-gray-500 mb-1">Team Members</label>
+                                                <label class="block text-sm font-semibold text-gray-500 mb-1">Team Members</label>
                                                 <Boombox :items="users.filter(u => u.id !== teamLeaderId)" :existing-value="null" label-field="full_name" placeholder="Add member" @change="addMember" />
                                                 <div v-if="teamMemberIds.length" class="mt-1.5 flex flex-wrap gap-1">
-                                                    <span v-for="id in teamMemberIds" :key="id" class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+                                                    <span v-for="id in teamMemberIds" :key="id" class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
                                                         {{ users.find(u => u.id === id)?.full_name }}
                                                         <button @click="removeMember(id)" class="ml-0.5 text-blue-400 hover:text-blue-700">×</button>
                                                     </span>
@@ -482,7 +482,7 @@ const minutesAgo = (val: string | null) => {
                                             </div>
 
                                             <button @click="assignTeam(selectedReport)" :disabled="!teamLeaderId || isAssigning"
-                                                class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-2 shadow-sm">
+                                                class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-base font-bold tracking-wide transition-colors flex items-center justify-center gap-2 shadow-sm">
                                                 <PhUser :size="16" />{{ isAssigning ? 'Dispatching…' : 'Dispatch Team' }}
                                             </button>
                                         </div>
@@ -498,7 +498,7 @@ const minutesAgo = (val: string | null) => {
                             <div class="flex gap-1.5">
                                 <button v-for="s in (['resolved','cancelled'] as StatusKey[])" :key="s"
                                     :disabled="updatingStatus === selectedReport.id" @click="updateStatus(selectedReport, s)"
-                                    :class="['flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer disabled:opacity-50',
+                                    :class="['flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-sm font-semibold transition-all border cursor-pointer disabled:opacity-50',
                                         selectedReport.status === s ? statusMeta[s].activeBadge : statusMeta[s].idleBadge]">
                                     <span :class="['w-1.5 h-1.5 rounded-full shrink-0', selectedReport.status === s ? 'bg-white' : statusMeta[s].dot]" />
                                     {{ statusMeta[s].label }}
@@ -520,12 +520,12 @@ const minutesAgo = (val: string | null) => {
 
                     <!-- Close -->
                     <button @click="closeImageModal"
-                        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white text-xl flex items-center justify-center transition-colors z-10">
+                        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl flex items-center justify-center transition-colors z-10">
                         ×
                     </button>
 
                     <!-- Counter -->
-                    <div class="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-black/50 text-white text-xs font-semibold z-10">
+                    <div class="absolute top-4 left-4 px-2.5 py-1 rounded-lg bg-black/50 text-white text-sm font-semibold z-10">
                         {{ modalIndex + 1 }} / {{ selectedReport.attachments.length }}
                     </div>
 
@@ -539,11 +539,11 @@ const minutesAgo = (val: string | null) => {
                     <!-- Prev / Next -->
                     <template v-if="selectedReport.attachments.length > 1">
                         <button @click="prevModal"
-                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white text-2xl flex items-center justify-center transition-colors">
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white text-3xl flex items-center justify-center transition-colors">
                             ‹
                         </button>
                         <button @click="nextModal"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white text-2xl flex items-center justify-center transition-colors">
+                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white text-3xl flex items-center justify-center transition-colors">
                             ›
                         </button>
 

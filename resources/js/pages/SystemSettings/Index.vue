@@ -248,22 +248,22 @@ const modalTitle = computed(() => {
         <!-- Form Modal -->
         <Modal :show="isFormVisible" @close="closeFormModal" class="fixed inset-0 z-50">
             <div v-if="isFormVisible" class="p-6 w-full max-w-lg">
-                <h2 class="text-base font-medium text-gray-900 dark:text-gray-100 mb-4">{{ modalTitle }}</h2>
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">{{ modalTitle }}</h2>
 
                 <!-- Hotline Form -->
                 <template v-if="activeTab === 'hotline'">
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Hotline Name <span class="text-red-500">*</span></label>
-                            <input v-model="form.hotline_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Hotline Name <span class="text-red-500">*</span></label>
+                            <input v-model="form.hotline_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Hotline Number <span class="text-red-500">*</span></label>
-                            <input v-model="form.hotline_no" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Hotline Number <span class="text-red-500">*</span></label>
+                            <input v-model="form.hotline_no" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Description</label>
-                            <textarea v-model="form.description" rows="3" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Description</label>
+                            <textarea v-model="form.description" rows="3" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                     </div>
                 </template>
@@ -272,16 +272,16 @@ const modalTitle = computed(() => {
                 <template v-else-if="activeTab === 'emergency'">
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Emergency Name <span class="text-red-500">*</span></label>
-                            <input v-model="form.emergency_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Emergency Name <span class="text-red-500">*</span></label>
+                            <input v-model="form.emergency_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" />
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Severity Level</label>
-                            <input v-model="form.severity_level" type="text" placeholder="e.g. high, medium, low" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Severity Level</label>
+                            <input v-model="form.severity_level" type="text" placeholder="e.g. high, medium, low" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" />
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Definition</label>
-                            <textarea v-model="form.definition" rows="3" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Definition</label>
+                            <textarea v-model="form.definition" rows="3" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" />
                         </div>
                     </div>
                 </template>
@@ -290,37 +290,37 @@ const modalTitle = computed(() => {
                 <template v-else-if="activeTab === 'incident'">
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Incident Name <span class="text-red-500">*</span></label>
-                            <input v-model="form.incident_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Incident Name <span class="text-red-500">*</span></label>
+                            <input v-model="form.incident_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Emergency <span class="text-red-500">*</span></label>
-                            <select v-model="form.emergency_id" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Emergency <span class="text-red-500">*</span></label>
+                            <select v-model="form.emergency_id" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500">
                                 <option value="">Select emergency</option>
                                 <option v-for="e in emergencies" :key="e.id" :value="e.id">{{ e.emergency_name }}</option>
                             </select>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Base Severity</label>
-                                <input v-model="form.base_severity" type="number" min="0" max="10" step="0.1" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Base Severity</label>
+                                <input v-model="form.base_severity" type="number" min="0" max="10" step="0.1" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Base Time</label>
-                                <input v-model="form.base_time" type="number" min="0" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Base Time</label>
+                                <input v-model="form.base_time" type="number" min="0" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Base Resources</label>
-                                <input v-model="form.base_resources" type="number" min="0" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Base Resources</label>
+                                <input v-model="form.base_resources" type="number" min="0" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Base Secondary</label>
-                                <input v-model="form.base_secondary" type="number" min="0" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Base Secondary</label>
+                                <input v-model="form.base_secondary" type="number" min="0" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Definition</label>
-                            <textarea v-model="form.definition" rows="3" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Definition</label>
+                            <textarea v-model="form.definition" rows="3" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" />
                         </div>
                     </div>
                 </template>
@@ -329,12 +329,12 @@ const modalTitle = computed(() => {
                 <template v-else>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Barangay Name <span class="text-red-500">*</span></label>
-                            <input v-model="form.barangay_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Barangay Name <span class="text-red-500">*</span></label>
+                            <input v-model="form.barangay_name" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Landmark</label>
-                            <input v-model="form.landmark" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Landmark</label>
+                            <input v-model="form.landmark" type="text" class="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                         </div>
                     </div>
                 </template>
@@ -342,11 +342,11 @@ const modalTitle = computed(() => {
                 <div class="flex justify-end gap-2 mt-6">
                     <button
                         @click="closeFormModal"
-                        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        class="px-4 py-2 text-base font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >Cancel</button>
                     <button
                         @click="submitForm"
-                        class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-900 hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white text-white transition-colors"
+                        class="px-4 py-2 text-base font-medium rounded-lg bg-gray-900 hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white text-white transition-colors"
                     >{{ formMode === 'create' ? 'Create' : 'Save changes' }}</button>
                 </div>
             </div>
@@ -358,14 +358,14 @@ const modalTitle = computed(() => {
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-7">
                     <div>
-                        <h1 class="text-lg font-medium text-gray-900 dark:text-gray-100">System Settings</h1>
-                        <p class="text-xs text-gray-400 mt-0.5">Homepage / System Settings</p>
+                        <h1 class="text-xl font-medium text-gray-900 dark:text-gray-100">System Settings</h1>
+                        <p class="text-sm text-gray-400 mt-0.5">Homepage / System Settings</p>
                     </div>
                     <button
                         @click="handleOpenCreate"
                         class="inline-flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700
                                dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white
-                               text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                               text-white text-base font-medium px-4 py-2 rounded-lg transition-colors"
                     >
                         <PhPlus :size="14" />
                         Add {{ activeTab }}
@@ -382,7 +382,7 @@ const modalTitle = computed(() => {
                             ? { borderColor: tabColors[tab.key].border, borderBottomColor: 'white' }
                             : {}"
                         :class="[
-                            'flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-medium',
+                            'flex items-center gap-1.5 px-3.5 py-1.5 text-base font-medium',
                             'rounded-t-md border-2 border-b-0 transition-all select-none',
                             activeTab === tab.key
                                 ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 z-10'
@@ -416,18 +416,18 @@ const modalTitle = computed(() => {
         <!-- Delete confirmation -->
         <Modal :show="showDeleteModal" @close="showDeleteModal = false">
             <div class="p-6 max-w-sm">
-                <h2 class="text-base font-medium text-gray-900 dark:text-gray-100 mb-1">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
                     Delete {{ activeTab }}
                 </h2>
-                <p class="text-sm text-gray-400 dark:text-gray-500">This action cannot be undone.</p>
+                <p class="text-base text-gray-400 dark:text-gray-500">This action cannot be undone.</p>
                 <div class="flex justify-end gap-2 mt-6">
                     <button
                         @click="showDeleteModal = false"
-                        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        class="px-4 py-2 text-base font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >Cancel</button>
                     <button
                         @click="deleteRecord"
-                        class="px-4 py-2 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors"
+                        class="px-4 py-2 text-base font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors"
                     >Delete</button>
                 </div>
             </div>

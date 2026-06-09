@@ -117,7 +117,7 @@ const table = useVueTable({
     <!-- Global Search -->
     <div class="flex flex-col gap-1 pt-1 sm:flex-row sm:items-end sm:justify-end">
       <div v-if="showPerPage" class="flex items-center gap-2">
-        <div class=" text-xs">Per page:</div>
+        <div class=" text-sm">Per page:</div>
         <CustomSelect label="" name="per_page" v-model="perPage" :options="perPageOptions" class="w-max" />
       </div>
       <div v-if="showSearch" class="flex items-center pt-4">
@@ -165,23 +165,23 @@ const table = useVueTable({
           <template v-for="page in data.links" :key="page.label">
 
             <Button v-if="page.active" size="sm"
-              :class="'z-10 text-xs h-auto border hover:!bg-sky-600/50 border-black bg-sky-600'">
+              :class="'z-10 text-sm h-auto border hover:!bg-sky-600/50 border-black bg-sky-600'">
               <span v-html="page.label"></span>
             </Button>
             <Link v-else-if="page.url" :href="page.url" method="get" preserve-state class="inline-block">
-            <Button size="sm" :class="'text-black bg-gray-200 border border-black text-xs hover:!bg-sky-600/50'">
+            <Button size="sm" :class="'text-black bg-gray-200 border border-black text-sm hover:!bg-sky-600/50'">
 
               <span v-html="page.label"></span>
             </Button>
             </Link>
             <Button v-else size="sm"
-              :class="'opacity-50 bg-white border border-black hover:!bg-sky-600/80 text-black text-xs'">
+              :class="'opacity-50 bg-white border border-black hover:!bg-sky-600/80 text-black text-sm'">
               <span v-html="page.label"></span>
             </Button>
           </template>
         </nav>
       </div>
-      <div class="flex text-sm ">
+      <div class="flex text-base ">
         Showing {{ data.from }} to {{ data.to }} of {{ data.total }} entries
       </div>
     </div>

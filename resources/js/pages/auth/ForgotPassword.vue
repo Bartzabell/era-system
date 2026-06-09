@@ -20,7 +20,7 @@ defineProps<{
 
         <Head title="Forgot password" />
 
-        <div v-if="status" class="mb-4 text-center text-sm font-medium text-green-600">
+        <div v-if="status" class="mb-4 text-center text-base font-medium text-green-600">
             {{ status }}
         </div>
 
@@ -41,7 +41,7 @@ defineProps<{
                 </div>
             </Form>
 
-            <div class="space-x-1 text-center text-sm text-muted-foreground">
+            <div class="space-x-1 text-center text-base text-muted-foreground">
                 <span>Or, return to</span>
                 <TextLink :href="login()">log in</TextLink>
             </div>

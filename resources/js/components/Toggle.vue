@@ -85,7 +85,7 @@ const sizeClasses = computed(() => {
             <label
                 v-if="label"
                 :class="[
-                    'text-sm font-medium select-none',
+                    'text-base font-medium select-none',
                     disabled ? 'text-gray-400' : 'text-gray-700 cursor-pointer',
                 ]"
                 @click="toggle"
@@ -95,7 +95,7 @@ const sizeClasses = computed(() => {
             <span
                 v-if="description"
                 :class="[
-                    'text-xs',
+                    'text-sm',
                     disabled ? 'text-gray-300' : 'text-gray-500',
                 ]"
             >

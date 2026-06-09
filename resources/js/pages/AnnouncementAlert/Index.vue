@@ -102,7 +102,7 @@ const columns = [
         header: 'Message',
         cell: ({ row }: any) => h(
             'p',
-            { class: 'line-clamp-2 text-sm text-gray-600 max-w-xs' },
+            { class: 'line-clamp-2 text-base text-gray-600 max-w-xs' },
             row.original.announcement_message
         ),
     },
@@ -111,7 +111,7 @@ const columns = [
         header: 'Audience',
         cell: ({ row }: any) => h(
             'span',
-            { class: `px-2 py-1 text-xs font-semibold rounded-full ${audienceBadgeClass(row.original)}` },
+            { class: `px-2 py-1 text-sm font-semibold rounded-full ${audienceBadgeClass(row.original)}` },
             audienceBadgeLabel(row.original)
         ),
     },
@@ -151,7 +151,7 @@ const columns = [
                     <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-2">
                         <div class="flex items-center justify-center text-center gap-2 mb-4 bg-orange-100 rounded-lg p-2">
                             <Megaphone :size="22" weight="fill" class="text-orange-600" />
-                            <h2 class="text-xl font-black text-gray-800">Broadcast Message</h2>
+                            <h2 class="text-2xl font-black text-gray-800">Broadcast Message</h2>
                         </div>
 
                         <form @submit.prevent="submitForm" class="flex flex-col gap-4 m-4">
@@ -161,28 +161,28 @@ const columns = [
                                     v-model="form.announcement_title"
                                     class="font-black"
                                 />
-                                <p v-if="form.errors.announcement_title" class="text-xs text-red-500 mt-1">
+                                <p v-if="form.errors.announcement_title" class="text-sm text-red-500 mt-1">
                                     {{ form.errors.announcement_title }}
                                 </p>
                             </div>
 
                             <div>
-                                <label class="block mb-1 text-sm text-gray-600">
+                                <label class="block mb-1 text-base text-gray-600">
                                     Message <span class="text-red-500">*</span>
                                 </label>
                                 <textarea
                                     v-model="form.announcement_message"
                                     rows="4"
                                     placeholder="Write your announcement..."
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-base resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
                                 />
-                                <p v-if="form.errors.announcement_message" class="text-xs text-red-500 mt-1">
+                                <p v-if="form.errors.announcement_message" class="text-sm text-red-500 mt-1">
                                     {{ form.errors.announcement_message }}
                                 </p>
                             </div>
 
                             <div>
-                                <label class="block mb-2 text-sm text-gray-600">
+                                <label class="block mb-2 text-base text-gray-600">
                                     Broadcast To <span class="text-red-500">*</span>
                                 </label>
                                 <div class="flex gap-4">
@@ -192,7 +192,7 @@ const columns = [
                                             v-model="form.for_citizens"
                                             class="w-4 h-4 accent-orange-500"
                                         />
-                                        <span class="text-sm font-medium text-gray-700">Citizens</span>
+                                        <span class="text-base font-medium text-gray-700">Citizens</span>
                                     </label>
                                     <label class="flex items-center gap-2 cursor-pointer select-none">
                                         <input
@@ -200,11 +200,11 @@ const columns = [
                                             v-model="form.for_responders"
                                             class="w-4 h-4 accent-orange-500"
                                         />
-                                        <span class="text-sm font-medium text-gray-700">Responders</span>
+                                        <span class="text-base font-medium text-gray-700">Responders</span>
                                     </label>
                                 </div>
                                 <p v-if="!form.for_citizens && !form.for_responders && form.isDirty"
-                                    class="text-xs text-orange-500 mt-1">
+                                    class="text-sm text-orange-500 mt-1">
                                     Select at least one audience.
                                 </p>
                             </div>
@@ -226,8 +226,8 @@ const columns = [
                         <div class="bg-white rounded-xl border border-gray-200 flex flex-col gap-2">
                             <div class="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-xl">
                                 <PhSiren :size="32" class="text-red-500" weight="fill" />
-                                <h3 class="text-sm font-bold text-gray-700">Today's Broadcasted Alerts</h3>
-                                <span class="ml-auto text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">
+                                <h3 class="text-base font-bold text-gray-700">Today's Broadcasted Alerts</h3>
+                                <span class="ml-auto text-sm bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">
                                     {{ broadcastAlerts.length }}
                                 </span>
                             </div>
@@ -239,7 +239,7 @@ const columns = [
                                     class="rounded-lg border border-red-100 bg-red-50 p-3"
                                 >
                                     <div class="flex items-start justify-between gap-1 mb-1">
-                                        <p class="text-xs font-bold text-gray-800 line-clamp-1">
+                                        <p class="text-sm font-bold text-gray-800 line-clamp-1">
                                             {{ alert.announcement_title }}
                                         </p>
                                         <span
@@ -249,7 +249,7 @@ const columns = [
                                             {{ audienceBadgeLabel(alert) }}
                                         </span>
                                     </div>
-                                    <p class="text-xs text-gray-500 line-clamp-2">{{ alert.announcement_message }}</p>
+                                    <p class="text-sm text-gray-500 line-clamp-2">{{ alert.announcement_message }}</p>
                                     <div class="flex items-center justify-between mt-1.5">
                                         <span class="text-[10px] text-gray-400 flex items-center gap-1">
                                             <PhUser :size="10" /> {{ alert.created_by_name }}
@@ -259,7 +259,7 @@ const columns = [
                                 </div>
 
                                 <p v-if="broadcastAlerts.length === 0"
-                                    class="text-xs text-gray-400 text-center py-3">
+                                    class="text-sm text-gray-400 text-center py-3">
                                     No broadcasts today
                                 </p>
                             </div>
@@ -268,8 +268,8 @@ const columns = [
                         <div class="bg-white rounded-xl border border-gray-200 flex flex-col gap-2">
                             <div class="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-xl">
                                 <PhCalendar :size="32" class="text-gray-500" weight="fill" />
-                                <h3 class="text-sm font-bold text-gray-700">Previous Broadcast (Weekly)</h3>
-                                <span class="ml-auto text-xs bg-gray-200 text-gray-600 font-semibold px-2 py-0.5 rounded-full">
+                                <h3 class="text-base font-bold text-gray-700">Previous Broadcast (Weekly)</h3>
+                                <span class="ml-auto text-sm bg-gray-200 text-gray-600 font-semibold px-2 py-0.5 rounded-full">
                                     {{ broadcastHistory.length }}
                                 </span>
                             </div>
@@ -281,7 +281,7 @@ const columns = [
                                     class="rounded-lg border border-gray-200 bg-gray-50 p-3"
                                 >
                                     <div class="flex items-start justify-between gap-1 mb-1">
-                                        <p class="text-xs font-bold text-gray-800 line-clamp-1">
+                                        <p class="text-sm font-bold text-gray-800 line-clamp-1">
                                             {{ item.announcement_title }}
                                         </p>
                                         <span
@@ -291,7 +291,7 @@ const columns = [
                                             {{ audienceBadgeLabel(item) }}
                                         </span>
                                     </div>
-                                    <p class="text-xs text-gray-500 line-clamp-2">{{ item.announcement_message }}</p>
+                                    <p class="text-sm text-gray-500 line-clamp-2">{{ item.announcement_message }}</p>
                                     <div class="flex items-center justify-between mt-1.5">
                                         <span class="text-[10px] text-gray-400 flex items-center gap-1">
                                             <PhUser :size="10" /> {{ item.created_by_name }}
@@ -301,7 +301,7 @@ const columns = [
                                 </div>
 
                                 <p v-if="broadcastHistory.length === 0"
-                                    class="text-xs text-gray-400 text-center py-3">
+                                    class="text-sm text-gray-400 text-center py-3">
                                     No broadcasts this week
                                 </p>
                             </div>
@@ -310,7 +310,7 @@ const columns = [
                 </div>
 
                 <div class="bg-white rounded-xl border border-gray-200 p-4">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">All Announcements</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">All Announcements</h2>
                     <DataTable
                         :columns="columns"
                         :data="announcements"
@@ -325,8 +325,8 @@ const columns = [
 
         <Modal :show="showDeleteModal" @close="showDeleteModal = false">
             <div class="p-6">
-                <h2 class="mb-4 text-lg font-medium text-gray-900">Delete Announcement</h2>
-                <p class="text-sm text-gray-600">
+                <h2 class="mb-4 text-xl font-medium text-gray-900">Delete Announcement</h2>
+                <p class="text-base text-gray-600">
                     Are you sure you want to delete
                     <strong>{{ deletingRecord?.announcement_title }}</strong>?
                     This action cannot be undone.

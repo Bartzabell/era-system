@@ -118,7 +118,7 @@ const exportCitizenReport = () => {
                     >
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-gray-700">Active Incidents</p>
+                                <p class="text-xl font-black col-span-2 leading-5 text-gray-700">Active Incidents</p>
                                 <div class="p-1 bg-red-100 rounded-md flex items-center justify-center">
                                     <Flame :size="40" color="#dc2626" weight="fill" />
                                 </div>
@@ -137,7 +137,7 @@ const exportCitizenReport = () => {
                     >
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-gray-700">Active Responders</p>
+                                <p class="text-xl font-black col-span-2 leading-5 text-gray-700">Active Responders</p>
                                 <div class="p-1 bg-orange-100 rounded-md flex items-center justify-center">
                                     <PhFireTruck :size="40" color="#ea580c" weight="fill" />
                                 </div>
@@ -156,7 +156,7 @@ const exportCitizenReport = () => {
                     >
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-gray-700">Avg Response Time</p>
+                                <p class="text-xl font-black col-span-2 leading-5 text-gray-700">Avg Response Time</p>
                                 <div class="p-1 bg-green-100 rounded-md flex items-center justify-center">
                                     <PhClockCountdown :size="40" color="#16a34a" weight="fill" />
                                 </div>
@@ -175,7 +175,7 @@ const exportCitizenReport = () => {
                     >
                         <div class="flex flex-col">
                             <div class="grid grid-cols-3">
-                                <p class="text-lg font-black col-span-2 leading-5 text-gray-700">Resolved Today</p>
+                                <p class="text-xl font-black col-span-2 leading-5 text-gray-700">Resolved Today</p>
                                 <div class="p-1 bg-gray-100 rounded-md flex items-center justify-center">
                                     <PhCheckCircle :size="40" color="#6b7280" weight="fill" />
                                 </div>
@@ -190,8 +190,8 @@ const exportCitizenReport = () => {
                 <!-- Map -->
                 <div class="relative bg-white overflow-hidden rounded-xl border border-gray-200 isolate z-0">
                     <div class="flex justify-between items-center p-4">
-                        <h1 class="text-2xl font-black text-gray-800">Live Incident Map</h1>
-                        <div class="flex gap-2 text-sm">
+                        <h1 class="text-3xl font-black text-gray-800">Live Incident Map</h1>
+                        <div class="flex gap-2 text-base">
                             <span class="flex items-center gap-1">
                                 <span class="w-3 h-3 rounded-full bg-red-600"></span> P1 Critical
                             </span>
@@ -219,7 +219,7 @@ const exportCitizenReport = () => {
             <div class="col-span-1 flex flex-col" style="height: calc(580px + 4rem + 4rem + 1rem);">
                 <div class="bg-white px-4 pt-3 rounded-xl border border-gray-200 flex flex-col h-full pb-4">
                     <div class="flex justify-between items-center">
-                        <h1 class="text-2xl font-black my-3 text-gray-800">Incident Feed</h1>
+                        <h1 class="text-3xl font-black my-3 text-gray-800">Incident Feed</h1>
                         <div class="flex gap-1">
                             <PhFunnel :size="24" color="#6b7280" weight="fill" />
                             <PhDotsThreeOutline :size="24" color="#6b7280" weight="fill" />
@@ -235,10 +235,10 @@ const exportCitizenReport = () => {
                             <div class="rounded-2xl bg-white h-full ml-5 p-4">
                                 <div class="flex flex-col gap-2">
                                     <div class="flex justify-between items-start gap-2">
-                                        <h3 class="font-bold text-sm line-clamp-1 text-gray-800">{{ incident.incident_name }}</h3>
+                                        <h3 class="font-bold text-base line-clamp-1 text-gray-800">{{ incident.incident_name }}</h3>
                                         <span
                                             v-if="incident.priority_level"
-                                            class="shrink-0 text-xs font-bold px-1.5 py-0.5 rounded"
+                                            class="shrink-0 text-sm font-bold px-1.5 py-0.5 rounded"
                                             :class="{
                                                 'bg-red-100 text-red-700':       incident.priority_level === 'P1',
                                                 'bg-orange-100 text-orange-700': incident.priority_level === 'P2',
@@ -251,20 +251,20 @@ const exportCitizenReport = () => {
                                         </span>
                                     </div>
                                     <div class="flex items-center gap-1">
-                                        <span class="text-xs font-medium" :class="getPriorityScoreColor(incident.priority_score)">
+                                        <span class="text-sm font-medium" :class="getPriorityScoreColor(incident.priority_score)">
                                             {{ incident.priority_label ?? '' }}
                                         </span>
-                                        <span v-if="incident.priority_score" class="text-xs text-gray-400">
+                                        <span v-if="incident.priority_score" class="text-sm text-gray-400">
                                             ({{ incident.priority_score }}/10)
                                         </span>
                                     </div>
-                                    <div class="flex items-center gap-1 text-xs text-gray-500">
+                                    <div class="flex items-center gap-1 text-sm text-gray-500">
                                         <PhMapPin :size="15" color="#9ca3af" weight="fill" />
                                         <span class="line-clamp-1">{{ incident.landmark }}</span>
                                     </div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-xs text-gray-400">{{ incident.time_ago }}</span>
-                                        <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 capitalize">
+                                        <span class="text-sm text-gray-400">{{ incident.time_ago }}</span>
+                                        <span class="text-sm px-2 py-1 rounded-full bg-gray-100 text-gray-600 capitalize">
                                             {{ incident.status }}
                                         </span>
                                     </div>
@@ -285,7 +285,7 @@ const exportCitizenReport = () => {
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <span class="text-sm">Monthly Report</span>
+                            <span class="text-base">Monthly Report</span>
                         </button>
                         <button
                             class="flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-sm"
@@ -294,7 +294,7 @@ const exportCitizenReport = () => {
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
-                            <span class="text-sm">Citizen Report</span>
+                            <span class="text-base">Citizen Report</span>
                         </button>
                     </div>
                 </div>

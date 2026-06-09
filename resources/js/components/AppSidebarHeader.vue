@@ -159,10 +159,10 @@ const dotClass = (n: any) =>
             >
                 <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <div class="flex items-center gap-2">
-                        <h3 class="font-bold text-sm text-gray-800">Notifications</h3>
+                        <h3 class="font-bold text-base text-gray-800">Notifications</h3>
                         <span
                             v-if="unreadCount > 0"
-                            class="text-xs bg-red-100 text-red-600 font-semibold px-1.5 py-0.5 rounded-full"
+                            class="text-sm bg-red-100 text-red-600 font-semibold px-1.5 py-0.5 rounded-full"
                         >
                             {{ unreadCount }} unread
                         </span>
@@ -194,7 +194,7 @@ const dotClass = (n: any) =>
                                     :class="dotClass(notif)"
                                 />
                                 <p
-                                    class="text-sm line-clamp-1"
+                                    class="text-base line-clamp-1"
                                     :class="notif.is_read
                                         ? 'text-gray-400 font-normal'
                                         : 'text-gray-800 font-semibold'"
@@ -203,20 +203,20 @@ const dotClass = (n: any) =>
                                 </p>
                             </div>
                             <span
-                                class="shrink-0 text-xs px-1.5 py-0.5 rounded font-medium"
+                                class="shrink-0 text-sm px-1.5 py-0.5 rounded font-medium"
                                 :class="audienceBadgeClass(notif)"
                             >
                                 {{ audienceLabel(notif) }}
                             </span>
                         </div>
                         <p
-                            class="text-xs line-clamp-2 whitespace-pre-line"
+                            class="text-sm line-clamp-2 whitespace-pre-line"
                             :class="notif.is_read ? 'text-gray-400' : 'text-gray-600 ml-3.5'"
                         >
                             {{ notif.announcement_message }}
                         </p>
                         <p
-                            class="text-xs text-gray-400 mt-1"
+                            class="text-sm text-gray-400 mt-1"
                             :class="notif.is_read ? '' : 'ml-3.5'"
                         >
                             {{ notif.time_ago }}
@@ -225,7 +225,7 @@ const dotClass = (n: any) =>
 
                     <div
                         v-if="notifications.length === 0"
-                        class="px-4 py-6 text-center text-sm text-gray-400"
+                        class="px-4 py-6 text-center text-base text-gray-400"
                     >
                         No notifications
                     </div>
@@ -252,7 +252,7 @@ const dotClass = (n: any) =>
                     :size="22"
                     weight="fill"
                 />
-                <h2 class="text-lg font-semibold text-gray-900 leading-tight">
+                <h2 class="text-xl font-semibold text-gray-900 leading-tight">
                     {{ selectedNotif.announcement_title }}
                 </h2>
             </div>
@@ -260,17 +260,17 @@ const dotClass = (n: any) =>
             <!-- Audience Badge + Time -->
             <div class="flex items-center gap-2 mb-4">
                 <span
-                    class="text-xs px-2 py-0.5 rounded-full font-semibold"
+                    class="text-sm px-2 py-0.5 rounded-full font-semibold"
                     :class="audienceBadgeClass(selectedNotif)"
                 >
                     {{ audienceLabel(selectedNotif) }}
                 </span>
-                <span class="text-xs text-gray-400">{{ selectedNotif.time_ago }}</span>
+                <span class="text-sm text-gray-400">{{ selectedNotif.time_ago }}</span>
             </div>
 
             <!-- Message Body -->
             <div
-                class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 whitespace-pre-line leading-relaxed mb-5"
+                class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base text-gray-700 whitespace-pre-line leading-relaxed mb-5"
             >
                 {{ selectedNotif.announcement_message }}
             </div>
@@ -278,7 +278,7 @@ const dotClass = (n: any) =>
             <!-- Linked Incident (if any) -->
             <div
                 v-if="selectedNotif.is_incident_alert"
-                class="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-5"
+                class="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-5"
             >
                 <PhShieldWarning :size="14" weight="fill" />
                 This notification is linked to an incident report.
@@ -288,7 +288,7 @@ const dotClass = (n: any) =>
             <div class="flex justify-end pt-2 border-t border-gray-100">
                 <button
                     @click="closeDetailModal"
-                    class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                    class="px-4 py-2 text-base font-medium rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
                 >
                     Close
                 </button>

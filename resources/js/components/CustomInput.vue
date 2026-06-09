@@ -155,7 +155,7 @@ const handleInput = (event) => {
 
 <template>
     <div>
-        <label class="text-[10px] 2xl:text-sm font-medium text-gray-600 dark:text-gray-200">{{ name }}</label>
+        <label class="text-[10px] 2xl:text-base font-medium text-gray-600 dark:text-gray-200">{{ name }}</label>
         <div
             :class="{ '!border-red-500 !border-2': message }"
             class="flex rounded-xl transition bg-white border border-black dark:bg-gray-400 focus-within:ring-1 dark:focus-within:ring-sky-300 focus-within:ring-sky-600 ring-sky-100"
@@ -169,12 +169,12 @@ const handleInput = (event) => {
                 @input="handleInput"
                 v-bind="inputAttributes"
                 :class="[
-                    'w-full py-[5px] rounded-xl focus-within:ring-1 dark:bg-gray-500 dark:text-gray-200 text-[10px] 2xl:text-base dark:focus-within:ring-sky-300 focus-within:ring-sky-900 ring-sky-100 focus:outline-none pl-2',
+                    'w-full py-[5px] rounded-xl focus-within:ring-1 dark:bg-gray-500 dark:text-gray-200 text-[10px] 2xl:text-lg dark:focus-within:ring-sky-300 focus-within:ring-sky-900 ring-sky-100 focus:outline-none pl-2',
                     { 'text-gray-500 font-black': readonly || disabled }
                 ]"
                 :type="actualType"
             />
         </div>
-        <small class="text-xs italic text-red-500 md:text-sm" v-if="message">{{ message }}</small>
+        <small class="text-sm italic text-red-500 md:text-base" v-if="message">{{ message }}</small>
     </div>
 </template>

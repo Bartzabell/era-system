@@ -33,7 +33,7 @@ const passwordInput = useTemplateRef('passwordInput');
         >
             <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
                 <p class="font-medium">Warning</p>
-                <p class="text-sm">
+                <p class="text-base">
                     Please proceed with caution, this cannot be undone.
                 </p>
             </div>
