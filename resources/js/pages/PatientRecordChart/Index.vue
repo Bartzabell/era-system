@@ -265,7 +265,7 @@ const activeBg    = computed(() => tabColors[activeTab.value].bg)
         </Modal>
 
         <div class="w-full flex justify-center py-8 px-4">
-            <div class="w-full max-w-7xl">
+            <div class="w-full">
 
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-7">
