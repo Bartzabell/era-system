@@ -90,4 +90,9 @@ class IncidentReport extends Model
     {
         return $this->hasMany(IrResponder::class, 'ir_id', 'id');
     }
+
+    public function patientRecordCharts()
+    {
+        return $this->hasMany(PatientRecordChart::class, 'incident_report_id');
+    }
 }

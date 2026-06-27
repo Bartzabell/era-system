@@ -18,6 +18,7 @@ use App\Models\Responder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LoginSettingController;
+use App\Http\Controllers\PatientRecordChartController;
 use App\Http\Controllers\SettingsController;
 
 Route::get('/', [LoginController::class, 'create'])->name('home');
@@ -59,6 +60,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/dispatch/{incidentReport}', [DispatchController::class, 'update'])->name('dispatch.update');
         Route::delete('/dispatch/{incidentReport}', [DispatchController::class, 'destroy'])->name('dispatch.destroy');
         Route::post('/dispatch/{incidentReport}/assign-team', [DispatchController::class, 'assignTeam'])->name('dispatch.assignTeam');
+    });
+
+    Route::middleware('role:administrator,assistant admin,responder')->group(function () {
+        Route::get    ('patient-record-chart',                   [PatientRecordChartController::class, 'index'])   ->name('patient-record-chart.index');
+        Route::post   ('patient-record-chart',                   [PatientRecordChartController::class, 'store'])   ->name('patient-record-chart.store');
+        Route::put    ('patient-record-chart/{patientRecordChart}', [PatientRecordChartController::class, 'update'])  ->name('patient-record-chart.update');
+        Route::delete ('patient-record-chart/{patientRecordChart}', [PatientRecordChartController::class, 'destroy']) ->name('patient-record-chart.destroy');
     });
 
     // Citizen page
