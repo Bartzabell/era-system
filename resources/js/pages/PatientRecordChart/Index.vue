@@ -6,7 +6,7 @@ import DataTable from '@/components/Datatable.vue'
 import Modal from '@/components/Modal.vue'
 import FormModal from './Partials/FormModal.vue'
 import { Button } from '@/components/ui/button'
-import { PhPencil, PhTrash, PhPlus } from '@phosphor-icons/vue'
+import { PhPencil, PhTrash, PhPlus, PhPrinter } from '@phosphor-icons/vue'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -227,18 +227,28 @@ const columns = computed(() => [
         id: 'actions',
         header: '',
         cell: ({ row }: any) => h('div', { class: 'flex items-center gap-1.5' }, [
-            h(Button, {
-                variant: 'ghost', size: 'icon',
-                onClick: () => openEditModal(row.original),
-                class: 'h-7 w-7 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded',
-            }, () => h(PhPencil, { size: 15 })),
-            ...(props.hasFullAccess ? [
+            h('div', { class: 'flex items-center gap-1.5' }, [
                 h(Button, {
                     variant: 'ghost', size: 'icon',
-                    onClick: () => openDeleteModal(row.original),
-                    class: 'h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded',
-                }, () => h(PhTrash, { size: 15 })),
-            ] : []),
+                    onClick: () => window.open(`/patient-record-chart/${row.original.id}/print`, '_blank'),
+                    class: 'h-7 w-7 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded',
+                    title: 'Print / PDF',
+                }, () => h(PhPrinter, { size: 15 })),
+
+                h(Button, {
+                    variant: 'ghost', size: 'icon',
+                    onClick: () => openEditModal(row.original),
+                    class: 'h-7 w-7 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded',
+                }, () => h(PhPencil, { size: 15 })),
+
+                ...(props.hasFullAccess ? [
+                    h(Button, {
+                        variant: 'ghost', size: 'icon',
+                        onClick: () => openDeleteModal(row.original),
+                        class: 'h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded',
+                    }, () => h(PhTrash, { size: 15 })),
+                ] : []),
+            ]),
         ]),
     },
 ])

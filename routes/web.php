@@ -63,10 +63,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware('role:administrator,assistant admin,responder')->group(function () {
-        Route::get    ('patient-record-chart',                   [PatientRecordChartController::class, 'index'])   ->name('patient-record-chart.index');
-        Route::post   ('patient-record-chart',                   [PatientRecordChartController::class, 'store'])   ->name('patient-record-chart.store');
-        Route::put    ('patient-record-chart/{patientRecordChart}', [PatientRecordChartController::class, 'update'])  ->name('patient-record-chart.update');
-        Route::delete ('patient-record-chart/{patientRecordChart}', [PatientRecordChartController::class, 'destroy']) ->name('patient-record-chart.destroy');
+        Route::get    ('patient-record-chart',                            [PatientRecordChartController::class, 'index'])   ->name('patient-record-chart.index');
+        Route::post   ('patient-record-chart',                            [PatientRecordChartController::class, 'store'])   ->name('patient-record-chart.store');
+        Route::get    ('patient-record-chart/{patientRecordChart}/print', [PatientRecordChartController::class, 'print'])   ->name('patient-record-chart.print');  // ← ADD
+        Route::put    ('patient-record-chart/{patientRecordChart}',       [PatientRecordChartController::class, 'update'])  ->name('patient-record-chart.update');
+        Route::delete ('patient-record-chart/{patientRecordChart}',       [PatientRecordChartController::class, 'destroy']) ->name('patient-record-chart.destroy');
     });
 
     // Citizen page

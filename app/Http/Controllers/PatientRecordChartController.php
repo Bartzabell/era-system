@@ -8,6 +8,7 @@ use App\Models\PatientRecordChart;
 use App\Models\IncidentReport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PatientRecordChartController extends Controller
 {
@@ -317,5 +318,21 @@ class PatientRecordChartController extends Controller
 
         return redirect()->route('patient-record-chart.index')
             ->with('success', 'Patient record deleted successfully.');
+    }
+
+    public function print(PatientRecordChart $patientRecordChart)
+    {
+        if (!$this->hasFullAccess() && $patientRecordChart->created_by !== Auth::id()) {
+            abort(403, 'Unauthorized.');
+        }
+
+        $pdf = Pdf::loadView('reports.print', [
+            'record' => $patientRecordChart,
+        ])
+        ->setPaper('legal', 'portrait');
+
+        $filename = 'PCR-' . $patientRecordChart->chart_code . '.pdf';
+
+        return $pdf->stream($filename);   // stream() opens in browser; download() forces download
     }
 }
