@@ -329,7 +329,7 @@ class PatientRecordChartController extends Controller
         $pdf = Pdf::loadView('reports.print', [
             'record' => $patientRecordChart,
         ])
-        ->setPaper('legal', 'portrait');
+        ->setPaper('A4', 'portrait');
 
         $filename = 'PCR-' . $patientRecordChart->chart_code . '.pdf';
 
