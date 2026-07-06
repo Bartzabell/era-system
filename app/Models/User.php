@@ -104,4 +104,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(SiteLocation::class, 'site_location_id', 'id');
     }
+
+    public function dutyLogs()
+    {
+        return $this->hasMany(DutyLog::class);
+    }
 }

@@ -100,7 +100,7 @@ class IncidentReportApiController extends Controller
             'map_coordinates' => $request->map_coordinates,
             'attachment' => $request->attachment,
             'severity_level' => 'low',
-            'status' => 'waiting',
+            'status' => 'verifying',
             'distance' => $distance,
             'remarks' => $request->remarks,
             'priority_score' => $priorityData['priority_score'],

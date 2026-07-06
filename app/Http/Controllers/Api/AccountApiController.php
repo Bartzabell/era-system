@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\DutyLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -108,6 +109,13 @@ class AccountApiController extends Controller
                     'email' => $user->email,
                 ]
             ], 403);
+        }
+
+        if ($user->role === 'responder') {
+            DutyLog::firstOrCreate(
+                ['user_id' => $user->id, 'duty_date' => today()],
+                ['checked_in_at' => now()]
+            );
         }
 
         $user->tokens()->delete();
