@@ -4,6 +4,7 @@ use App\Http\Controllers\AnnouncementAlertController;
 use App\Http\Controllers\CitizenController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\DutyLogController;
 use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\MonthlyReportController;
 use App\Http\Controllers\UserController;
@@ -87,8 +88,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/api/responders', function () {
             return Responder::with('user')
-                ->where('is_active', true)
                 ->whereNull('deleted_at')
+                ->whereHas('user.dutyLogs', function ($q) {
+                    $q->whereDate('duty_date', today());
+                })
                 ->get()
                 ->map(fn($r) => [
                     'id'              => $r->id,
@@ -123,6 +126,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Admin only routes
     Route::middleware('role:administrator')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/duty-logs', [DutyLogController::class, 'index'])->name('duty-logs.index');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');

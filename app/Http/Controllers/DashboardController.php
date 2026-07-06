@@ -8,6 +8,7 @@ use App\Models\IncidentReport;
 use App\Models\Responder;
 use App\Exports\MonthlyReportExport;
 use App\Exports\CitizenReportExport;
+use App\Models\DutyLog;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
@@ -19,9 +20,11 @@ class DashboardController extends Controller
             ->whereNull('deleted_at')
             ->count();
 
-        $activeResponders = Responder::where('is_active', true)
-            ->whereNull('deleted_at')
-            ->count();
+        // $activeResponders = Responder::where('is_active', true)
+        //     ->whereNull('deleted_at')
+        //     ->count();
+
+        $activeResponders = DutyLog::whereDate('duty_date', Carbon::today())->count();
 
         $avgResponseTime = IncidentReport::whereNotNull('datetime_arrived')
             ->whereNull('deleted_at')

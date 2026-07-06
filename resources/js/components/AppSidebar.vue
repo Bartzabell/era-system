@@ -108,6 +108,12 @@ const navGroups: NavGroup[] = [
                 admin: true,
             },
             {
+                title: 'On-Duty Logs',
+                href: '/duty-logs',
+                icon: CalendarRange,
+                admin: true,
+            },
+            {
                 title: 'Other Settings',
                 href: '/system-settings',
                 icon: PhGear,
