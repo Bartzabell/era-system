@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\DutyLog;
+use App\Models\MobileBridgeToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AccountApiController extends Controller
 {
@@ -461,6 +463,20 @@ class AccountApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Password reset successfully'
+        ]);
+    }
+
+    public function generateBridgeToken(Request $request)
+    {
+        $token = MobileBridgeToken::create([
+            'token'      => Str::random(64),
+            'user_id'    => $request->user()->id,
+            'expires_at' => now()->addSeconds(60),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'bridge_token' => $token->token,
         ]);
     }
 }

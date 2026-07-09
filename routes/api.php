@@ -26,6 +26,7 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         Route::put('/users/password', [AccountApiController::class, 'changePassword']);
         Route::post('/users/profile-picture', [AccountApiController::class, 'updateProfilePicture']);
         Route::post('/users/verify-id', [AccountApiController::class, 'submitValidId']);
+        Route::post('/mobile-bridge-token', [AccountApiController::class, 'generateBridgeToken']);
 
         Route::get('/hotlines', [HotlineApiController::class, 'index']);
         Route::post('/responder/update-facility', [IncidentReportApiController::class, 'updateResponderFacility']);

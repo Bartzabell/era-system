@@ -21,6 +21,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LoginSettingController;
 use App\Http\Controllers\PatientRecordChartController;
 use App\Http\Controllers\SettingsController;
+use App\Models\MobileBridgeToken;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', [LoginController::class, 'create'])->name('home');
 //Route::get('/login', [LoginController::class, 'create'])->name('login');
@@ -42,6 +44,26 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
 
     return response('<h2 style="text-align:center; margin-top:50px;">✅ Email Verified! You may now go back to the app.</h2>');
 })->middleware(['signed'])->name('verification.verify');
+
+Route::get('/mobile-login-bridge', function (Illuminate\Http\Request $request) {
+    $tokenValue = $request->query('token');
+
+    if (!$tokenValue) {
+        abort(403, 'Missing token');
+    }
+
+    $bridgeToken = MobileBridgeToken::where('token', $tokenValue)->first();
+
+    if (!$bridgeToken || !$bridgeToken->isValid()) {
+        abort(403, 'Invalid or expired token');
+    }
+
+    $bridgeToken->update(['used_at' => now()]);
+
+    Auth::login($bridgeToken->user);
+
+    return redirect('/patient-record-chart');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
