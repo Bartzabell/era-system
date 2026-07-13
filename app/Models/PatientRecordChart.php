@@ -151,6 +151,17 @@ class PatientRecordChart extends Model
         'temperature'           => 'decimal:1',
     ];
 
+    protected $appends = ['print_signed_url'];
+
+    public function getPrintSignedUrlAttribute()
+    {
+        return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'patient-record-chart.print-signed',
+            now()->addMinutes(5),
+            ['patientRecordChart' => $this->id]
+        );
+    }
+
     // ── Computed ───────────────────────────────────────────────────────────
 
     /** Full name from parts, falling back to patient_name. */

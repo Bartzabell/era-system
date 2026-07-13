@@ -38,6 +38,7 @@ interface PatientRecord {
     incident_report: { id: number; incident_code: string } | null
     creator: { first_name: string; last_name: string } | null
     created_at: string
+    print_signed_url: string
 }
 
 const props = defineProps<{
@@ -180,7 +181,6 @@ const columns = computed(() => [
         header: 'Actions',
         cell: ({ row }: any) => h('div', { class: 'flex flex-col lg:flex-row items-center gap-1.5' }, [
             h('div', { class: 'flex flex-col lg:flex-row items-center gap-3 lg:gap-1.5' }, [
-                // Desktop: inline print/preview
                 ...(!isMobile.value ? [
                     h(Button, {
                         variant: 'default', size: 'icon',
@@ -189,10 +189,9 @@ const columns = computed(() => [
                         title: 'Print / PDF',
                     }, () => h(PhPrinter, { size: 18 })),
                 ] : [
-                    // Mobile: force download
                     h(Button, {
                         variant: 'default', size: 'icon',
-                        onClick: () => window.location.href = `/patient-record-chart/${row.original.id}/print?download=1`,
+                        onClick: () => window.location.href = row.original.print_signed_url,
                         class: 'text-gray-800 bg-green-200 rounded',
                         title: 'Download PDF',
                     }, () => h(PhDownload, { size: 18 })),

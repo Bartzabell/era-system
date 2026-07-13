@@ -22,6 +22,8 @@ use App\Http\Controllers\LoginSettingController;
 use App\Http\Controllers\PatientRecordChartController;
 use App\Http\Controllers\SettingsController;
 use App\Models\MobileBridgeToken;
+use App\Models\PatientRecordChart;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', [LoginController::class, 'create'])->name('home');
@@ -64,6 +66,16 @@ Route::get('/mobile-login-bridge', function (Illuminate\Http\Request $request) {
 
     return redirect('/patient-record-chart');
 });
+
+Route::get('/patient-record-chart/{patientRecordChart}/print-signed', function (PatientRecordChart $patientRecordChart) {
+    $pdf = Pdf::loadView('reports.print', [
+        'record' => $patientRecordChart,
+    ])->setPaper('A4', 'portrait');
+
+    $filename = 'PCR-' . $patientRecordChart->chart_code . '.pdf';
+
+    return $pdf->download($filename);
+})->name('patient-record-chart.print-signed')->middleware('signed');
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
