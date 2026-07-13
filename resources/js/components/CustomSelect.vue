@@ -38,11 +38,11 @@ const updateValue = (event) => {
 
 <template>
   <div>
-    <label class="text-[10px] 2xl:text-base font-medium text-gray-600 rounded-xl">{{ label }}</label>
+    <label class="text-[12px] 2xl:text-base font-medium text-gray-600 rounded-xl">{{ label }}</label>
     <div
       class="flex w-full transition bg-white border border-black rounded-xl focus-within:ring-1 focus-within:ring-orange-900 ring-orange-100">
       <select :name="name" :value="modelValue" @input="updateValue" :readonly="readonly" :disabled="disabled" :class="[
-        'w-full py-1.5 rounded-xl focus-within:ring-1 text-[10px] 2xl:text-lg focus-within:ring-orange-900 ring-orange-100 focus:outline-none pl-2',
+        'w-full py-1.5 rounded-xl focus-within:ring-1 text-[12px] 2xl:text-lg focus-within:ring-orange-900 ring-orange-100 focus:outline-none pl-2',
         { 'bg-gray-100': readonly || disabled }
       ]">
         <option value="" disabled selected hidden>{{ placeholder }}</option>

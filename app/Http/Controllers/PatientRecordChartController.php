@@ -320,7 +320,7 @@ class PatientRecordChartController extends Controller
             ->with('success', 'Patient record deleted successfully.');
     }
 
-    public function print(PatientRecordChart $patientRecordChart)
+    public function print(PatientRecordChart $patientRecordChart, Request $request)
     {
         if (!$this->hasFullAccess() && $patientRecordChart->created_by !== Auth::id()) {
             abort(403, 'Unauthorized.');
@@ -328,11 +328,14 @@ class PatientRecordChartController extends Controller
 
         $pdf = Pdf::loadView('reports.print', [
             'record' => $patientRecordChart,
-        ])
-        ->setPaper('A4', 'portrait');
+        ])->setPaper('A4', 'portrait');
 
         $filename = 'PCR-' . $patientRecordChart->chart_code . '.pdf';
 
-        return $pdf->stream($filename);   // stream() opens in browser; download() forces download
+        if ($request->boolean('download')) {
+            return $pdf->download($filename);
+        }
+
+        return $pdf->stream($filename);
     }
 }

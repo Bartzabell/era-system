@@ -227,32 +227,32 @@ const displayText = computed(() => {
                     'opacity-100 cursor-not-allowed': readonly || disabled,
                     'border-gray-800 bg-gray-50': readonly || disabled
                 }">
-                <div class="flex items-center text-[10px] 2xl:text-lg gap-2 overflow-hidden">
+                <div class="flex items-center text-[12px] 2xl:text-lg gap-2 overflow-hidden">
                     <template v-if="!multiple">
                         <span :class="[
-                            'truncate text-[10px] 2xl:text-lg',
+                            'truncate text-[12px] 2xl:text-lg',
                             (!selectedItem && !multiple) || (multiple && selectedItems.length === 0) ? 'text-gray-400 italic opacity-90' : 'text-black',
                             (readonly || disabled) ? 'text-amber-500 font-black' : ''
                         ]">
                             {{ displayText || '- ' }}
                         </span>
                         <button v-if="!readonly && !disabled" type="button"
-                            class="ml-1 hover:bg-gray-200 text-[10px] 2xl:text-lg rounded-full p-0.5"
+                            class="ml-1 hover:bg-gray-200 text-[12px] 2xl:text-lg rounded-full p-0.5"
                             @click.stop="removeItem(item)">
                             <X class="w-3 h-3" />
                         </button>
                     </template>
                     <template v-if="multiple && selectedItems.length > 0">
                         <div v-for="item in selectedItems.slice(0, 5)" :key="item.id"
-                            class="flex items-center px-1 text-[10px] 2xl:text-sm bg-gray-100 rounded-sm">
+                            class="flex items-center px-1 text-[12px] 2xl:text-sm bg-gray-100 rounded-sm">
                             {{ item[labelField] }} {{ formatDateTime(item[descriptionField]) }}
                             <button v-if="!readonly && !disabled" type="button"
-                                class="ml-1 hover:bg-gray-200 text-[10px] 2xl:text-lg rounded-full p-0.5"
+                                class="ml-1 hover:bg-gray-200 text-[12px] 2xl:text-lg rounded-full p-0.5"
                                 @click.stop="removeItem(item)">
                                 <X class="w-3 h-3" />
                             </button>
                         </div>
-                        <span v-if="selectedItems.length > 2" class="text-[10px] 2xl:text-sm text-gray-500">
+                        <span v-if="selectedItems.length > 2" class="text-[12px] 2xl:text-sm text-gray-500">
                             +{{ selectedItems.length - 2 }}
                         </span>
                     </template>
@@ -270,8 +270,8 @@ const displayText = computed(() => {
                         <CommandItem class="font-medium" v-for="item in filteredItems" :key="item.id" :value="item"
                             @select="() => selectItem(item)">
 
-                            <div class="flex text-[10px] 2xl:text-base flex-col">
-                                {{ item[labelField] }}<br><span class="text-[10px] 2xl:text-sm opacity-70">
+                            <div class="flex text-[12px] 2xl:text-base flex-col">
+                                {{ item[labelField] }}<br><span class="text-[12px] 2xl:text-sm opacity-70">
                                     {{ item[nameDescriptionField] }}<template v-if="item[descriptionField]"> : {{
                                         formatDateTime(item[descriptionField]) }}</template>
                                     <template v-if="item[secondDescriptionField]"> ( {{

@@ -117,8 +117,8 @@ const table = useVueTable({
     <!-- Global Search -->
     <div class="flex flex-col gap-1 pt-1 sm:flex-row sm:items-end sm:justify-end">
       <div v-if="showPerPage" class="flex items-center gap-2">
-        <div class=" text-sm">Per page:</div>
-        <CustomSelect label="" name="per_page" v-model="perPage" :options="perPageOptions" class="w-max" />
+        <div class="text-base lg:text-sm">Page:</div>
+        <CustomSelect label="" name="per_page" v-model="perPage" :options="perPageOptions" class="w-full lg:w-max" />
       </div>
       <div v-if="showSearch" class="flex items-center pt-4">
         <PhMagnifyingGlass class="relative text-gray-400 transform -translate-y-1/2 left-8 top-3" :size="24" />
@@ -169,10 +169,10 @@ const table = useVueTable({
               <span v-html="page.label"></span>
             </Button>
             <Link v-else-if="page.url" :href="page.url" method="get" preserve-state class="inline-block">
-            <Button size="sm" :class="'text-black bg-gray-200 border border-black text-sm hover:!bg-sky-600/50'">
+              <Button size="sm" :class="'text-black bg-gray-200 border border-black text-sm hover:!bg-sky-600/50'">
 
-              <span v-html="page.label"></span>
-            </Button>
+                <span v-html="page.label"></span>
+              </Button>
             </Link>
             <Button v-else size="sm"
               :class="'opacity-50 bg-white border border-black hover:!bg-sky-600/80 text-black text-sm'">

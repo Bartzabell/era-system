@@ -6,7 +6,7 @@ import DataTable from '@/components/Datatable.vue'
 import Modal from '@/components/Modal.vue'
 import FormModal from './Partials/FormModal.vue'
 import { Button } from '@/components/ui/button'
-import { PhPencil, PhTrash, PhPlus, PhPrinter } from '@phosphor-icons/vue'
+import { PhPencil, PhTrash, PhPlus, PhPrinter, PhDownload } from '@phosphor-icons/vue'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -175,6 +175,45 @@ const formatDate = (val: string) => val
 // ── Columns ────────────────────────────────────────────────────────────────
 
 const columns = computed(() => [
+    {
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }: any) => h('div', { class: 'flex flex-col lg:flex-row items-center gap-1.5' }, [
+            h('div', { class: 'flex flex-col lg:flex-row items-center gap-3 lg:gap-1.5' }, [
+                // Desktop: inline print/preview
+                ...(!isMobile.value ? [
+                    h(Button, {
+                        variant: 'default', size: 'icon',
+                        onClick: () => window.location.href = `/patient-record-chart/${row.original.id}/print`,
+                        class: 'text-gray-800 bg-green-200 rounded',
+                        title: 'Print / PDF',
+                    }, () => h(PhPrinter, { size: 18 })),
+                ] : [
+                    // Mobile: force download
+                    h(Button, {
+                        variant: 'default', size: 'icon',
+                        onClick: () => window.location.href = `/patient-record-chart/${row.original.id}/print?download=1`,
+                        class: 'text-gray-800 bg-green-200 rounded',
+                        title: 'Download PDF',
+                    }, () => h(PhDownload, { size: 18 })),
+                ]),
+
+                h(Button, {
+                    variant: 'default', size: 'icon',
+                    onClick: () => openEditModal(row.original),
+                    class: 'text-gray-800 bg-blue-200 rounded',
+                }, () => h(PhPencil, { size: 18 })),
+
+                ...(props.hasFullAccess ? [
+                    h(Button, {
+                        variant: 'default', size: 'icon',
+                        onClick: () => openDeleteModal(row.original),
+                        class: 'text-gray-800 bg-red-200 rounded',
+                    }, () => h(PhTrash, { size: 18 })),
+                ] : []),
+            ]),
+        ]),
+    },
     { accessorKey: 'chart_code', header: 'Chart Code' },
     { accessorKey: 'patient_name', header: 'Patient' },
     {
@@ -236,34 +275,6 @@ const columns = computed(() => [
         header: 'Created',
         cell: ({ row }: any) => formatDate(row.original.created_at),
     },
-    {
-        id: 'actions',
-        header: '',
-        cell: ({ row }: any) => h('div', { class: 'flex items-center gap-1.5' }, [
-            h('div', { class: 'flex items-center gap-1.5' }, [
-                h(Button, {
-                    variant: 'ghost', size: 'icon',
-                    onClick: () => window.open(`/patient-record-chart/${row.original.id}/print`, '_blank'),
-                    class: 'h-7 w-7 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded',
-                    title: 'Print / PDF',
-                }, () => h(PhPrinter, { size: 15 })),
-
-                h(Button, {
-                    variant: 'ghost', size: 'icon',
-                    onClick: () => openEditModal(row.original),
-                    class: 'h-7 w-7 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded',
-                }, () => h(PhPencil, { size: 15 })),
-
-                ...(props.hasFullAccess ? [
-                    h(Button, {
-                        variant: 'ghost', size: 'icon',
-                        onClick: () => openDeleteModal(row.original),
-                        class: 'h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded',
-                    }, () => h(PhTrash, { size: 15 })),
-                ] : []),
-            ]),
-        ]),
-    },
 ])
 
 const activeColor = computed(() => tabColors[activeTab.value].border)
@@ -310,15 +321,15 @@ const activeBg = computed(() => tabColors[activeTab.value].bg)
                 </div>
 
                 <!-- Triage tabs -->
-                <div class="flex w-[90vw] overflow-x-auto gap-0.5">
+                <div class="flex flex-col lg:flex-row w-[90vw] overflow-x-auto gap-0.5">
                     <button v-for="tab in tabs" :key="tab.key" @click="switchTab(tab.key)" :style="activeTab === tab.key
                         ? { borderColor: tabColors[tab.key].border, borderBottomColor: 'white' }
                         : {}" :class="[
-                            'flex items-center gap-1.5 px-3.5 py-1.5 text-base font-medium',
-                            'rounded-t-md border-2 border-b-0 transition-all select-none',
+                            'flex items-center gap-1.5 px-1.5 lg:px-3.5 py-1.5 text-base font-medium',
+                            'border-2 transition-all select-none',
                             activeTab === tab.key
-                                ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 z-10'
-                                : 'bg-gray-50 dark:bg-gray-800 border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                                ? 'bg-white rounded-t-md dark:bg-gray-900 text-gray-900 dark:text-gray-100 z-10'
+                                : 'bg-gray-100 rounded-none border-gray-400 dark:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                         ]">
                         <span class="w-1.5 h-1.5 rounded-full flex-shrink-0"
                             :style="{ background: tabColors[tab.key].dot }" />
