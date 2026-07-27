@@ -46,16 +46,17 @@ const props = defineProps<{
 const breadcrumbs = [{ title: 'Dashboard', href: '/dashboard' }, { title: 'Dispatch', href: '/dispatch' }]
 
 // ── Status ─────────────────────────────────────────────────────────────────
-type StatusKey = 'waiting' | 'assigned' | 'arriving' | 'resolved' | 'cancelled'
+type StatusKey = 'verifying' | 'waiting' | 'assigned' | 'arriving' | 'resolved' | 'cancelled'
 
 const statusMeta: Record<StatusKey, { label: string; dot: string; idleBadge: string; activeBadge: string }> = {
+    verifying: { label: 'Verifying', dot: 'bg-teal-400', idleBadge: 'bg-white text-teal-600 border border-teal-300 hover:bg-teal-50', activeBadge: 'bg-teal-500 text-white border border-teal-500' },
     waiting:   { label: 'Waiting',   dot: 'bg-yellow-400', idleBadge: 'bg-white text-yellow-600 border border-yellow-300 hover:bg-yellow-50',  activeBadge: 'bg-yellow-500 text-white border border-yellow-500'  },
     assigned:  { label: 'Assigned',  dot: 'bg-blue-500',   idleBadge: 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50',        activeBadge: 'bg-blue-500 text-white border border-blue-500'      },
     arriving:  { label: 'Arriving',  dot: 'bg-purple-500', idleBadge: 'bg-white text-purple-600 border border-purple-300 hover:bg-purple-50',  activeBadge: 'bg-purple-500 text-white border border-purple-500'  },
     resolved:  { label: 'Resolved',  dot: 'bg-green-500',  idleBadge: 'bg-white text-green-600 border border-green-300 hover:bg-green-50',     activeBadge: 'bg-green-500 text-white border border-green-500'    },
     cancelled: { label: 'Cancelled', dot: 'bg-gray-400',   idleBadge: 'bg-white text-gray-500 border border-gray-300 hover:bg-gray-50',        activeBadge: 'bg-gray-500 text-white border border-gray-500'      },
 }
-const statusFlow: StatusKey[] = ['waiting', 'assigned', 'arriving', 'resolved', 'cancelled']
+const statusFlow: StatusKey[] = ['verifying', 'waiting', 'assigned', 'arriving', 'resolved', 'cancelled']
 const getStatusMeta = (s: string) => statusMeta[s as StatusKey] ?? statusMeta.waiting
 
 const activeFilter   = ref<StatusKey | null>(null)
@@ -460,7 +461,7 @@ const minutesAgo = (val: string | null) => {
                                     </div>
                                     <p v-else class="text-sm text-gray-400 italic">No responders assigned yet.</p>
 
-                                    <template v-if="selectedReport.status === 'waiting'">
+                                    <template v-if="['verifying', 'waiting'].includes(selectedReport.status)">
                                         <div class="border-t border-gray-100 dark:border-gray-700 pt-3 space-y-2">
                                             <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Assign Team</p>
 
@@ -492,7 +493,7 @@ const minutesAgo = (val: string | null) => {
                         </div>
 
                         <!-- Status buttons -->
-                        <div v-if="hasFullAccess && ['arriving','assigned','waiting'].includes(selectedReport.status)"
+                        <div v-if="hasFullAccess && ['verifying','arriving','assigned','waiting'].includes(selectedReport.status)"
                             class="px-5 pb-4 pt-1 border-t border-gray-100 dark:border-gray-700">
                             <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2.5 mt-3">Update Status</p>
                             <div class="flex gap-1.5">
