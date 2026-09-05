@@ -24,7 +24,11 @@ class DashboardController extends Controller
         //     ->whereNull('deleted_at')
         //     ->count();
 
-        $activeResponders = DutyLog::whereDate('duty_date', Carbon::today())->count();
+        $activeResponders = Responder::where('is_active', true)
+            ->whereHas('user.dutyLogs', function ($q) {
+                $q->whereNull('checked_out_at');
+            })
+            ->count();
 
         $avgResponseTime = IncidentReport::whereNotNull('datetime_arrived')
             ->whereNull('deleted_at')

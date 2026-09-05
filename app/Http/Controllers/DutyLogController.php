@@ -18,13 +18,12 @@ class DutyLogController extends Controller
         $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
         $endDate   = $startDate->copy()->endOfMonth();
 
-        $sessions = DutyLog::with('user:id,full_name')
+        // Every session that could be "the latest known session" for any day this month
+        $sessionsByUser = DutyLog::with('user:id,full_name')
             ->where('checked_in_at', '<=', $endDate)
-            ->where(function ($q) use ($startDate) {
-                $q->whereNull('checked_out_at')
-                ->orWhere('checked_out_at', '>=', $startDate);
-            })
-            ->get();
+            ->orderBy('checked_in_at')
+            ->get()
+            ->groupBy('user_id');
 
         $activeResponders = Responder::with('user:id,full_name')
             ->where('is_active', true)
@@ -34,23 +33,37 @@ class DutyLogController extends Controller
         $offDutyLogs = [];
 
         for ($day = $startDate->copy(); $day->lte($endDate); $day->addDay()) {
-            $dateKey  = $day->format('Y-m-d');
-            $dayStart = $day->copy()->startOfDay();
-            $dayEnd   = $day->copy()->endOfDay();
+            $dateKey = $day->format('Y-m-d');
+            $dayEnd  = $day->copy()->endOfDay();
 
-            $onDuty = $sessions->filter(fn ($s) =>
-                $s->checked_in_at <= $dayEnd
-                && (is_null($s->checked_out_at) || $s->checked_out_at >= $dayStart)
-            );
+            $onDutyThisDay = collect();
 
-            $onDutyUserIds = $onDuty->pluck('user_id')->unique()->all();
+            foreach ($activeResponders as $responder) {
+                $userSessions = $sessionsByUser->get($responder->user_id, collect());
 
-            if ($onDuty->isNotEmpty()) {
-                $dutyLogs[$dateKey] = $onDuty->map(fn ($s) => [
+                // The most recent session that had already started by the end of this day
+                $latest = $userSessions->filter(fn ($s) => $s->checked_in_at <= $dayEnd)->last();
+
+                if (!$latest) {
+                    continue; // hadn't checked in yet as of this day
+                }
+
+                // Still open as of this day if never checked out, or checked out AFTER this day ended
+                $isOpen = is_null($latest->checked_out_at) || $latest->checked_out_at->gt($dayEnd);
+
+                if ($isOpen) {
+                    $onDutyThisDay->push($latest);
+                }
+            }
+
+            if ($onDutyThisDay->isNotEmpty()) {
+                $dutyLogs[$dateKey] = $onDutyThisDay->map(fn ($s) => [
                     'name' => $s->user?->full_name ?? 'Unknown',
                     'time' => $s->checked_in_at->format('M d, Y | h:i A'),
                 ])->values();
             }
+
+            $onDutyUserIds = $onDutyThisDay->pluck('user_id')->all();
 
             $offDuty = $activeResponders
                 ->reject(fn ($r) => in_array($r->user_id, $onDutyUserIds))
