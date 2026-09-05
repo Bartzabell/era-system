@@ -114,10 +114,17 @@ class AccountApiController extends Controller
         }
 
         if ($user->role === 'responder') {
-            DutyLog::firstOrCreate(
-                ['user_id' => $user->id, 'duty_date' => today()],
-                ['checked_in_at' => now()]
-            );
+            $alreadyOpen = DutyLog::where('user_id', $user->id)
+                ->whereNull('checked_out_at')
+                ->exists();
+
+            if (!$alreadyOpen) {
+                DutyLog::create([
+                    'user_id'       => $user->id,
+                    'duty_date'     => today(),
+                    'checked_in_at' => now(),
+                ]);
+            }
         }
 
         $user->tokens()->delete();
@@ -478,5 +485,22 @@ class AccountApiController extends Controller
             'success' => true,
             'bridge_token' => $token->token,
         ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role === 'responder') {
+            DutyLog::where('user_id', $user->id)
+                ->whereNull('checked_out_at')
+                ->latest('checked_in_at')
+                ->first()
+                ?->update(['checked_out_at' => now()]);
+        }
+
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['success' => true, 'message' => 'Logged out successfully']);
     }
 }

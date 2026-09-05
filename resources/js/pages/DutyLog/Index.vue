@@ -13,6 +13,7 @@ interface DutyEntry {
 
 const props = defineProps<{
     dutyLogs: Record<string, DutyEntry[]>
+    offDutyLogs: Record<string, { name: string }[]>
     month: number
     year: number
 }>()
@@ -106,6 +107,11 @@ const selectedEntries = computed(() => {
     return props.dutyLogs[selectedDateKey.value] ?? []
 })
 
+const selectedOffDutyEntries = computed(() => {
+    if (!selectedDateKey.value) return []
+    return props.offDutyLogs[selectedDateKey.value] ?? []
+})
+
 const openDayModal = (dateKey: string | null) => {
     if (!dateKey) return
     selectedDateKey.value = dateKey
@@ -185,7 +191,7 @@ const weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
         <!-- Day Detail Modal -->
         <Modal :show="showModal" @close="closeModal">
-            <div class="p-6 max-w-3xl w-full">
+            <div class="p-6 w-[50vw]">
                 <h2 class="text-xl font-bold text-gray-900 mb-1">Responders on Duty</h2>
                 <p class="text-base text-gray-500 mb-4">{{ selectedDateKey }}</p>
 
@@ -198,6 +204,17 @@ const weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
                         class="flex items-center gap-5 justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
                         <span class="font-semibold text-gray-800">{{ entry.name }}</span>
                         <span class="text-sm text-gray-500">{{ entry.time }}</span>
+                    </div>
+                </div>
+
+                <h3 class="text-base font-bold text-gray-700 mt-6 mb-2">Not On Duty</h3>
+                <div v-if="selectedOffDutyEntries.length === 0" class="py-4 text-center text-gray-400 text-sm">
+                    Everyone was on duty this day.
+                </div>
+                <div v-else class="space-y-2 max-h-60 overflow-y-auto">
+                    <div v-for="(entry, idx) in selectedOffDutyEntries" :key="idx"
+                        class="flex items-center p-3 rounded-lg bg-gray-50 border border-gray-100">
+                        <span class="font-semibold text-gray-800">{{ entry.name }}</span>
                     </div>
                 </div>
 

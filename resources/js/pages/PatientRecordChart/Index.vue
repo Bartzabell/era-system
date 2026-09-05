@@ -52,7 +52,7 @@ const props = defineProps<{
 
 const breadcrumbs = [
     { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Patient Record Charts', href: '/patient-record-chart' },
+    { title: 'Patient Chart Records', href: '/patient-record-chart' },
 ]
 
 const isMobile = ref(false)
@@ -282,7 +282,7 @@ const activeBg = computed(() => tabColors[activeTab.value].bg)
 
 <template>
 
-    <Head title="Patient Record Charts" />
+    <Head title="Patient Chart Records" />
     <component :is="isMobile ? 'div' : AppLayout" v-bind="isMobile ? {} : { breadcrumbs }">
 
         <!-- Form modal -->
@@ -297,9 +297,9 @@ const activeBg = computed(() => tabColors[activeTab.value].bg)
                 <div
                     class="flex flex-col lg:flex-row items-start justify-normal gap-5 lg:gap-0 lg:items-center lg:justify-between mb-7">
                     <div>
-                        <h1 class="text-xl font-medium text-gray-900 dark:text-gray-100">Patient Record Charts
+                        <h1 class="text-xl font-medium text-gray-900 dark:text-gray-100">Patient Chart Records
                         </h1>
-                        <p class="hidden lg:block text-sm text-gray-400 mt-0.5">Homepage / Patient Record Charts</p>
+                        <p class="hidden lg:block text-sm text-gray-400 mt-0.5">Homepage / Patient Chart Records</p>
                     </div>
                     <button @click="openCreateModal" class="inline-flex w-full lg:w-max justify-center items-center gap-1.5 bg-gray-900 hover:bg-gray-700
                             dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white

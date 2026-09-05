@@ -52,5 +52,7 @@ Route::middleware(['throttle:60,1', 'mobile.token'])->group(function () {
         // Announcements
         Route::get('/announcements', [AnnouncementApiController::class, 'index']);
         Route::post('/announcements/{id}/mark-as-read', [AnnouncementApiController::class, 'markAsRead']);
+
+        Route::post('/auth/logout', [AccountApiController::class, 'logout']);
     });
 });

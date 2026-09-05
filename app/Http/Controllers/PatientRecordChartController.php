@@ -267,8 +267,8 @@ class PatientRecordChartController extends Controller
 
             $record = PatientRecordChart::create($data);
 
-            // Auto-generate chart code: PRC-{YEAR}-{PADDED_ID}
-            $record->chart_code = 'PRC-' . now()->year . '-' . str_pad($record->id, 4, '0', STR_PAD_LEFT);
+            // Auto-generate chart code: PCR-{YEAR}-{PADDED_ID}
+            $record->chart_code = 'PCR-' . now()->year . '-' . str_pad($record->id, 4, '0', STR_PAD_LEFT);
             $record->save();
         });
 
